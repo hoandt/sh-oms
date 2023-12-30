@@ -5,3 +5,6 @@ tsconfig.tsbuildinfo
 /test-results/
 /playwright-report/
 /playwright/.cache/
+# ignore .env files as they are usually used to store sensitive information
+# which should not be committed
+.env*
