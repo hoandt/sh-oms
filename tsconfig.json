@@ -1,6 +1,9 @@
 {
   "extends": "eslint-config-molindo/tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "target": "es5",
     "lib": [
       "dom",
