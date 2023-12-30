@@ -19,6 +19,7 @@ const auth: AuthOptions = {
           }),
         });
         const user = await res.json();
+
         if (user.user) {
           const res = { ...user.user, jwt: user.jwt };
 
@@ -52,12 +53,6 @@ const auth: AuthOptions = {
           jwt: u.jwt,
           userWithRole: {
             ...userWithRole,
-            warehouses: userWithRole.warehouses.map(
-              ({ id }: { id: number }) => id
-            ),
-            reservations: userWithRole.reservations.map(
-              ({ id }: { id: number }) => id
-            ),
           },
         };
       }

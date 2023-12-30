@@ -34,7 +34,4 @@ type UserWithRole = {
     createdAt: string;
     updatedAt: string;
   };
-  warehouses: number[];
-  reservations: number[];
-  organization: Organization;
 };
