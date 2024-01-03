@@ -31,13 +31,13 @@ export default function LocaleLayout({ children, params: { locale } }: Props) {
   const messages = useMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className="h-full scroll-smooth">
       <head>
         <title>next-intl & next-auth</title>
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          " flex h-full flex-col bg-background font-sans antialiased bg-blue-50",
           fontSans.variable
         )}
       >

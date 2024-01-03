@@ -1,7 +1,7 @@
 "use client";
 
+import PageLayout from "@/components/PageLayout";
 import { useTranslations } from "next-intl";
-import PageLayout from "../../../components/PageLayout";
 
 export default function Secret() {
   const t = useTranslations("Secret");

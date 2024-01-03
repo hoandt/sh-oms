@@ -1,18 +1,19 @@
-import {NextRequest} from 'next/server';
-import {withAuth} from 'next-auth/middleware';
-import createIntlMiddleware from 'next-intl/middleware';
-import {locales} from './navigation';
+import { NextRequest } from "next/server";
+import { withAuth } from "next-auth/middleware";
+import createIntlMiddleware from "next-intl/middleware";
+import { locales } from "./navigation";
 
 const publicPages = [
-  '/',
-  '/login'
+  "/",
+  "/login",
+  "/register",
   // (/secret requires auth)
 ];
 
 const intlMiddleware = createIntlMiddleware({
   locales,
-  localePrefix: 'as-needed',
-  defaultLocale: 'en'
+  localePrefix: "as-needed",
+  defaultLocale: "en",
 });
 
 const authMiddleware = withAuth(
@@ -22,20 +23,20 @@ const authMiddleware = withAuth(
   (req) => intlMiddleware(req),
   {
     callbacks: {
-      authorized: ({token}) => token != null
+      authorized: ({ token }) => token != null,
     },
     pages: {
-      signIn: '/login'
-    }
+      signIn: "/login",
+    },
   }
 );
 
 export default function middleware(req: NextRequest) {
   const publicPathnameRegex = RegExp(
-    `^(/(${locales.join('|')}))?(${publicPages
-      .flatMap((p) => (p === '/' ? ['', '/'] : p))
-      .join('|')})/?$`,
-    'i'
+    `^(/(${locales.join("|")}))?(${publicPages
+      .flatMap((p) => (p === "/" ? ["", "/"] : p))
+      .join("|")})/?$`,
+    "i"
   );
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
 
@@ -48,5 +49,5 @@ export default function middleware(req: NextRequest) {
 
 export const config = {
   // Skip all paths that should not be internationalized
-  matcher: ['/((?!api|_next|.*\\..*).*)']
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };
