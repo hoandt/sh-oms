@@ -1,5 +1,6 @@
 import { postInbound, updateInbound } from "@/app/api/services/inbounds";
 import { getInventory, postInventory, updateInventory } from "@/app/api/services/inventories";
+import { postTransaction } from "@/app/api/services/transactions";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
@@ -36,7 +37,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         });
 
         if (inventories?.data.length === 0) {
-          postInventory({
+          const newInventory = await postInventory({
             inventory: {
               system_item_master: id,
               availableQty: item.qty,
@@ -47,6 +48,15 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               organization: inbound.organization.id
             }
           });
+
+          postTransaction({
+            transaction: {
+              system_inventory: newInventory?.data.data.id,
+              type: "inbound",
+              ref: inbound.code,
+              qty: item.qty
+            }
+          });
         } else {
             updateInventory({
                 id: inventories.data[0].id,
@@ -54,8 +64,17 @@ export async function PUT(req: NextRequest, res: NextResponse) {
                     availableQty: inventories.data[0].attributes.availableQty + item.qty,
                 }
             });
-        }
 
+            postTransaction({
+              transaction: {
+                system_inventory: inventories.data[0].id,
+                type: "inbound",
+                ref: inbound.code,
+                qty: item.qty
+              }
+            });
+        }
+      
         updateInbound({
           id: inbound.id,
           inbound: {

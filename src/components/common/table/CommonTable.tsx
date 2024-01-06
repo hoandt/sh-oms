@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "./CommonPagination";
 import { CommonNewToolbar, Row as RowToolbar,TypeDropdown } from "./CommonNewToolbar";
+import { Loader2Icon } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   isLoading: boolean;
@@ -108,7 +109,9 @@ export function CommonTable<TData, TValue>({
 
   const renderTable = () => {
     if (isLoading) {
-      return;
+      return <div className="flex items-center justify-center">
+        <Loader2Icon strokeWidth={1} className="animate-spin" width={52} height={52} />
+      </div> 
     }
     return (
       <Table>

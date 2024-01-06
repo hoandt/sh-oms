@@ -3,7 +3,7 @@ import axios from "axios";
 import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 
-const SUB_DOMAIN = "/api/system-transaction";
+const SUB_DOMAIN = "/api/system-transactions";
 
 export const getTransaction = async ({ options}: {  options: QueryOptions }) => {
   try {

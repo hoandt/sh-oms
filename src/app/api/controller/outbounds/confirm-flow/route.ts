@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
                     documents: {}
                   }
                 });
-                return;
+                return NextResponse.json({ message: "Successfully" }, { status: 200 });
               } else {
                 if (qtyOrder > availableQty) {
                   updateOutbound({
@@ -58,8 +58,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
                       documents: {}
                     }
                   });
-                  return;
-                }
+                  return NextResponse.json({ message: "Successfully" }, { status: 200 });                }
               }
     
               if (inventories?.data.length) {

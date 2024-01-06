@@ -18,6 +18,7 @@ import { Information } from "./components/Information";
 import {AlertDialog, AlertDialogTrigger, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
 
 const optionsTabs = [
   {
@@ -127,7 +128,7 @@ export default function Inbounds() {
       {
         accessorKey: "status",
         header: () => <div className="">{"Trạng thái"}</div>,
-        cell: ({ row }) => <div>{row.getValue("status")}</div>,
+        cell: ({ row }) => <Badge>{row.getValue("status")}</Badge>,
         enableSorting: false,
         enableHiding: false
       },
@@ -213,7 +214,7 @@ export default function Inbounds() {
                         <AlertDialogAction onClick={()=> {
                               mutationDelete.mutateAsync(row.original.id);
                         }}>
-                          {mutationDelete.isPending &&  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> }
+                          {mutationDelete.isPending &&  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
                           Confirm
                         </AlertDialogAction>
                     </AlertDialogFooter> 

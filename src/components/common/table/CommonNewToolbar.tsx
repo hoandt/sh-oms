@@ -2,7 +2,7 @@
 
 import { RowSelectionState } from "@tanstack/react-table";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -54,29 +54,31 @@ export function CommonNewToolbar<TData>({
   const searchParams = useSearchParams();
   const isShowSubComponent = Object.keys(rowSelection).length;
   const originalRows = [{ label: "Bulk Delete", value: "DELETE" }] as Array<Row>;
+  const inputRef = useRef<any>(null)
 
-  function handleChangeInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = e.target.value;
+  function onSearch(){
+    const val = inputRef.current?.value;
     const params = new URLSearchParams(searchParams);
     if (val) {
       params.set("q", val);
     } else {
       params.delete("q");
     }
-
     replace(`${pathname}?${params.toString()}`);
   }
 
   return (
     <div className="flex flex-row justify-between gap-2 p-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <Input
+          ref={inputRef}
           key={searchParams?.get("q")}
           className="h-8 w-[150px] lg:w-[250px]"
           defaultValue={searchParams.get("q")?.toString()}
-          onChange={handleChangeInput}
           placeholder="Searching..."
         />
+
+        <Button className="h-8" onClick={onSearch}>Tìm kiếm</Button>
       </div>
 
       <div className="flex flex-row gap-2">
