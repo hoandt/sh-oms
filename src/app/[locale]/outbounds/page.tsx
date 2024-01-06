@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import React, {  useMemo} from "react";
 import { ColumnDef, PaginationState, Row } from "@tanstack/react-table";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CheckIcon, Loader2Icon, Trash, Truck } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, ChevronRightIcon, Loader2Icon, Trash, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { PAGE_SIZE_TABLE } from "@/lib/helpers";
@@ -95,7 +95,7 @@ export default function Inbounds() {
                 style: { cursor: 'pointer' },
               }}
             >
-              {row.getIsExpanded() ? '👇' : '👉'}
+               {row.getIsExpanded() ? <ChevronDownIcon /> : <ChevronRightIcon />}
             </button>
           ) : (
             '🔵'

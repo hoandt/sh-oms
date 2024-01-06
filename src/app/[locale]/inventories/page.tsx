@@ -10,6 +10,7 @@ import { useGetInventories } from "@/query-keys";
 import Image from "next/image";
 import { defaultImage } from "@/lib/constants";
 import Transactions from "./components/TransactionSubTable";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 export default function Inventory() {
   const searchParams = useSearchParams();
@@ -44,7 +45,7 @@ export default function Inventory() {
                 style: { cursor: 'pointer' },
               }}
             >
-              {row.getIsExpanded() ? '👇' : '👉'}
+              {row.getIsExpanded() ? <ChevronDownIcon /> : <ChevronRightIcon />}
             </button>
           ) : (
             '🔵'
