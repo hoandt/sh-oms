@@ -61,6 +61,11 @@ export default function Inbounds() {
       return deleteOutbound({ id });
     },
     onSuccess: () => {
+      toast({
+        duration: DURATION_TOAST,
+        title: "Scheduled: Catch up",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+      });
       refetch();
     }
   });

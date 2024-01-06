@@ -106,7 +106,7 @@ export const deleteOutbound = async ({ id }: any) => {
 
 
 export const updateFlowOutbound = async ({ outbounds }: any) => {
-  const endpoint = `/api/controller/outbounds/confirm-flow`;
+  const endpoint = `/api/controller/outbounds/confirm-outbound-flow`;
 
   const body = {
     payload: {

@@ -1,13 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import {  updateOutbound } from "@/app/api/services/outbounds";
 import { getInventory, updateInventory } from "@/app/api/services/inventories";
-import { SystemInventory } from "@/types/todo";
 import { sortArrayByExp } from "@/lib/helpers";
+import { postTransaction } from "@/app/api/services/transactions";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
     try {
-        const token = true;
-        if (token) {
           const responseData = await req.json();
           const outbounds = responseData.payload.outbounds;
     
@@ -86,6 +84,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
                 let qtyInventoryManual = order.qty;
                 for (const inventory of inventories?.data) {
                   let inventoryPayload = {};
+                  
                   if (!inventory.attributes.availableQty) {
                     continue;
                   }
@@ -126,6 +125,15 @@ export async function PUT(req: NextRequest, res: NextResponse) {
                     id: inventory.id,
                     inventory: inventoryPayload
                   });
+
+                  postTransaction({
+                    transaction: {
+                      system_inventory: order.system_item_master.data.id,
+                      type: "outbound",
+                      ref: order.code,
+                      qty: order.qty
+                    }
+                  });
                 }
               }
             }
@@ -148,9 +156,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           }
           
           return NextResponse.json({ message: "Successfully" }, { status: 200 });
-        } else {
-          return NextResponse.json({ message: "Internal Error" }, { status: 400 });
-        }
       } catch (error) {
         return NextResponse.json({ error: error }, { status: 500 });
       }
@@ -179,7 +184,7 @@ function updateProperties(data: any, newObj: any) {
     };
   }
   
-  function timer(ms: number) {
+function timer(ms: number) {
     return new Promise((res) => setTimeout(res, ms));
   }
   
