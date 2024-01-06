@@ -5,7 +5,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { Logo } from "@/components/Logo";
-import { SlimLayout } from "@/components/SlimLayout";
+import { SlimLayout } from "@/components/common/layout/CommonLayout";
 import { type Metadata } from "next";
 
 // export const metadata: Metadata = {

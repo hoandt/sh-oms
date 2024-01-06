@@ -1,4 +1,4 @@
-import { SlimLayout } from "@/components/SlimLayout";
+import { SlimLayout } from "@/components/common/layout/CommonLayout";
 import React from "react";
 
 const loading = () => {

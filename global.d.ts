@@ -35,3 +35,18 @@ type UserWithRole = {
     updatedAt: string;
   };
 };
+
+type BackendDataResponse = {
+  data: {
+    id: number;
+    attributes: { [key: string]: string | number | boolean | null };
+  } | null;
+  error?: BackendErrorResponse;
+  meta: {};
+};
+
+type standardizeBackendResponse = {
+  success: boolean;
+  data: any;
+  meta: any;
+};

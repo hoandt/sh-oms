@@ -6,6 +6,9 @@ import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import { Be_Vietnam_Pro as FontSans } from "next/font/google";
 import { cn } from "../../lib/utils";
+import { CommonLayout } from "@/components/common/layout/CommonLayout";
+import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 export const fontSans = FontSans({
   subsets: ["vietnamese"],
@@ -32,17 +35,19 @@ export default function LocaleLayout({ children, params: { locale } }: Props) {
 
   return (
     <html lang={locale} className="h-full scroll-smooth">
-      <head>
-        <title>next-intl & next-auth</title>
-      </head>
       <body
         className={cn(
-          " flex h-full flex-col bg-background font-sans antialiased bg-blue-50",
+          "flex h-full flex-col bg-background font-sans antialiased bg-blue-50",
           fontSans.variable
         )}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <ReactQueryProvider>
+            <CommonLayout>
+                {children}
+                <Toaster />
+            </CommonLayout>
+          </ReactQueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
