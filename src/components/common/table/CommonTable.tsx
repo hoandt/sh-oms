@@ -1,6 +1,19 @@
 "use client";
 
-import * as React from "react";
+import {
+  CommonNewToolbar,
+  Row as RowToolbar,
+  TypeDropdown,
+} from "./CommonNewToolbar";
+import { DataTablePagination } from "./CommonPagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -19,18 +32,8 @@ import {
   useReactTable,
   Row,
 } from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
-import { DataTablePagination } from "./CommonPagination";
-import { CommonNewToolbar, Row as RowToolbar,TypeDropdown } from "./CommonNewToolbar";
 import { Loader2Icon } from "lucide-react";
+import * as React from "react";
 
 interface DataTableProps<TData, TValue> {
   isLoading: boolean;
@@ -45,7 +48,7 @@ interface DataTableProps<TData, TValue> {
   onCallbackExtraActionTable?: ({
     type,
     selected,
-    data
+    data,
   }: {
     type: TypeDropdown;
     selected: RowSelectionState;
@@ -67,7 +70,7 @@ export function CommonTable<TData, TValue>({
   pageSize = 20,
   setPagination,
   renderSubComponent,
-  getRowCanExpand
+  getRowCanExpand,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -87,8 +90,8 @@ export function CommonTable<TData, TValue>({
       columnFilters,
       pagination: {
         pageIndex: pageIndex ?? 0,
-        pageSize
-      }
+        pageSize,
+      },
     },
     onPaginationChange: setPagination,
     manualPagination: true,
@@ -109,9 +112,16 @@ export function CommonTable<TData, TValue>({
 
   const renderTable = () => {
     if (isLoading) {
-      return <div className="flex items-center justify-center">
-        <Loader2Icon strokeWidth={1} className="animate-spin" width={52} height={52} />
-      </div> 
+      return (
+        <div className="flex items-center justify-center">
+          <Loader2Icon
+            strokeWidth={1}
+            className="animate-spin"
+            width={52}
+            height={52}
+          />
+        </div>
+      );
     }
     return (
       <Table>
@@ -143,9 +153,12 @@ export function CommonTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
-                  ))} 
+                  ))}
                 </TableRow>
                 {row?.getIsExpanded() && (
                   <TableRow>
@@ -170,19 +183,21 @@ export function CommonTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      {extraActionTable && <CommonNewToolbar
-        filterComponent={filterComponent}
-        rows={extraActionTable}
-        onCallbackSelection={(type) => {
-          onCallbackExtraActionTable?.({
-            type,
-            selected: rowSelection,
-            data: table.getSelectedRowModel().rows.map((e) => e.original)
-          });
-          table.resetRowSelection();
-        }}
-        rowSelection={rowSelection}
-      />}
+      {extraActionTable && (
+        <CommonNewToolbar
+          filterComponent={filterComponent}
+          rows={extraActionTable}
+          onCallbackSelection={(type) => {
+            onCallbackExtraActionTable?.({
+              type,
+              selected: rowSelection,
+              data: table.getSelectedRowModel().rows.map((e) => e.original),
+            });
+            table.resetRowSelection();
+          }}
+          rowSelection={rowSelection}
+        />
+      )}
       <div className="rounded-md border">{renderTable()}</div>
       {!!pageCount && <DataTablePagination table={table} />}
     </div>

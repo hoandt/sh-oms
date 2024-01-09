@@ -1,8 +1,5 @@
 "use client";
 
-import { RowSelectionState } from "@tanstack/react-table";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +9,16 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { RowSelectionState } from "@tanstack/react-table";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import React, { useRef } from "react";
 
 export type Option = {
   label: string;
@@ -25,7 +31,8 @@ export interface DataTableSearchableColumn<TData> {
   title: string;
 }
 
-export interface DataTableFilterableColumn<TData> extends DataTableSearchableColumn<TData> {
+export interface DataTableFilterableColumn<TData>
+  extends DataTableSearchableColumn<TData> {
   options: Array<Option>;
 }
 
@@ -53,10 +60,12 @@ export function CommonNewToolbar<TData>({
   const { replace } = useRouter();
   const searchParams = useSearchParams();
   const isShowSubComponent = Object.keys(rowSelection).length;
-  const originalRows = [{ label: "Bulk Delete", value: "DELETE" }] as Array<Row>;
-  const inputRef = useRef<any>(null)
+  const originalRows = [
+    { label: "Bulk Delete", value: "DELETE" },
+  ] as Array<Row>;
+  const inputRef = useRef<any>(null);
 
-  function onSearch(){
+  function onSearch() {
     const val = inputRef.current?.value;
     const params = new URLSearchParams(searchParams);
     if (val) {
@@ -78,7 +87,9 @@ export function CommonNewToolbar<TData>({
           placeholder="Searching..."
         />
 
-        <Button className="h-8" onClick={onSearch}>Tìm kiếm</Button>
+        <Button className="h-8" onClick={onSearch}>
+          Tìm kiếm
+        </Button>
       </div>
 
       <div className="flex flex-row gap-2">
@@ -104,7 +115,10 @@ export function CommonNewToolbar<TData>({
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuGroup>
                 {originalRows.concat(rows)?.map((row, index) => (
-                  <DropdownMenuItem key={index} onClick={() => onCallbackSelection(row.value)}>
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={() => onCallbackSelection(row.value)}
+                  >
                     {row.label}
                   </DropdownMenuItem>
                 ))}

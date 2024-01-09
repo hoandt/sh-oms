@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server";
+import { locales } from "./navigation";
 import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
-import { locales } from "./navigation";
+import { NextRequest } from "next/server";
 
 const publicPages = [
   "/",

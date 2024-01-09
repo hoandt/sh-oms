@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import logoLaravel from "@/images/logos/laravel.svg";
@@ -8,6 +6,7 @@ import logoStatamic from "@/images/logos/statamic.svg";
 import logoStaticKit from "@/images/logos/statickit.svg";
 import logoTransistor from "@/images/logos/transistor.svg";
 import logoTuple from "@/images/logos/tuple.svg";
+import Image from "next/image";
 
 export function Hero() {
   return (

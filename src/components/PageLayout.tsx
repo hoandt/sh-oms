@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
 import LocaleSwitcher from "./LocaleSwitcher";
+import { ReactNode } from "react";
 
 type Props = {
   children?: ReactNode;

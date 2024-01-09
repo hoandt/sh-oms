@@ -1,28 +1,24 @@
-import qs from "qs";
-import axios from "axios";
 import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
+import axios from "axios";
+import qs from "qs";
 
 const SUB_DOMAIN = "/api/oms-inbounds";
 
-export const getInbound = async ({
-  options
-}: {
-  options: QueryOptions;
-}) => {
+export const getInbound = async ({ options }: { options: QueryOptions }) => {
   try {
     const params: QueryOptions = {
-      ...options
+      ...options,
     };
 
     const queryOptions = qs.stringify(params, {
       encodeValuesOnly: true,
-      addQueryPrefix: true
+      addQueryPrefix: true,
     });
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
     const res: DataResponseFromBackend = await axios.get(ENDPOINT, {
-      headers: adminHeadersList
+      headers: adminHeadersList,
     });
 
     return res.data;
@@ -33,7 +29,7 @@ export const getInbound = async ({
 
 export const updateInbound = async ({
   id,
-  inbound
+  inbound,
 }: {
   id: number;
   inbound: any;
@@ -44,11 +40,11 @@ export const updateInbound = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...inbound
-        }
+          ...inbound,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -58,11 +54,7 @@ export const updateInbound = async ({
   }
 };
 
-export const postInbound = async ({
-  inbound
-}: {
-  inbound: any;
-}) => {
+export const postInbound = async ({ inbound }: { inbound: any }) => {
   try {
     const endpoint = `${SUB_DOMAIN}`;
 
@@ -70,11 +62,11 @@ export const postInbound = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...inbound
-        }
+          ...inbound,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -91,7 +83,7 @@ export const deleteInbound = async ({ id }: { id: number }) => {
     const res: DataResponseFromBackend = await axios.delete(
       `${BACKEND_URL}${endpoint}`,
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 

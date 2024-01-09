@@ -1,30 +1,26 @@
-import qs from "qs";
-import axios from "axios";
 import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
+import axios from "axios";
+import qs from "qs";
 
 const SUB_DOMAIN = "/api/system-inventories";
 
-export const getInventory = async ({
-  options
-}: {
-  options: QueryOptions;
-}) => {
+export const getInventory = async ({ options }: { options: QueryOptions }) => {
   try {
     const params: QueryOptions = {
-      ...options
+      ...options,
     };
 
     const queryOptions = qs.stringify(params, {
       encodeValuesOnly: true,
-      addQueryPrefix: true
+      addQueryPrefix: true,
     });
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
 
-    console.log({ENDPOINT})
+    console.log({ ENDPOINT });
     const res: DataResponseFromBackend = await axios.get(ENDPOINT, {
-      headers: adminHeadersList
+      headers: adminHeadersList,
     });
 
     return res.data;
@@ -35,7 +31,7 @@ export const getInventory = async ({
 
 export const updateInventory = async ({
   id,
-  inventory
+  inventory,
 }: {
   id: number;
   inventory: any;
@@ -47,11 +43,11 @@ export const updateInventory = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...inventory
-        }
+          ...inventory,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -61,11 +57,7 @@ export const updateInventory = async ({
   }
 };
 
-export const postInventory = async ({
-  inventory
-}: {
-  inventory: any;
-}) => {
+export const postInventory = async ({ inventory }: { inventory: any }) => {
   try {
     const endpoint = `${SUB_DOMAIN}`;
 
@@ -73,11 +65,11 @@ export const postInventory = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...inventory
-        }
+          ...inventory,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -94,7 +86,7 @@ export const deleteInventory = async ({ id }: { id: number }) => {
     const res: DataResponseFromBackend = await axios.delete(
       `${BACKEND_URL}${endpoint}`,
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 

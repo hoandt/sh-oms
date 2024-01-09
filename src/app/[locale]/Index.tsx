@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import PageLayout from "../../components/PageLayout";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import PageLayout from "../../components/PageLayout";
+import Link from "next/link";
 
 type Props = {
   session: Session | null;

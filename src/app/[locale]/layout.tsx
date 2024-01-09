@@ -1,14 +1,13 @@
+import { cn } from "../../lib/utils";
 import "../../styles/globals.css";
-import { NextIntlClientProvider, useMessages } from "next-intl";
-import { ReactNode } from "react";
+import { CommonLayout } from "@/components/common/layout/CommonLayout";
+import { Toaster } from "@/components/ui/toaster";
+import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
 import type { Metadata } from "next";
-
+import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Roboto_Mono } from "next/font/google";
 import { Be_Vietnam_Pro as FontSans } from "next/font/google";
-import { cn } from "../../lib/utils";
-import { CommonLayout } from "@/components/common/layout/CommonLayout";
-import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
-import { Toaster } from "@/components/ui/toaster"
+import { ReactNode } from "react";
 
 export const fontSans = FontSans({
   subsets: ["vietnamese"],
@@ -44,8 +43,8 @@ export default function LocaleLayout({ children, params: { locale } }: Props) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReactQueryProvider>
             <CommonLayout>
-                {children}
-                <Toaster />
+              {children}
+              <Toaster />
             </CommonLayout>
           </ReactQueryProvider>
         </NextIntlClientProvider>

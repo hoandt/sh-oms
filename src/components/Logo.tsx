@@ -1,4 +1,4 @@
-export function Logo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
   return (
     <svg aria-hidden="true" viewBox="0 0 109 40" {...props}>
       <path
@@ -28,5 +28,5 @@ export function Logo(props: React.ComponentPropsWithoutRef<'svg'>) {
         fill="#0F172A"
       />
     </svg>
-  )
+  );
 }

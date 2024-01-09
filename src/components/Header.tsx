@@ -1,16 +1,15 @@
 "use client";
 
-import { Fragment } from "react";
-import Link from "next/link";
-import { Popover, Transition } from "@headlessui/react";
-import clsx from "clsx";
-
+import LocaleSwitcher from "./LocaleSwitcher";
 import { Button } from "@/components/Button";
 import { Container } from "@/components/Container";
 import { Logo } from "@/components/Logo";
 import { NavLink } from "@/components/NavLink";
-import LocaleSwitcher from "./LocaleSwitcher";
+import { Popover, Transition } from "@headlessui/react";
+import clsx from "clsx";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { Fragment } from "react";
 
 function MobileNavLink({
   href,

@@ -1,31 +1,29 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import React, {  useMemo} from "react";
-import { ColumnDef, PaginationState, Row } from "@tanstack/react-table";
-import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { CommonTable } from "@/components/common/table/CommonTable";
-import { OmsInbound, SystemTransaction } from "@/types/todo";
 import { Badge } from "@/components/ui/badge";
+import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { useGetTransactionsByInboundId } from "@/query-keys";
+import { OmsInbound, SystemTransaction } from "@/types/todo";
+import { ColumnDef, PaginationState, Row } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
+import React, { useMemo } from "react";
 
-export default function Transactions({id}:{id: number}) {
+export default function Transactions({ id }: { id: number }) {
   const t = useTranslations("Secret");
 
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
-      pageSize: PAGE_SIZE_TABLE
+      pageSize: PAGE_SIZE_TABLE,
     });
 
-  const {
-    data: transactions,
-    isLoading: loadingTransaction,
-  } = useGetTransactionsByInboundId({
-    id,
-    page: pageIndex,
-    pageSize
-  });
+  const { data: transactions, isLoading: loadingTransaction } =
+    useGetTransactionsByInboundId({
+      id,
+      page: pageIndex,
+      pageSize,
+    });
 
   const columns = useMemo(() => {
     return [
@@ -33,12 +31,8 @@ export default function Transactions({id}:{id: number}) {
         accessorKey: "id",
         width: 60,
         header: () => <div>{"ID"}</div>,
-        cell: ({ row }) => (
-          <div>
-            {row.getValue("id")}
-          </div>
-        ),
-        enableSorting: false
+        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        enableSorting: false,
       },
       {
         accessorKey: "type",
@@ -51,7 +45,7 @@ export default function Transactions({id}:{id: number}) {
           );
         },
         enableSorting: false,
-        enableHiding: false
+        enableHiding: false,
       },
       {
         accessorKey: "code",
@@ -62,24 +56,24 @@ export default function Transactions({id}:{id: number}) {
               <span>{row.original.qty}</span>
             </div>
           );
-        }
+        },
       },
       {
         accessorKey: "note",
         header: () => <div className="">{"Ghi chú"}</div>,
         cell: ({ row }) => <div>{row.getValue("note") || "-"}</div>,
         enableSorting: false,
-        enableHiding: false
+        enableHiding: false,
       },
     ] as ColumnDef<SystemTransaction>[];
   }, []);
 
   return (
     <CommonTable
-        filterComponent={null}
-        data={(transactions?.data as SystemTransaction[]) || []}
-        columns={columns}
-        isLoading={loadingTransaction}
+      filterComponent={null}
+      data={(transactions?.data as SystemTransaction[]) || []}
+      columns={columns}
+      isLoading={loadingTransaction}
     />
   );
 }

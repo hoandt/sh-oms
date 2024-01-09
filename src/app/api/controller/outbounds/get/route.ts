@@ -1,10 +1,10 @@
-import { NextResponse, NextRequest } from "next/server";
-import { fetchData, standardizeBackendResponse } from "@/lib/helpers";
-import { getServerSession } from "next-auth";
-import { NextApiRequest, NextApiResponse } from "next";
-import { redirect } from "next/navigation";
-import { adminHeadersList, BACKEND_ENDPOINT } from "@/lib/constants";
 import auth from "@/auth";
+import { adminHeadersList, BACKEND_ENDPOINT } from "@/lib/constants";
+import { fetchData, standardizeBackendResponse } from "@/lib/helpers";
+import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const urlPath = req.nextUrl.search;
@@ -35,10 +35,10 @@ export async function GET(req: NextRequest, res: NextResponse) {
     `${BACKEND_ENDPOINT}${path}`,
     {
       method: "GET",
-      headers: adminHeadersList
+      headers: adminHeadersList,
     }
   );
 
-  console.log({response: `${BACKEND_ENDPOINT}${path}`})
+  console.log({ response: `${BACKEND_ENDPOINT}${path}` });
   return NextResponse.json(standardizeBackendResponse(response));
 }

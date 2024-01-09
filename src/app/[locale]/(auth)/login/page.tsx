@@ -1,12 +1,13 @@
 "use client";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
-import { useLocale, useTranslations } from "next-intl";
-import { FormEvent, useState } from "react";
+
 import { Logo } from "@/components/Logo";
 import { SlimLayout } from "@/components/common/layout/CommonLayout";
 import { type Metadata } from "next";
+import { signIn, useSession } from "next-auth/react";
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 
 // export const metadata: Metadata = {
 //   title: "Sign In",

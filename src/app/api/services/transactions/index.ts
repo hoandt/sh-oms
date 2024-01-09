@@ -1,24 +1,28 @@
-import qs from "qs";
-import axios from "axios";
 import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
+import axios from "axios";
+import qs from "qs";
 
 const SUB_DOMAIN = "/api/system-transactions";
 
-export const getTransaction = async ({ options}: {  options: QueryOptions }) => {
+export const getTransaction = async ({
+  options,
+}: {
+  options: QueryOptions;
+}) => {
   try {
     const params: QueryOptions = {
-      ...options
+      ...options,
     };
 
     const queryOptions = qs.stringify(params, {
       encodeValuesOnly: true,
-      addQueryPrefix: true
+      addQueryPrefix: true,
     });
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
     const res: DataResponseFromBackend = await axios.get(ENDPOINT, {
-      headers: adminHeadersList
+      headers: adminHeadersList,
     });
 
     return res.data;
@@ -29,7 +33,7 @@ export const getTransaction = async ({ options}: {  options: QueryOptions }) => 
 
 export const updateTransaction = async ({
   id,
-  transaction
+  transaction,
 }: {
   id: number;
   transaction: any;
@@ -41,11 +45,11 @@ export const updateTransaction = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...transaction
-        }
+          ...transaction,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -56,7 +60,7 @@ export const updateTransaction = async ({
 };
 
 export const postTransaction = async ({
-  transaction
+  transaction,
 }: {
   transaction: any;
 }) => {
@@ -67,11 +71,11 @@ export const postTransaction = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...transaction
-        }
+          ...transaction,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -88,7 +92,7 @@ export const deleteTransaction = async ({ id }: { id: number }) => {
     const res: DataResponseFromBackend = await axios.delete(
       `${BACKEND_URL}${endpoint}`,
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 

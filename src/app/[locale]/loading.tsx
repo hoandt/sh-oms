@@ -1,6 +1,6 @@
+import backgroundImage from "@/images/background-call-to-action.jpg";
 import Image from "next/image";
 import React from "react";
-import backgroundImage from "@/images/background-call-to-action.jpg";
 
 const loading = () => {
   return (

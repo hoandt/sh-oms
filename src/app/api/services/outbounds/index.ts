@@ -1,19 +1,25 @@
-import qs from "qs";
-import axios from "axios";
 import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
+import axios from "axios";
+import qs from "qs";
 
 const SUB_DOMAIN = "/api/oms-outbounds";
 
-export const getOutbound = async ({ id, options }: { id: number, options: QueryOptions }) => {
+export const getOutbound = async ({
+  id,
+  options,
+}: {
+  id: number;
+  options: QueryOptions;
+}) => {
   try {
     const params: QueryOptions = {
-      ...options
+      ...options,
     };
 
     const queryOptions = qs.stringify(params, {
       encodeValuesOnly: true,
-      addQueryPrefix: true
+      addQueryPrefix: true,
     });
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
@@ -27,7 +33,7 @@ export const getOutbound = async ({ id, options }: { id: number, options: QueryO
 
 export const updateOutbound = async ({
   id,
-  outbounds
+  outbounds,
 }: {
   id: number;
   outbounds: any;
@@ -37,19 +43,19 @@ export const updateOutbound = async ({
 
     const bodyData = JSON.stringify({
       data: {
-        ...outbounds
-      }
+        ...outbounds,
+      },
     });
 
     const res: DataResponseFromBackend = await axios.put(
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...outbounds
-        }
+          ...outbounds,
+        },
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -61,7 +67,7 @@ export const updateOutbound = async ({
 
 export const postOutbound = async ({
   id,
-  outbounds
+  outbounds,
 }: {
   id: number;
   outbounds: any;
@@ -71,17 +77,17 @@ export const postOutbound = async ({
 
     const bodyData = JSON.stringify({
       data: {
-        ...outbounds
-      }
+        ...outbounds,
+      },
     });
 
     const res: DataResponseFromBackend = await axios.post(
       `${BACKEND_URL}${endpoint}`,
       {
-        body: bodyData
+        body: bodyData,
       },
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
@@ -98,7 +104,7 @@ export const deleteOutbound = async ({ id }: { id: number }) => {
     const res: DataResponseFromBackend = await axios.delete(
       `${BACKEND_URL}${endpoint}`,
       {
-        headers: adminHeadersList
+        headers: adminHeadersList,
       }
     );
 
