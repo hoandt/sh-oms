@@ -5,11 +5,7 @@ import qs from "qs";
 
 const SUB_DOMAIN = "/api/system-transactions";
 
-export const getUser = async ({
-  options,
-}: {
-  options: QueryOptions;
-}) => {
+export const getUser = async ({ options }: { options: QueryOptions }) => {
   try {
     const params: QueryOptions = {
       ...options,
@@ -31,13 +27,7 @@ export const getUser = async ({
   }
 };
 
-export const updateUser = async ({
-  id,
-  user,
-}: {
-  id: number;
-  user: any;
-}) => {
+export const updateUser = async ({ id, user }: { id: number; user: any }) => {
   try {
     const endpoint = `${SUB_DOMAIN}/${id}`;
 
@@ -59,11 +49,7 @@ export const updateUser = async ({
   }
 };
 
-export const postUser = async ({
-  transaction,
-}: {
-  transaction: any;
-}) => {
+export const postUser = async ({ transaction }: { transaction: any }) => {
   try {
     const endpoint = `${SUB_DOMAIN}`;
 
