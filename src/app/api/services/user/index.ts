@@ -3,9 +3,9 @@ import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 import axios from "axios";
 import qs from "qs";
 
-const SUB_DOMAIN = "/api/users/me";
+const SUB_DOMAIN = "/api/system-transactions";
 
-export const getTransaction = async ({
+export const getUser = async ({
   options,
 }: {
   options: QueryOptions;
@@ -31,12 +31,12 @@ export const getTransaction = async ({
   }
 };
 
-export const updateTransaction = async ({
+export const updateUser = async ({
   id,
-  transaction,
+  user,
 }: {
   id: number;
-  transaction: any;
+  user: any;
 }) => {
   try {
     const endpoint = `${SUB_DOMAIN}/${id}`;
@@ -45,7 +45,7 @@ export const updateTransaction = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...transaction,
+          ...user,
         },
       },
       {
@@ -59,7 +59,7 @@ export const updateTransaction = async ({
   }
 };
 
-export const postTransaction = async ({
+export const postUser = async ({
   transaction,
 }: {
   transaction: any;
@@ -85,7 +85,7 @@ export const postTransaction = async ({
   }
 };
 
-export const deleteTransaction = async ({ id }: { id: number }) => {
+export const deleteUser = async ({ id }: { id: number }) => {
   try {
     const endpoint = `${SUB_DOMAIN}/${id}`;
 

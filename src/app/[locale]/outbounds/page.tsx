@@ -47,7 +47,7 @@ const optionsTabs = [
   { label: "Đơn huỷ", value: "cancelled" },
 ];
 
-export default function Inbounds() {
+export default function Outbounds() {
   const t = useTranslations("Secret");
   const router = useRouter();
   const pathname = usePathname();
@@ -118,7 +118,11 @@ export default function Inbounds() {
                 style: { cursor: "pointer" },
               }}
             >
-              {row.getIsExpanded() ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              {row.getIsExpanded() ? (
+                <ChevronDownIcon width={20} height={20} />
+              ) : (
+                <ChevronRightIcon width={20} height={20} />
+              )}
             </button>
           ) : (
             "🔵"

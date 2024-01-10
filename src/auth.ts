@@ -59,7 +59,6 @@ const auth: AuthOptions = {
       return token;
     },
     session: ({ session, token }): Awaitable<UserSession> => {
-      //get data from jwt callback and expand session object
       return {
         ...session,
         jwt: token.jwt as string,

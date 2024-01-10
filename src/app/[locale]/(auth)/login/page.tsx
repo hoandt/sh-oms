@@ -9,10 +9,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-// export const metadata: Metadata = {
-//   title: "Sign In",
-// };
-
 export default function Login() {
   const locale = useLocale();
   const t = useTranslations("Login");
@@ -33,57 +29,87 @@ export default function Login() {
       } else {
         //  refresh page to get session
         router.refresh();
-        // router.push("/" + locale);
       }
     });
   }
 
   return (
-    <>
-      <div className="flex">
-        <Link href="/" aria-label="Home">
-          <Logo className="h-10 w-auto" />
-        </Link>
-      </div>
-      <h2 className="mt-20 text-lg font-semibold text-gray-900">
-        Sign in to your account
-      </h2>
-      <p className="mt-2 text-sm text-gray-700">
-        Don’t have an account?{" "}
-        <Link
-          href="/register"
-          className="font-medium text-blue-600 hover:underline"
+    <div className="w-full flex justify-center items-center mt-10">
+      <div className="w-1/4 flex flex-col">
+        <div className="flex">
+          <Link href="/" aria-label="Home">
+            <Logo className="h-10 w-auto" />
+          </Link>
+        </div>
+        <h2 className="mt-20 text-lg font-semibold text-gray-900">
+          Sign in to your account
+        </h2>
+        <p className="mt-2 text-sm text-gray-700">
+          Don’t have an account?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-blue-600 hover:underline"
+          >
+            Sign up
+          </Link>{" "}
+          for a free trial.
+        </p>
+        <form
+          action="/api/auth/callback/credentials"
+          className="space-y-6"
+          method="POST"
+          onSubmit={onSubmit}
         >
-          Sign up
-        </Link>{" "}
-        for a free trial.
-      </p>
-      <form
-        action="/api/auth/callback/credentials"
-        method="post"
-        onSubmit={onSubmit}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          width: 300,
-        }}
-      >
-        <label style={{ display: "flex" }}>
-          <span style={{ display: "inline-block", flexGrow: 1, minWidth: 100 }}>
-            {t("username")}
-          </span>
-          <input name="username" type="text" />
-        </label>
-        <label style={{ display: "flex" }}>
-          <span style={{ display: "inline-block", flexGrow: 1, minWidth: 100 }}>
-            {t("password")}
-          </span>
-          <input name="password" type="password" />
-        </label>
-        {error && <p>{t("error", { error })}</p>}
-        <button type="submit">{t("submit")}</button>
-      </form>
-    </>
+          <div>
+            <label className="block text-sm font-medium leading-6 text-gray-900">
+              UserName
+            </label>
+            <div className="mt-2">
+              <input
+                id="username"
+                name="username"
+                type="username"
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium leading-6 text-gray-900">
+                Password
+              </label>
+              <div className="text-sm">
+                <a
+                  href="#"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }

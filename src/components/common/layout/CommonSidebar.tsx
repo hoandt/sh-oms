@@ -7,10 +7,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useSidebarContext } from "@/provider/SidebarProvider";
+import { motion } from "framer-motion";
 import {
   ContainerIcon,
   GalleryVerticalEndIcon,
   Laptop2Icon,
+  SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -31,20 +34,24 @@ const router = [
     icon: <Laptop2Icon />,
     href: "/inventories",
   },
+  {
+    name: "Setting",
+    icon: <SettingsIcon />,
+    href: "/settings",
+  },
 ];
 
 export function CommonSidebar() {
-  const [isExpand, setIsExpand] = useState(false);
+  const { toggleSidebar, setToggleSidebar } = useSidebarContext();
 
   function handleExpand() {
-    setIsExpand((e) => !e);
+    setToggleSidebar?.((e) => !e);
   }
-
   return (
     <div
       className={cn(
-        "lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4",
-        isExpand && "lg:w-60"
+        "lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-18 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4",
+        toggleSidebar && "lg:w-60"
       )}
     >
       <div
@@ -58,10 +65,10 @@ export function CommonSidebar() {
         />
       </div>
       <nav className="mt-8">
-        <ul role="list" className="flex flex-col items-center space-y-1">
+        <ul role="list" className="flex flex-col items-center gap-2 p-3">
           {router.map((value, index) => {
             return (
-              <li key={index}>
+              <li key={index} className=" w-full">
                 <Link
                   href={value.href}
                   className="bg-gray-800 text-white group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-semibold"
@@ -74,7 +81,7 @@ export function CommonSidebar() {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  <span className={cn(isExpand ? "" : "sr-only")}>
+                  <span className={cn(toggleSidebar ? "" : "sr-only")}>
                     {value.name}
                   </span>
                 </Link>

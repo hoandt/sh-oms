@@ -2,8 +2,11 @@ import { cn } from "../../lib/utils";
 import "../../styles/globals.css";
 import { CommonLayout } from "@/components/common/layout/CommonLayout";
 import { Toaster } from "@/components/ui/toaster";
+import ReactAuthProvider from "@/provider/ReactAuthProvider";
 import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
+import { SidebarProvider } from "@/provider/SidebarProvider";
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Roboto_Mono } from "next/font/google";
 import { Be_Vietnam_Pro as FontSans } from "next/font/google";
@@ -42,10 +45,14 @@ export default function LocaleLayout({ children, params: { locale } }: Props) {
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReactQueryProvider>
-            <CommonLayout>
-              {children}
-              <Toaster />
-            </CommonLayout>
+            <ReactAuthProvider>
+              <SidebarProvider>
+                <CommonLayout>
+                  {children}
+                  <Toaster />
+                </CommonLayout>
+              </SidebarProvider>
+            </ReactAuthProvider>
           </ReactQueryProvider>
         </NextIntlClientProvider>
       </body>

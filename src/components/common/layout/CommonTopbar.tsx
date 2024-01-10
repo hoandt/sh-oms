@@ -5,16 +5,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { useState } from "react";
 
 export function CommonTopbar() {
+  const { data } = useSession();
+  console.log({ data });
+
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
       <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
@@ -50,7 +48,7 @@ export function CommonTopbar() {
                   className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                   aria-hidden="true"
                 >
-                  Tom Cook
+                  {data?.user?.email || "-"}
                 </span>
                 <svg
                   className="ml-2 h-5 w-5 text-gray-400"
@@ -66,17 +64,18 @@ export function CommonTopbar() {
                 </svg>
               </span>
             </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <a
-                href="#"
+            <PopoverContent className="w-50">
+              <Link
+                href={"/settings"}
                 className="block px-3 py-1 text-sm leading-6 text-gray-900"
                 role="menuitem"
                 id="user-menu-item-0"
               >
                 Your profile
-              </a>
+              </Link>
               <a
                 href="#"
+                onClick={() => signOut()}
                 className="block px-3 py-1 text-sm leading-6 text-gray-900"
                 role="menuitem"
                 id="user-menu-item-1"

@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
 
-export default function Inventory() {
+export default function Inventories() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
 
@@ -45,7 +45,11 @@ export default function Inventory() {
                 style: { cursor: "pointer" },
               }}
             >
-              {row.getIsExpanded() ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              {row.getIsExpanded() ? (
+                <ChevronDownIcon width={20} height={20} />
+              ) : (
+                <ChevronRightIcon width={20} height={20} />
+              )}
             </button>
           ) : (
             "🔵"
