@@ -34,7 +34,7 @@ export default function SystemItemMaster() {
     pageSize,
   });
 
-  console.log({customers});
+  console.log({ customers });
 
   const columns = useMemo(() => {
     return [
@@ -74,7 +74,9 @@ export default function SystemItemMaster() {
         accessorKey: "note",
         header: () => <div className="">{"Quận huyện"}</div>,
         cell: ({ row }) => {
-          const district = row.original.attributes?.contact?.address_district?.data?.attributes.name || "-";
+          const district =
+            row.original.attributes?.contact?.address_district?.data?.attributes
+              .name || "-";
           return <div className="flex space-x-2">{district}</div>;
         },
         enableSorting: false,
@@ -84,7 +86,9 @@ export default function SystemItemMaster() {
         accessorKey: "note",
         header: () => <div className="">{"Tỉnh thành"}</div>,
         cell: ({ row }) => {
-          const province = row.original.attributes?.contact?.address_province?.data?.attributes.name || "-";
+          const province =
+            row.original.attributes?.contact?.address_province?.data?.attributes
+              .name || "-";
           return <div className="flex space-x-2">{province}</div>;
         },
         enableSorting: false,

@@ -1,12 +1,8 @@
-const pluginSortImports = require("@trivago/prettier-plugin-sort-imports");
-
 /**
  * @refs  https://github.com/tailwindlabs/prettier-plugin-tailwindcss/issues/31#issuecomment-1195411734
  */
 /** @type {import("prettier").Parser}  */
-const bothParser = {
-  ...pluginSortImports.parsers.typescript,
-};
+const bothParser = {};
 
 /** @type {import("prettier").Plugin}  */
 const mixedPlugin = {
