@@ -1,22 +1,31 @@
 export interface AddressDistrict {
-  name?: string;
-  parent_id: number;
-  carrierCodes?: any;
-  aliases?: string;
+  id: string | number | null | undefined;
+  attributes: {
+    name?: string;
+    parent_id: number;
+    carrierCodes?: any;
+    aliases?: string;
+  };
 }
 
 export interface AddressProvince {
-  name?: string;
-  parent_id: number;
-  aliases?: string;
-  carrierCodes?: any;
+  id: string | number | null | undefined;
+  attributes: {
+    name?: string;
+    parent_id: number;
+    carrierCodes?: any;
+    aliases?: string;
+  };
 }
 
 export interface AddressWard {
-  name?: string;
-  parent_id: number;
-  carrierCodes?: any;
-  aliases?: string;
+  id: string | number | null | undefined;
+  attributes: {
+    name?: string;
+    parent_id: number;
+    carrierCodes?: any;
+    aliases?: string;
+  };
 }
 
 export interface Country {
@@ -309,28 +318,31 @@ export interface OmsOutboundHistory {
 }
 
 export interface OmsUser {
-  contact?: SharedAddressBox;
-  phone?: string;
-  name?: string;
-  users_permissions_user?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
+  id: string | number;
+  attributes: {
+    contact?: SharedAddressBox;
+    phone?: string;
+    name?: string;
+    users_permissions_user?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+  };
 }
 
 export interface Organization {
@@ -418,6 +430,7 @@ export interface Organization {
 export interface SharedAddressBox {
   __component?: "shared.address-box";
   address_province?:
+    | any
     | number
     | { set: [number] | [{ id: number }] }
     | {
@@ -437,6 +450,7 @@ export interface SharedAddressBox {
             ];
       };
   address_district?:
+    | any
     | number
     | { set: [number] | [{ id: number }] }
     | {
@@ -486,6 +500,7 @@ export interface SharedCapacity {
 }
 
 export interface SharedItem {
+  lot: string;
   __component?: "shared.item";
   system_item_master?:
     | any
@@ -686,19 +701,46 @@ export interface SystemItemCategory {
 }
 
 export interface SystemItemMaster {
-  name: string;
-  description?: string;
-  isLotSerialControl?: boolean;
-  bestBeforeMandatory?: boolean;
-  users_permissions_user?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
+  id: number | string;
+  attributes: {
+    name: string;
+    description?: string;
+    isLotSerialControl?: boolean;
+    bestBeforeMandatory?: boolean;
+    users_permissions_user?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    shipAlone?: boolean;
+    shipAsIs?: boolean;
+    stackable?: boolean;
+    sku: string;
+    height?: number;
+    length?: number;
+    depth?: number;
+    system_inventories?:
+      | number[]
+      | { set: number[] | { id: number }[] }
+      | {
+          disconnect?: number[] | { id: number }[];
+          connect?:
+            | number[]
+            | {
                 id: number;
                 position?: {
                   before?: number;
@@ -706,114 +748,90 @@ export interface SystemItemMaster {
                   start?: boolean;
                   end?: boolean;
                 };
-              }
-            ];
-      };
-  shipAlone?: boolean;
-  shipAsIs?: boolean;
-  stackable?: boolean;
-  sku: string;
-  height?: number;
-  length?: number;
-  depth?: number;
-  system_inventories?:
-    | number[]
-    | { set: number[] | { id: number }[] }
-    | {
-        disconnect?: number[] | { id: number }[];
-        connect?:
-          | number[]
-          | {
-              id: number;
-              position?: {
-                before?: number;
-                after?: number;
-                start?: boolean;
-                end?: boolean;
-              };
-            }[];
-      };
-  images?: string;
-  reStockLevel?: number;
-  isFragile?: boolean;
-  trackingMethod: `LIFO` | `FIFO` | `FEFO` | `DEFAULT`;
-  expWarningDays?: number;
-  price?: number;
-  storageTemp?: number;
-  weight?: number;
-  innerPackW?: number;
-  innerPackH?: number;
-  innerPackL?: number;
-  innerPackWeight?: number;
-  masterW?: number;
-  masterWeight?: number;
-  masterH?: number;
-  masterL?: number;
-  palletW?: number;
-  palletH?: number;
-  palletL?: number;
-  palletWeight?: number;
-  system_item_master?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
-  system_item_category?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
-  barcode?: string;
-  organization?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
-  bundle?: SharedItem[];
-  isBundle?: boolean;
-  isAlias?: boolean;
+              }[];
+        };
+    images?: string;
+    reStockLevel?: number;
+    isFragile?: boolean;
+    trackingMethod: `LIFO` | `FIFO` | `FEFO` | `DEFAULT`;
+    expWarningDays?: number;
+    price?: number;
+    storageTemp?: number;
+    weight?: number;
+    innerPackW?: number;
+    innerPackH?: number;
+    innerPackL?: number;
+    innerPackWeight?: number;
+    masterW?: number;
+    masterWeight?: number;
+    masterH?: number;
+    masterL?: number;
+    palletW?: number;
+    palletH?: number;
+    palletL?: number;
+    palletWeight?: number;
+    system_item_master?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    system_item_category?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    barcode?: string;
+    organization?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    bundle?: SharedItem[];
+    isBundle?: boolean;
+    isAlias?: boolean;
+  };
 }
 
 export interface SystemPickingList {

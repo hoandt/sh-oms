@@ -32,8 +32,10 @@ export function Information({ id }: { id: number }) {
                 alt=""
               />
               <div>{value.system_item_master?.data?.attributes.name}</div>
-              <div className="font-bold">{`Quantity: ${value.qty}`}</div>
-              <div className="font-bold">{`Lot: ${value.lot || "-"}`}</div>
+              <div className="font-bold">{`Quantity: ${
+                value?.qty || "0"
+              }`}</div>
+              <div className="font-bold">{`Lot: ${value?.lot || "-"}`}</div>
             </div>
           );
         })}

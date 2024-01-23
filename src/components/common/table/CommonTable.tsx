@@ -43,7 +43,7 @@ interface DataTableProps<TData, TValue> {
   pageIndex?: number;
   pageSize?: number;
   setPagination?: OnChangeFn<PaginationState>;
-  filterComponent: React.ReactNode;
+  filterComponent?: React.ReactNode;
   extraActionTable?: RowToolbar[];
   onCallbackExtraActionTable?: ({
     type,
@@ -190,7 +190,7 @@ export function CommonTable<TData, TValue>({
     <div className="space-y-4 h-full">
       {extraActionTable && (
         <CommonNewToolbar
-          filterComponent={filterComponent}
+          filterComponent={filterComponent || <></>}
           rows={extraActionTable}
           onCallbackSelection={(type) => {
             onCallbackExtraActionTable?.({

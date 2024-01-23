@@ -15,8 +15,6 @@ export const standardizeBackendResponse = (
   response: BackendDataResponse
 ): DataResponseFromBackend => {
   if (response.error) {
-    // Error response
-
     return {
       success: false,
       data: response.error.details?.errors,
@@ -26,7 +24,7 @@ export const standardizeBackendResponse = (
     // Success response
     return {
       success: true,
-      data: response.data,
+      data: response.data || {},
       meta: response.meta,
     };
   }

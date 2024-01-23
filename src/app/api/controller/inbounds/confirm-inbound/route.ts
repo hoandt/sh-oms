@@ -1,4 +1,4 @@
-import { postInbound, updateInbound } from "@/app/api/services/inbounds";
+import { updateInbound } from "@/app/api/services/inbounds";
 import {
   getInventory,
   postInventory,
@@ -92,10 +92,3 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
-
-const createSystemTransaction = async (
-  inventoryId: number,
-  type: string,
-  ref: string,
-  qty: number
-) => {};

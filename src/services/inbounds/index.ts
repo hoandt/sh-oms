@@ -2,7 +2,7 @@ import { fetchData } from "@/lib/helpers";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 import qs from "qs";
 
-export function transformData(data: any): any {
+function transformData(data: any): any {
   if (data && data.data && Array.isArray(data.data)) {
     data.data.forEach((item: any) => {
       if (item.attributes) {

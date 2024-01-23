@@ -1,7 +1,6 @@
 "use client";
 
 import { Logo } from "@/components/Logo";
-import { SlimLayout } from "@/components/common/layout/CommonLayout";
 import { type Metadata } from "next";
 import { signIn, useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";

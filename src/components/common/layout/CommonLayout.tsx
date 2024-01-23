@@ -15,7 +15,7 @@ export function CommonLayout({ children }: { children: React.ReactNode }) {
   return (
     <AnimatePresence>
       {isAuthenticated && <CommonSidebar />}
-      <motion.div className={cn("lg:pl-20", toggleSidebar && "lg:pl-60")}>
+      <motion.div className={cn("lg:pl-16", toggleSidebar && "lg:pl-60")}>
         {isAuthenticated && <CommonTopbar />}
         <main>
           <div className="">{children}</div>

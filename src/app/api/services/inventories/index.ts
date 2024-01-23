@@ -17,9 +17,7 @@ export const getInventory = async ({ options }: { options: QueryOptions }) => {
     });
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
-
-    console.log({ ENDPOINT });
-    const res: DataResponseFromBackend = await axios.get(ENDPOINT, {
+    const res: DataResponseFromBackend<any> = await axios.get(ENDPOINT, {
       headers: adminHeadersList,
     });
 
@@ -61,7 +59,7 @@ export const postInventory = async ({ inventory }: { inventory: any }) => {
   try {
     const endpoint = `${SUB_DOMAIN}`;
 
-    const res: DataResponseFromBackend = await axios.post(
+    const res: DataResponseFromBackend<any> = await axios.post(
       `${BACKEND_URL}${endpoint}`,
       {
         data: {

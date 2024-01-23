@@ -21,8 +21,24 @@ export const MASTER_CUSTOMER_WAREHOUSE =
 export const EXT_API = process.env.NEXT_EXT_API || "http://localhost:3001";
 
 export const BACKEND_ENDPOINT = `${BACKEND_URL}/api`;
+
 export let adminHeadersList = {
   Accept: "*/*",
   Authorization: "Bearer " + NEXT_SUPER_TOKEN,
   "Content-Type": "application/json",
 };
+
+export enum METHOD_DELIVERY {
+  GHN = "GHN",
+  GHTK = "GHTK",
+  VNP = "VNP",
+}
+
+export const GHN_URL = process.env.NEXT_GHN_URL;
+export const GHN_TOKEN =
+  process.env.NEXT_GHN_TOKEN || "0ef02582-3733-11ee-b1d4-92b443b7a897";
+export const GHN_SHOP_ID = process.env.NEXT_GHN_SHOP_ID || "125467";
+
+export const GHTK_URL = process.env.NEXT_GHTK_URL;
+export const GHTK_TOKEN =
+  process.env.NEXT_GHTK_TOKEN || "0ef02582-3733-11ee-b1d4-92b443b7a897";

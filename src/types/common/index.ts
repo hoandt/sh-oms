@@ -9,10 +9,10 @@ export type QueryOptions = {
   };
 };
 
-export type DataResponseFromBackend = {
+export type DataResponseFromBackend<T = {}> = {
   total?: number;
   responseStatus?: number;
   success: boolean;
-  data: any;
+  data: T;
   meta: any;
 };
