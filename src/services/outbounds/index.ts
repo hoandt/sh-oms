@@ -1,4 +1,4 @@
-import { API_ADMIN_ENDPOINT } from "@/lib/constants";
+import { API_ADMIN_ENDPOINT } from "@/lib/config";
 import { fetchData } from "@/lib/helpers";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 import qs from "qs";

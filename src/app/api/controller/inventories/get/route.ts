@@ -1,4 +1,4 @@
-import { adminHeadersList, BACKEND_ENDPOINT } from "@/lib/constants";
+import { adminHeadersList, BACKEND_ENDPOINT } from "@/lib/config";
 import { fetchData, standardizeBackendResponse } from "@/lib/helpers";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";

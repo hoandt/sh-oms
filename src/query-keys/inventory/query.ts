@@ -3,7 +3,7 @@ import { getSystemInventories } from "@/services/inventories";
 import { useQuery } from "@tanstack/react-query";
 
 interface IGetInventory {
-  code: string;
+  code?: string;
   page?: number;
   pageSize?: number;
 }

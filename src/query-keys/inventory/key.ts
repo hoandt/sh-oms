@@ -4,6 +4,6 @@ export const inventoryQueryKeys = {
     code,
   }: {
     pageParam?: number;
-    code: string;
+    code?: string;
   }) => ["get-inventories", pageParam, code],
 };

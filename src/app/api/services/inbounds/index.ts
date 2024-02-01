@@ -1,4 +1,4 @@
-import { adminHeadersList, BACKEND_URL } from "@/lib/constants";
+import { adminHeadersList, BACKEND_URL } from "@/lib/config";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 import axios from "axios";
 import qs from "qs";

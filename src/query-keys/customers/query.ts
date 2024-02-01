@@ -5,6 +5,7 @@ import {
   getProvinces,
   getWards,
 } from "@/services/customers";
+import { getOrganization } from "@/services/organization";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetProvinces = () => {
@@ -41,6 +42,17 @@ export const useGetCustomers = ({ code, page, pageSize }: any) => {
       pageParam: page,
     }),
     queryFn: () => getCustomers({ page, pageSize }),
+  });
+
+  return query;
+};
+
+export const useGetOrganization = ({ page, pageSize }: any) => {
+  const query = useQuery({
+    queryKey: customersQueryKeys.getOrganization({
+      pageParam: page,
+    }),
+    queryFn: () => getOrganization({ page, pageSize }),
   });
 
   return query;

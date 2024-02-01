@@ -1,20 +1,25 @@
 import {
   adminHeadersList,
-  BACKEND_URL,
   GHN_SHOP_ID,
   GHN_TOKEN,
   GHN_URL,
   GHTK_TOKEN,
   GHTK_URL,
-} from "@/lib/constants";
+  VNPOST_TOKEN,
+  VNPOST_URL,
+} from "@/lib/config";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
-import { DataResponseGHN, DataResponseGHTK } from "@/types/customer";
+import {
+  DataResponseGHN,
+  DataResponseGHTK,
+  DataResponseVNPost,
+} from "@/types/customer";
 import axios from "axios";
 import { isEmpty, omitBy } from "lodash";
-import qs from "qs";
 
 const GHN_DOMAIN_FEE = "/shiip/public-api/v2/shipping-order/fee";
 const GHTK_DOMAIN_FEE = "/services/shipment/fee";
+const VNPOST_TOKEN_DOMAIN_FEE = "/customer-partner/ServicesCharge";
 
 export const getGHNMethodGetFee = async ({ payload }: { payload: any }) => {
   try {
@@ -44,6 +49,24 @@ export const getGHTKMethod = async ({ payload }: { payload: any }) => {
       {},
       {
         headers: { ...adminHeadersList, Token: GHTK_TOKEN },
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getVNPostMethod = async ({ payload }: { payload: any }) => {
+  try {
+    const ENDPOINT = `${VNPOST_URL}${VNPOST_TOKEN_DOMAIN_FEE}`;
+
+    const res: DataResponseFromBackend<DataResponseVNPost[]> = await axios.post(
+      ENDPOINT,
+      payload,
+      {
+        headers: { ...adminHeadersList, Token: VNPOST_TOKEN },
       }
     );
 

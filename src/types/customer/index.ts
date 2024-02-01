@@ -44,3 +44,15 @@ export type DataResponseDeliveryMethod = {
   name: string;
   duration: string;
 };
+
+export type DataResponseVNPost = {
+  serviceCode: string;
+  serviceName: string;
+  weightConvert: number;
+  priceWeight: number;
+  mainFee: number;
+  totalFee: number;
+  addonService: any;
+  additionRequest: any;
+  vasfee: number;
+};

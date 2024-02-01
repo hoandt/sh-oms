@@ -6,15 +6,6 @@ import { DataResponseDeliveryMethod } from "@/types/customer";
 import { ColumnDef, PaginationState, Row } from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
 
-const optionsTabs = [
-  {
-    label: "Đơn mới",
-    value: "waiting_for_confirm",
-  },
-  { label: "Đơn hoàn thành", value: "done" },
-  { label: "Đơn huỷ", value: "cancelled" },
-];
-
 export default function TableDelivery({
   data,
   loading,

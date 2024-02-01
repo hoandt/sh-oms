@@ -44,3 +44,9 @@ export function sortArrayByExp(
     return 0;
   });
 }
+
+export const priceFormat = new Intl.NumberFormat("vi", {
+  style: "currency",
+  currency: "VND",
+  maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});

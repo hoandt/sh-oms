@@ -2,7 +2,7 @@
 
 import Transactions from "./components/TransactionSubTable";
 import { CommonTable } from "@/components/common/table/CommonTable";
-import { defaultImage } from "@/lib/constants";
+import { defaultImage } from "@/lib/config";
 import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { useGetInventories } from "@/query-keys";
 import { OmsInbound, SystemInventory } from "@/types/todo";

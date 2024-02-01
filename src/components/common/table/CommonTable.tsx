@@ -113,7 +113,7 @@ export function CommonTable<TData, TValue>({
   const renderTable = () => {
     if (isLoading) {
       return (
-        <div className="flex items-center justify-center h-[700px]">
+        <div className="flex items-center justify-center h-[500px]">
           <Loader2Icon
             strokeWidth={1}
             className="animate-spin"

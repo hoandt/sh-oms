@@ -142,6 +142,7 @@ export interface OmsInboundHistory {
 }
 
 export interface OmsOutbound {
+  system_item_master: any;
   id: number;
   code: string;
   users_permissions_user?:
@@ -346,20 +347,78 @@ export interface OmsUser {
 }
 
 export interface Organization {
-  name?: string;
-  taxcode: string;
-  address?: string;
-  legalRep?: string;
-  phone?: string;
-  address_province?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
+  id: string;
+  attributes: {
+    name?: string;
+    taxcode: string;
+    address?: string;
+    legalRep?: string;
+    phone?: string;
+    address_province?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    address_district?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    address_ward?:
+      | number
+      | { set: [number] | [{ id: number }] }
+      | {
+          disconnect?: [number] | [{ id: number }];
+          connect?:
+            | [number]
+            | [
+                {
+                  id: number;
+                  position?: {
+                    before?: number;
+                    after?: number;
+                    start?: boolean;
+                    end?: boolean;
+                  };
+                }
+              ];
+        };
+    system_stores?:
+      | number[]
+      | { set: number[] | { id: number }[] }
+      | {
+          disconnect?: number[] | { id: number }[];
+          connect?:
+            | number[]
+            | {
                 id: number;
                 position?: {
                   before?: number;
@@ -367,64 +426,9 @@ export interface Organization {
                   start?: boolean;
                   end?: boolean;
                 };
-              }
-            ];
-      };
-  address_district?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
-  address_ward?:
-    | number
-    | { set: [number] | [{ id: number }] }
-    | {
-        disconnect?: [number] | [{ id: number }];
-        connect?:
-          | [number]
-          | [
-              {
-                id: number;
-                position?: {
-                  before?: number;
-                  after?: number;
-                  start?: boolean;
-                  end?: boolean;
-                };
-              }
-            ];
-      };
-  system_stores?:
-    | number[]
-    | { set: number[] | { id: number }[] }
-    | {
-        disconnect?: number[] | { id: number }[];
-        connect?:
-          | number[]
-          | {
-              id: number;
-              position?: {
-                before?: number;
-                after?: number;
-                start?: boolean;
-                end?: boolean;
-              };
-            }[];
-      };
+              }[];
+        };
+  };
 }
 
 export interface SharedAddressBox {

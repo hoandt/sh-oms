@@ -1,4 +1,4 @@
-import { defaultImage } from "@/lib/constants";
+import { defaultImage } from "@/lib/config";
 import { useGetInbound } from "@/query-keys";
 import { OmsInbound } from "@/types/todo";
 import Image from "next/image";

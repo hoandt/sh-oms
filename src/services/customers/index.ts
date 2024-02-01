@@ -93,6 +93,7 @@ export const getWards = async ({ districtId }: { districtId: number }) => {
 
 export const getFeeTracking = async ({ options }: { options: any }) => {
   const ENDPOINT = `/api/controller/customers/get-fees?options=${options}`;
+
   const res: DataResponseFromBackend<DataResponseDeliveryMethod[]> =
     await fetchData(ENDPOINT, {
       method: "POST",
@@ -124,8 +125,6 @@ export const getCustomers = async ({ code, page = 1, pageSize = 15 }: any) => {
     encodeValuesOnly: true,
     addQueryPrefix: true,
   });
-
-  console.log({ queryOptions });
 
   const ENDPOINT = `/api/controller/customers/get?options=${queryOptions}`;
   const res: DataResponseFromBackend<OmsUser[]> = await fetchData(ENDPOINT, {

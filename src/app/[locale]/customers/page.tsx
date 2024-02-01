@@ -1,7 +1,7 @@
 "use client";
 
 import { CommonTable } from "@/components/common/table/CommonTable";
-import { defaultImage } from "@/lib/constants";
+import { defaultImage } from "@/lib/config";
 import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { useGetCustomers, useGetSystemItemMaster } from "@/query-keys";
 import { OmsUser, SystemItemMaster } from "@/types/todo";

@@ -13,54 +13,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { METHOD_DELIVERY } from "@/lib/constants";
+import { METHOD_DELIVERY } from "@/lib/config";
+import { useOutbound } from "@/lib/store";
 import { customersQueryKeys } from "@/query-keys";
 import { getFeeTracking } from "@/services";
+import { formShippingSchema } from "@/types/common";
 import { DataResponseDeliveryMethod } from "@/types/customer";
 import { AddressDistrict, AddressProvince } from "@/types/todo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
-  address_delivery: z.string().min(3, "Định dạng không đúng"),
-  address_ward_delivery: z.coerce
-    .number({ invalid_type_error: "Xin nhập phường/xã" })
-    .gt(0, "Xin nhập"),
-  address_district_delivery: z.coerce
-    .number({ invalid_type_error: "Xin nhập quận/huyện" })
-    .gt(0, "Xin nhập"),
-  address_province_delivery: z.coerce
-    .number({ invalid_type_error: "Xin nhập tỉnh/thành" })
-    .gt(0, "Xin nhập"),
-  object_delivery: z.any(),
-
-  address_pick: z.string().min(3, "Định dạng không đúng"),
-  address_ward_pick: z.coerce
-    .number({ invalid_type_error: "Xin nhập phường/xã" })
-    .gt(0, "Xin nhập"),
-  address_district_pick: z.coerce
-    .number({ invalid_type_error: "Xin nhập quận/huyện" })
-    .gt(0, "Xin nhập"),
-  address_province_pick: z.coerce
-    .number({ invalid_type_error: "Xin nhập tỉnh/thành" })
-    .gt(0, "Xin nhập"),
-  object_pick: z.any(),
-
-  weight: z.string(),
-});
-
 export default function Tracking() {
+  const router = useRouter();
+  const { setSelectedCustomerTracking } = useOutbound();
   const queryClient = useQueryClient();
 
-  const [dataMethodDelivery, setDataMethodDelivery] = useState<
-    DataResponseDeliveryMethod[]
-  >([]);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof formShippingSchema>>({
+    resolver: zodResolver(formShippingSchema),
     defaultValues: {
       address_delivery: "",
       address_province_delivery: 0,
@@ -74,6 +48,10 @@ export default function Tracking() {
     },
   });
 
+  const [dataMethodDelivery, setDataMethodDelivery] = useState<
+    DataResponseDeliveryMethod[]
+  >([]);
+
   const mutationGetFee = useMutation({
     mutationFn: (values: any) => {
       return getFeeTracking({ options: values });
@@ -86,7 +64,7 @@ export default function Tracking() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formShippingSchema>) {
     const stateDistrictPick = queryClient.getQueryData(
       customersQueryKeys.getDistricts(values.address_province_pick)
     ) as AddressDistrict[];
@@ -118,6 +96,11 @@ export default function Tracking() {
     const ghnAddressDelivery =
       values.object_delivery.attributes.carrierCodes.ghn?.split("_");
 
+    const vnpostAddressPick =
+      values.object_pick.attributes.carrierCodes.vnpost?.split("_");
+    const vnpostAddressDelivery =
+      values.object_delivery.attributes.carrierCodes.vnpost?.split("_");
+
     const payload = [
       {
         name: METHOD_DELIVERY.GHN,
@@ -143,17 +126,27 @@ export default function Tracking() {
           weight: values.weight,
         },
       },
-      // {
-      //   name: METHOD_DELIVERY.VNP,
-      //   payload: {
-      //     address: `${values.address_delivery} ${wardDeliveryGHTK}`,
-      //     province: provinceDeliveryGHTK,
-      //     pick_province: provincePickGHTK,
-      //     district: districtDeliveryGHTK,
-      //     pick_district: distrcitPickGHTK,
-      //     weight: values.weight,
-      //   },
-      // },
+      {
+        name: METHOD_DELIVERY.VNP,
+        payload: {
+          scope: 1,
+          customerCode: "C000368268",
+          data: {
+            senderProvinceCode: vnpostAddressPick[0],
+            senderDistrictCode: vnpostAddressPick[1],
+            senderCommuneCode: vnpostAddressPick[2],
+            receiverAddress: `${values.address_delivery}`,
+            receiverProvinceCode: vnpostAddressDelivery[0],
+            receiverDistrictCode: vnpostAddressDelivery[1],
+            receiverCommuneCode: vnpostAddressDelivery[2],
+            weight: values.weight,
+            serviceCode: "CTN007",
+            addonService: [],
+            additionRequest: [],
+            vehicle: "BO",
+          },
+        },
+      },
     ];
 
     mutationGetFee.mutate(payload);
@@ -192,20 +185,19 @@ export default function Tracking() {
           />
 
           <div className="flex flex-row gap-3">
-            <Button
-              className="w-full"
-              onClick={() => form.handleSubmit(onSubmit)()}
-              type="submit"
-            >
+            <Button className="w-full gap-2" type="submit">
               {mutationGetFee.isPending && (
                 <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
               )}
               Tra cứu
             </Button>
-            <Button className="w-full" onClick={() => {}} type="submit">
-              {mutationGetFee.isPending && (
-                <Loader2Icon className="ml-2 h-4 w-4 animate-spin" />
-              )}
+            <Button
+              className="w-full"
+              onClick={() => {
+                setSelectedCustomerTracking(form.getValues());
+                router.push(`/outbounds/create`);
+              }}
+            >
               Tạo đơn
             </Button>
           </div>

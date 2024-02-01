@@ -6,4 +6,8 @@ export const customersQueryKeys = {
     "get-customers",
     pageParam,
   ],
+  getOrganization: ({ pageParam }: { pageParam?: number }) => [
+    "get-organization",
+    pageParam,
+  ],
 };

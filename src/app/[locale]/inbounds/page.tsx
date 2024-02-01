@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { DURATION_TOAST } from "@/lib/constants";
+import { DURATION_TOAST } from "@/lib/config";
 import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import { useGetInbounds } from "@/query-keys/inbound";
@@ -36,6 +36,7 @@ import {
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
+import { Filter } from "./components/Filter";
 
 const optionsTabs = [
   {
@@ -312,7 +313,7 @@ export default function Inbounds() {
             },
           ]}
           onCallbackExtraActionTable={({ type, selected, data }) => {}}
-          filterComponent={null}
+          filterComponent={<Filter />}
           data={(inbounds?.data as OmsInbound[]) || []}
           columns={columns}
           isLoading={loadingOutbounds}
