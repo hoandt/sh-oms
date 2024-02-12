@@ -46,6 +46,9 @@ import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
+import { useQueryClient } from "@tanstack/react-query";
+import { mappingFilterDynamic } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/helpers";
 
 export interface DataTableSearchableColumn<TData> {
   id: keyof TData;
@@ -79,6 +82,10 @@ export const schema = z.object({
 const enum TypeFilter {
   NEW = "NEW",
   EXIST = "EXIST",
+}
+
+const enum FILTERBAR_DYNAMIC {
+  "ORAGNIZATION" = "ORAGNIZATION",
 }
 
 const SavedFilterComponent = () => {
@@ -209,6 +216,7 @@ export function CommonNewToolbar<TData>({
   rowSelection,
   rows,
 }: DataTableToolbarProps<TData>) {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -235,6 +243,10 @@ export function CommonNewToolbar<TData>({
     const params = new URLSearchParams(searchParams);
     params.delete("q");
     params.delete("status");
+
+    mappingFilterDynamic(params, "organization");
+    mappingFilterDynamic(params, "users");
+
     const arraySearchParams = qs.parse(params.toString());
     return Object.entries(arraySearchParams);
   }, [searchParams]);
@@ -313,17 +325,20 @@ export function CommonNewToolbar<TData>({
 
       <div className="flex gap-2">
         {filterList.map((filter, index) => {
-          const key = filter[0];
+          const key = capitalizeFirstLetter(filter[0]);
           const value = filter[1];
           return (
             <Badge
               key={index}
               onClick={() => {
-                removeQueryParams(key);
+                removeQueryParams(filter[0]);
               }}
               className="cursor-pointer px-4 py-2 flex gap-2"
             >
-              <div className=" font-bold">{`${key}: ${value}`}</div>
+              <div className="flex flex-row gap-1">
+                <div className="font-bold">{`${key}:`}</div>
+                <div className="font-bold">{`${value}`}</div>
+              </div>
               <XIcon width={12} height={12} />
             </Badge>
           );

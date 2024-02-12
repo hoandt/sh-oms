@@ -50,3 +50,8 @@ export const priceFormat = new Intl.NumberFormat("vi", {
   currency: "VND",
   maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
+
+export const capitalizeFirstLetter = (str: string) => {
+  const newStr = str.replaceAll("_", " ");
+  return newStr.charAt(0).toUpperCase() + newStr.slice(1);
+};
