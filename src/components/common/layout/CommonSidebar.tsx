@@ -113,7 +113,7 @@ export function CommonSidebar() {
                           active && "bg-gray-800"
                         )}
                       >
-                        <TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               {valueP.icon}
