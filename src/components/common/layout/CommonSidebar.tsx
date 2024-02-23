@@ -17,6 +17,7 @@ import {
   Package2Icon,
   PieChartIcon,
   SettingsIcon,
+  TerminalSquareIcon,
   UserSquare2Icon,
 } from "lucide-react";
 import Link from "next/link";
@@ -40,6 +41,11 @@ const router = [
         name: "Inventory",
         icon: <Laptop2Icon />,
         href: "/inventories",
+      },
+      {
+        name: "Logs",
+        icon: <TerminalSquareIcon />,
+        href: "/wms-logs",
       },
     ],
   },

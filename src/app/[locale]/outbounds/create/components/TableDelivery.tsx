@@ -1,6 +1,6 @@
 "use client";
 
-import { IndeterminateCheckbox } from "@/components/common/custom/Checkbox";
+import { IndeterminateCheckbox } from "@/components/common/custom/checkbox";
 import { CommonTable } from "@/components/common/table/CommonTable";
 import { Badge } from "@/components/ui/badge";
 import { DataResponseDeliveryMethod } from "@/types/customer";
