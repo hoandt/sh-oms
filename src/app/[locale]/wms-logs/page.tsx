@@ -12,12 +12,26 @@ import { format } from "date-fns";
 import { Button } from "@/components/Button";
 import Link from "next/link";
 import { logQueryKeys } from "@/query-keys/logs/key";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Loader2Icon } from "lucide-react";
+import { DURATION_TOAST } from "@/lib/config";
+import { useToast } from "@/components/ui/use-toast";
 
 const Page = () => {
-  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const session = useSession() as any;
   const [user, setUser] = useState<string>("");
-  const [data, setData] = useState([""]);
+  const [log, setLog] = useState<WMSLog[]>([]);
 
   useEffect(() => {
     if (session.data) {
@@ -26,31 +40,15 @@ const Page = () => {
     }
   }, [session]);
 
-  const { data: logs, isLoading } = useGetLogs({
-    page: 0,
-    pageSize: 0,
-  });
-
-  const generateLogs = logs?.data.slice(0, 20);
-  const hasViewMore = data.length > 20;
+  const hasViewMore = log.length > 20;
 
   const mutateTransaction = useMutation({
     mutationFn: (logs: any) => {
       return createLogs({ logs });
     },
     onSuccess(data, __, _) {
-      const newData = data.data;
-      queryClient.setQueryData(
-        logQueryKeys.getLogs({ pageParam: 0 }),
-        (prevData: any) => {
-          if (prevData) {
-            const newPage = [newData.data, ...prevData.data];
-            return { ...prevData, data: newPage };
-          }
-        }
-      );
-
-      setData((prev) => [...prev, newData.data]);
+      const newData = (data.data as any).data as WMSLog;
+      setLog((prev) => [...prev, newData]);
     },
   });
 
@@ -59,7 +57,16 @@ const Page = () => {
       return deleteLogs({ id });
     },
     onSuccess: (data) => {
-      console.log({ data });
+      const returnData = (data.data as any).data;
+      const newData = log.filter((e) => e.id !== returnData.id);
+
+      toast({
+        duration: DURATION_TOAST,
+        title: "Scheduled: Catch up",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+      });
+
+      return setLog(newData);
     },
   });
 
@@ -113,13 +120,41 @@ const Page = () => {
         accessorKey: "actions",
         header: () => <div className="">{"Hành Động"}</div>,
         cell: ({ row }) => (
-          <Button
-            onClick={() => {
-              mutateDeleteTransaction.mutate(row.original.id as number);
-            }}
-          >
-            {"Xoá"}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger
+              className="text-center text-sm leading-6 text-gray-500"
+              asChild
+            >
+              <Button className="flex gap-2">
+                {"Xoá"}
+                {mutateDeleteTransaction.isPending && (
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    mutateDeleteTransaction.mutate(row.original.id as number);
+                  }}
+                >
+                  {mutateDeleteTransaction.isPending && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Confirm
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         ),
         enableSorting: false,
         enableHiding: false,
@@ -157,9 +192,9 @@ const Page = () => {
 
             <CommonTable
               filterComponent={null}
-              data={generateLogs || []}
+              data={log || []}
               columns={columns}
-              isLoading={isLoading}
+              isLoading={false}
             />
 
             {hasViewMore && (

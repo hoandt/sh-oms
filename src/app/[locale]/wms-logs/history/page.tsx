@@ -23,6 +23,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Loader2Icon } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { DURATION_TOAST } from "@/lib/config";
 type TrackingCodeLine = {
   code: string;
   startTime: string;
@@ -30,6 +32,7 @@ type TrackingCodeLine = {
   user: string;
 };
 const page = () => {
+  const { toast } = useToast();
   const session = useSession() as any;
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
@@ -55,6 +58,11 @@ const page = () => {
       return deleteLogs({ id });
     },
     onSuccess: (data) => {
+      toast({
+        duration: DURATION_TOAST,
+        title: "Scheduled: Catch up",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+      });
       refetch();
     },
   });

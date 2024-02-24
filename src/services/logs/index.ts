@@ -71,6 +71,5 @@ export const deleteLogs = async ({ id }: any) => {
     body: JSON.stringify(body),
   });
 
-  const logResponses = { data: res.data, meta: res.meta };
-  return transformData(logResponses);
+  return res;
 };
