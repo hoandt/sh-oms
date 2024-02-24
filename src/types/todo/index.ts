@@ -683,6 +683,18 @@ export interface SystemInventory {
       };
 }
 
+export interface WMSLog {
+  id: number | string;
+  attributes: {
+    transaction: string;
+    type: string;
+    createdAt: Date;
+    updatedAt: Date;
+    user: number;
+    status: string;
+  };
+}
+
 export interface SystemItemCategory {
   name?: string;
   system_item_masters?:

@@ -38,7 +38,7 @@ export const ReactQueryProvider = ({ children }: { children: ReactNode }) => {
         },
       }}
     >
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
       {children}
     </PersistQueryClientProvider>
   );

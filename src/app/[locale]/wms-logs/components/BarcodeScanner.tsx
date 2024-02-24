@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Loader2Icon } from "lucide-react";
 
 const InboundIDScan = z.object({
   inboundID: z
@@ -25,12 +26,13 @@ const InboundIDScan = z.object({
 });
 
 function BarcodeScanForm({
+  isLoading,
   handleScan,
 }: {
+  isLoading: boolean;
   handleScan: (code: string) => void;
 }) {
   const router = useRouter();
-  const [loading, setLoading] = React.useState(false);
   const { toast, dismiss } = useToast();
   const form = useForm<z.infer<typeof InboundIDScan>>({
     resolver: zodResolver(InboundIDScan),
@@ -67,10 +69,10 @@ function BarcodeScanForm({
                 />
               </FormControl>
               <FormDescription className="relative mt-2">
-                <span className={cn(loading ? "opacity-0" : "")}>
+                <span className={cn(isLoading ? "opacity-0" : "")}>
                   Scan mã vận đơn trên phiếu giao hàng
                 </span>
-                {loading && <>loading...</>}
+                {isLoading && <Loader2Icon className="h-4 w-4 animate-spin" />}
               </FormDescription>
 
               <FormMessage />

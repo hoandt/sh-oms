@@ -14,7 +14,7 @@ interface SidebarContextType {
 }
 
 const useSidebar = () => {
-  const [toggleSidebar, setToggleSidebar] = useState(false);
+  const [toggleSidebar, setToggleSidebar] = useState(true);
 
   return {
     toggleSidebar,
