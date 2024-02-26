@@ -10,12 +10,14 @@ import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { motion } from "framer-motion";
 import {
+  BoxIcon,
   ContainerIcon,
   GalleryVerticalEndIcon,
   HardDriveUploadIcon,
   Laptop2Icon,
   Package2Icon,
   PieChartIcon,
+  SearchIcon,
   SettingsIcon,
   TerminalSquareIcon,
   UserSquare2Icon,
@@ -28,45 +30,20 @@ const router = [
     title: "Main",
     route: [
       {
-        name: "Inbound",
-        icon: <ContainerIcon />,
-        href: "/inbounds",
-      },
-      {
-        name: "Outbound",
-        icon: <GalleryVerticalEndIcon />,
-        href: "/outbounds",
-      },
-      {
-        name: "Inventory",
-        icon: <Laptop2Icon />,
-        href: "/inventories",
-      },
-      {
-        name: "Logs",
-        icon: <TerminalSquareIcon />,
+        name: "Packing",
+        icon: <BoxIcon />,
         href: "/wms-logs",
+      },
+      {
+        name: "Search",
+        icon: <SearchIcon />,
+        href: "/history",
       },
     ],
   },
   {
     title: "More",
     route: [
-      {
-        name: "Products",
-        icon: <PieChartIcon />,
-        href: "/products",
-      },
-      {
-        name: "Shipping",
-        icon: <Package2Icon />,
-        href: "/shipping",
-      },
-      {
-        name: "Customers",
-        icon: <UserSquare2Icon />,
-        href: "/customers",
-      },
       {
         name: "Setting",
         icon: <SettingsIcon />,

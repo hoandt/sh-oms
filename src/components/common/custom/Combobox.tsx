@@ -82,10 +82,10 @@ export const Combobox = ({
                 />
                 <CommandGroup className="w-fill p-2">
                   <ScrollArea className="h-[200px] rounded-md border overflow-scroll">
-                    {dataOptions?.map((options: any) => (
+                    {dataOptions?.map((options: any, id) => (
                       <CommandItem
                         value={options.value}
-                        key={options.value}
+                        key={id}
                         onSelect={() => {
                           form.setValue(name, options.value, {
                             shouldDirty: true,

@@ -124,14 +124,14 @@ export function CommonTable<TData, TValue>({
       );
     }
     return (
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+            {table.getHeaderGroups().map((headerGroup, i) => (
+              <TableRow key={i}>
+                {headerGroup.headers.map((header, j) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={j}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -146,14 +146,15 @@ export function CommonTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <React.Fragment>
                   <TableRow
-                    key={row.id}
+                    key={index}
                     data-state={row.getIsSelected() && "selected"}
+                    className="h-12 py-4"
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                    {row.getVisibleCells().map((cell, i) => (
+                      <TableCell key={i}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -174,7 +175,7 @@ export function CommonTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-12 py-4 text-center"
                 >
                   No results.
                 </TableCell>

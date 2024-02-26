@@ -1,11 +1,11 @@
-import { deleteLogs } from "@/app/api/services/logs";
+import { updateLogs } from "@/app/api/services/logs";
 import { NextResponse, NextRequest } from "next/server";
 
-export async function DELETE(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const outboundData = (await req.json()) as { id: number };
+    const logData = (await req.json()) as { id: number; videoUrl: string };
 
-    const response = await deleteLogs(outboundData);
+    const response = await updateLogs(logData);
 
     return NextResponse.json(
       { message: "Successfully", data: response?.data },

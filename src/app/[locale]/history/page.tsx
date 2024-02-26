@@ -10,7 +10,6 @@ import { CommonTable } from "@/components/common/table/CommonTable";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 import { deleteLogs } from "@/services";
-import { Button } from "@/components/Button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,15 +21,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Trash } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
-type TrackingCodeLine = {
-  code: string;
-  startTime: string;
+import { toInteger } from "lodash";
+import { Button } from "@/components/ui/button";
 
-  user: string;
-};
 const page = () => {
   const { toast } = useToast();
   const session = useSession() as any;
@@ -57,11 +53,13 @@ const page = () => {
     mutationFn: (id: number) => {
       return deleteLogs({ id });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast({
         duration: DURATION_TOAST,
-        title: "Scheduled: Catch up",
-        description: "Friday, February 10, 2023 at 5:57 PM",
+        title: "Đã xóa",
+        description: `Giao dịch ${JSON.stringify(
+          data.data.data.attributes.transaction
+        )} đã được xóa!`,
       });
       refetch();
     },
@@ -117,6 +115,25 @@ const page = () => {
         enableHiding: false,
       },
       {
+        accessorKey: "videoURL",
+        header: () => <div className="">{"Video"}</div>,
+        cell: ({ row }) => {
+          const videoURL = row.original.attributes.videoUrl;
+          return videoURL ? (
+            <a
+              href={videoURL}
+              className="text-blue-500"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {videoURL}
+            </a>
+          ) : (
+            "-"
+          );
+        },
+      },
+      {
         accessorKey: "actions",
         header: () => <div className="">{"Hành Động"}</div>,
         cell: ({ row }) => (
@@ -125,8 +142,8 @@ const page = () => {
               className="text-center text-sm leading-6 text-gray-500"
               asChild
             >
-              <Button className="flex gap-2">
-                {"Xoá"}
+              <Button className="flex gap-2" variant={"destructive"}>
+                <Trash className="h-4 w-4 text-red-50" />
                 {mutateDeleteTransaction.isPending && (
                   <Loader2Icon className="h-4 w-4 animate-spin" />
                 )}
@@ -134,23 +151,24 @@ const page = () => {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>Xóa giao dịch?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                  Hành động này không thể hoàn tác, bạn phải thực hiện đóng gói
+                  lại.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  className="bg-red-500 text-red-50"
                   onClick={() => {
-                    mutateDeleteTransaction.mutate(row.original.id);
+                    mutateDeleteTransaction.mutate(toInteger(row.original.id));
                   }}
                 >
                   {mutateDeleteTransaction.isPending && (
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Confirm
+                  Xác nhận
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -163,19 +181,21 @@ const page = () => {
   }, []);
 
   return (
-    <CommonTable
-      extraActionTable={[]}
-      filterComponent={null}
-      data={(logs?.data as WMSLog[]) || []}
-      columns={columns}
-      isLoading={isLoading}
-      setPagination={setPagination}
-      pageIndex={pageIndex}
-      pageSize={pageSize}
-      pageCount={
-        Math.ceil((logs?.meta?.pagination?.total || 0) / pageSize) || 1
-      }
-    />
+    <div className="px-4">
+      <CommonTable
+        extraActionTable={[]}
+        filterComponent={null}
+        data={(logs?.data as WMSLog[]) || []}
+        columns={columns}
+        isLoading={isLoading}
+        setPagination={setPagination}
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        pageCount={
+          Math.ceil((logs?.meta?.pagination?.total || 0) / pageSize) || 1
+        }
+      />
+    </div>
   );
 
   return null;

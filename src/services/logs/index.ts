@@ -73,3 +73,18 @@ export const deleteLogs = async ({ id }: any) => {
 
   return res;
 };
+
+export const updateLogs = async ({ id, videoUrl }: any) => {
+  const body = {
+    id,
+    videoUrl,
+  };
+
+  const ENDPOINT = `/api/controller/logs/update`;
+  const res: DataResponseFromBackend = await fetchData(ENDPOINT, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+
+  return res;
+};

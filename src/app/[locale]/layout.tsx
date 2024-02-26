@@ -6,7 +6,6 @@ import ReactAuthProvider from "@/provider/ReactAuthProvider";
 import { ReactQueryProvider } from "@/provider/ReactQueryProvider";
 import { SidebarProvider } from "@/provider/SidebarProvider";
 import type { Metadata } from "next";
-import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Roboto_Mono } from "next/font/google";
 import { Be_Vietnam_Pro as FontSans } from "next/font/google";

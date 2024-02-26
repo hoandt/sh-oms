@@ -18,7 +18,7 @@ export const getLogs = async ({ options }: { options: QueryOptions }) => {
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
 
-    console.log({ENDPOINT})
+    console.log({ ENDPOINT });
     const res: DataResponseFromBackend<any> = await axios.get(ENDPOINT, {
       headers: adminHeadersList,
     });
@@ -31,10 +31,10 @@ export const getLogs = async ({ options }: { options: QueryOptions }) => {
 
 export const updateLogs = async ({
   id,
-  inventory,
+  videoUrl,
 }: {
   id: number;
-  inventory: any;
+  videoUrl: string;
 }) => {
   try {
     const endpoint = `${SUB_DOMAIN}/${id}`;
@@ -43,14 +43,14 @@ export const updateLogs = async ({
       `${BACKEND_URL}${endpoint}`,
       {
         data: {
-          ...inventory,
+          videoUrl,
         },
       },
       {
         headers: adminHeadersList,
       }
     );
-
+    console.log({ res });
     return res;
   } catch (error) {
     console.log(error);

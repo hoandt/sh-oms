@@ -692,6 +692,7 @@ export interface WMSLog {
     updatedAt: Date;
     user: number;
     status: string;
+    videoUrl: string;
   };
 }
 
