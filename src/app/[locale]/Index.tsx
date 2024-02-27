@@ -1,6 +1,5 @@
 "use client";
 
-import PageLayout from "../../components/PageLayout";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
@@ -18,7 +17,7 @@ export default function Index({ session }: Props) {
   }
 
   return (
-    <PageLayout title={t("title")}>
+    <div title={t("title")}>
       {session ? (
         <>
           <p>{t("loggedIn", { username: session.user?.name })}</p>
@@ -35,6 +34,6 @@ export default function Index({ session }: Props) {
           <Link href={locale + "/login"}>{t("login")}</Link>
         </>
       )}
-    </PageLayout>
+    </div>
   );
 }

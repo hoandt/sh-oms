@@ -1,6 +1,5 @@
 import { inboundQueryKeys } from "./key";
 import { getInbound, getOperateInbounds } from "@/services/inbounds";
-import { getOutbound } from "@/services/outbounds";
 import { useQuery } from "@tanstack/react-query";
 
 interface IGetInbounds {
