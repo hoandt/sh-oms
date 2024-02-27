@@ -68,7 +68,7 @@ export default function Login() {
               name="username"
               type="text"
               required
-              className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
           <div>
@@ -84,7 +84,7 @@ export default function Login() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                className=" mt-1 block w-full px-3 py-2 border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                className=" mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md  focus:ring-orange-500 focus:border-orange-500"
               />
               <button
                 type="button"
