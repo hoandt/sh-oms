@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Tooltip,
   TooltipContent,
@@ -24,7 +22,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 const router = [
   {
     title: "Main",
@@ -64,7 +61,7 @@ export function CommonSidebar() {
   return (
     <div
       className={cn(
-        "lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-18 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4",
+        "fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-18 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4",
         toggleSidebar && "lg:w-60"
       )}
     >
