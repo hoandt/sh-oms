@@ -35,7 +35,7 @@ const page = () => {
   const keyword = searchParams.get("q") || "";
   const session = useSession() as any;
   const user = session.data as any;
-
+  const [isOpen, setIsOpen] = React.useState(false);
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
@@ -128,7 +128,10 @@ const page = () => {
             //  display Camera icon
 
             <PlayCircle
-              onClick={() => setCurrentVideo(videoURL)}
+              onClick={() => {
+                setIsOpen(true);
+                setCurrentVideo(videoURL);
+              }}
               className="h-6 w-6 text-slate-500 cursor-pointer"
             />
           ) : (
@@ -185,8 +188,15 @@ const page = () => {
 
   return (
     <div className="px-4">
+      {JSON.stringify(isOpen)}
       {currentVideo && (
-        <Dialog defaultOpen>
+        <Dialog
+          defaultOpen={isOpen}
+          onOpenChange={() => {
+            setIsOpen((prev) => !prev);
+            setCurrentVideo("");
+          }}
+        >
           <DialogHeader>Video</DialogHeader>
           <DialogContent className="w-[480px]">
             <VideoPlayer src={currentVideo} />
