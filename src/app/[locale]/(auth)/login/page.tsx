@@ -1,8 +1,7 @@
 "use client";
 
-import { Logo } from "@/components/Logo";
-import { type Metadata } from "next";
-import { signIn, useSession } from "next-auth/react";
+import Logo from "@/components/Logo";
+import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,9 +34,9 @@ export default function Login() {
   return (
     <div className="w-full flex justify-center items-center mt-10">
       <div className="w-1/4 flex flex-col">
-        <div className="flex">
+        <div className="flex w-full">
           <Link href="/" aria-label="Home">
-            <Logo className="h-10 w-auto" />
+            <Logo />
           </Link>
         </div>
         <h2 className="mt-20 text-lg font-semibold text-gray-900">
@@ -47,7 +46,7 @@ export default function Login() {
           Don’t have an account?{" "}
           <Link
             href="/register"
-            className="font-medium text-blue-600 hover:underline"
+            className="font-medium text-orange-600 hover:underline"
           >
             Sign up
           </Link>{" "}
@@ -80,12 +79,12 @@ export default function Login() {
                 Password
               </label>
               <div className="text-sm">
-                <a
+                {/* <a
                   href="#"
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot password?
-                </a>
+                </a> */}
               </div>
             </div>
             <div className="mt-2">

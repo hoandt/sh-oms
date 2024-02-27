@@ -1,12 +1,10 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import { createLogs, deleteLogs, transformData } from "@/services";
-import { ColumnDef } from "@tanstack/react-table";
+import { createLogs, deleteLogs } from "@/services";
 import { WMSLog } from "@/types/todo";
-import { CommonTable } from "@/components/common/table/CommonTable";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
@@ -20,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CameraIcon, Loader2Icon, Video } from "lucide-react";
+import { Router } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -34,37 +32,48 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toInteger } from "lodash";
+import { cn } from "@/lib/utils";
 
-const CurrentUser = () => {
-  const { data } = useSession();
-  return <div>{data?.user?.email}</div>;
-};
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
   deviceId: string;
   action: CameraAction;
   trackingCode: string;
+  log: WMSLog[];
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
+  const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const { toast } = useToast();
+  const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
+
   const session = useSession() as any;
-  const [user, setUser] = useState<string>("");
+  const [currentUser, setCurrentUser] = useState<UserWithRole>();
   const [log, setLog] = useState<WMSLog[]>([]);
   const [cameraAction, setCameraAction] = useState<CameraActionPayload>({
     deviceId: "",
     action: "idle",
     trackingCode: "",
+    log,
   });
   useEffect(() => {
     if (session.data) {
       const user = session.data.userWithRole as UserWithRole;
-      setUser(user.firstName + " " + user.lastName);
+      setCurrentUser(user);
     }
   }, [session]);
+  useEffect(() => {
+    cameraAction.action === "start" && finishRecordBtn.current?.focus();
+    finishRecordBtn.current?.focus();
+  }, [log, cameraAction.action]);
+
+  useEffect(() => {
+    setIsBarcodeFocused(true);
+  }, [cameraAction]);
 
   const hasViewMore = log.length > 7;
 
@@ -74,6 +83,7 @@ const Page = () => {
     },
     onSuccess(data, __, _) {
       const newData = (data.data as any).data as WMSLog;
+      setCameraAction({ ...cameraAction, log: [newData, ...log] });
       setLog((prev) => [newData, ...prev].slice(0, 8));
     },
   });
@@ -93,136 +103,20 @@ const Page = () => {
           data.data.data.attributes.transaction
         )} đã được xóa!`,
       });
-
-      return setLog(newData);
+      setLog(newData);
     },
   });
-
-  const columns = useMemo(() => {
-    return [
-      {
-        accessorKey: "id",
-        width: 60,
-        header: () => <div>{"ID"}</div>,
-        cell: ({ row }) => <div>{row.original.id}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "status",
-        header: () => <div className="w-3/4">{"Transaction"}</div>,
-        cell: ({ row }) => {
-          const transaction = row.original.attributes.transaction;
-          return <div className="flex space-x-2">{transaction}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "status",
-        header: () => <div className="">{"Trạng thái"}</div>,
-        cell: ({ row }) => {
-          const status = row.original.attributes.status;
-          return <div>{status}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "note",
-        header: () => <div className="">{"Ngày đóng gói"}</div>,
-        cell: ({ row }) => {
-          const date = row.original.attributes.createdAt;
-          return <div>{format(date, "HH:mm dd/MM/yyyy")}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "user",
-        header: () => <div className="">{"Nhân viên đóng gói"}</div>,
-        cell: ({ row }) => (
-          <div>
-            <CurrentUser />
-          </div>
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "videoURL",
-        header: () => <div className="">{"Video"}</div>,
-        cell: ({ row }) => {
-          const videoURL = row.original.attributes.videoUrl;
-          return videoURL ? (
-            <a
-              href={videoURL}
-              className="text-blue-500"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {videoURL}
-            </a>
-          ) : (
-            "-"
-          );
-        },
-      },
-      {
-        accessorKey: "actions",
-        header: () => <div className="">{"Hành Động"}</div>,
-        cell: ({ row }) => (
-          <>
-            {/* Display packing url  */}
-            <Button variant="outline">
-              <CameraIcon className="h-4 w-4" />
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger
-                className="text-center text-sm leading-6 text-gray-500"
-                asChild
-              >
-                <Button className="flex gap-2" variant="outline">
-                  {"Xoá"}
-                  {mutateDeleteTransaction.isPending && (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
-                  )}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Xóa giao dịch?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Hành động này không thể hoàn tác, bạn có chắc chắn muốn xóa?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      mutateDeleteTransaction.mutate(row.original.id as number);
-                    }}
-                  >
-                    {mutateDeleteTransaction.isPending && (
-                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Xác nhận
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-    ] as ColumnDef<WMSLog>[];
-  }, []);
+  const handleRecordComplete = () => {
+    setCameraAction({ ...cameraAction, action: "stop" });
+    setIsBarcodeFocused((prev) => !prev);
+  };
 
   const handleScan = (code: string) => {
     mutateTransaction.mutate({
+      organization: currentUser?.organization.id,
       transaction: code,
       type: "outbound",
-      status: "packing",
+      status: "packed",
       user: 1,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
@@ -249,6 +143,9 @@ const Page = () => {
                     handleStream={(status: boolean) => {
                       setScanActive(status);
                     }}
+                    handleUploading={(status: boolean) => {
+                      setIsUploading(status);
+                    }}
                   />
                 </div>
               </>
@@ -256,6 +153,7 @@ const Page = () => {
             {scanActive && (
               <BarcodeScanForm
                 handleScan={handleScan}
+                isFocused={isBarcodeFocused}
                 isLoading={mutateTransaction.isPending}
               />
             )}
@@ -265,27 +163,104 @@ const Page = () => {
         {/* Main Content */}
         <div className="col-span-4 pt-32">
           <div className="p-4 ">
-            <h1 className="text-2xl text-gray-800">Tracking mã đơn</h1>
+            <h1 className="text-2xl text-slate-600 flex font-bold ">
+              Tracking mã đơn{" "}
+              {isUploading && (
+                <Router
+                  strokeWidth={3}
+                  className="animate-pulse text-orange-500 w-8"
+                />
+              )}
+            </h1>
             {/* make a button inline */}
 
             {/* View all transaction button  */}
             <div className="flex justify-between mb-2">
-              <h2 className="text-lg text-gray-600">
+              <h2 className="  text-slate-500">
                 {"Nhân viên: "}
-                <span className="text-gray-800">{user}</span>
+                <span className="text-slate-800">
+                  {currentUser?.lastName} {currentUser?.firstName}
+                </span>
               </h2>
               <Button>
                 <Link href={"/history"}>{"Xem toàn bộ"}</Link>
               </Button>
             </div>
-            {/* Table */}
-
-            <CommonTable
-              filterComponent={null}
-              data={log || []}
-              columns={columns}
-              isLoading={false}
-            />
+            {/* Display a simple table show recent log, if log is empty, display placeholder message */}
+            {log.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left">Mã đơn</th>
+                    <th className="text-left">Nhân viên</th>
+                    <th className="text-left">Thời gian</th>
+                    <th className="text-left">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {log.map((log) => {
+                    return (
+                      <tr key={log.id}>
+                        <td>
+                          <Link
+                            target="_blank"
+                            href={`/history?q=${log.attributes.transaction}`}
+                            className={cn(
+                              "text-gray-800 bold   hover:underline cursor-pointer inline-flex items-center gap-2"
+                            )}
+                          >
+                            {log.attributes.transaction}
+                          </Link>
+                        </td>
+                        <td>
+                          {currentUser?.lastName} {currentUser?.firstName}
+                        </td>
+                        <td>
+                          {format(
+                            new Date(log.attributes.createdAt),
+                            "dd/MM/yyyy hh:MM"
+                          )}
+                        </td>
+                        <td>
+                          <AlertDialog>
+                            <AlertDialogTrigger>
+                              <Button variant="outline">Xóa</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  {"Xác nhận xóa"}
+                                </AlertDialogTitle>
+                              </AlertDialogHeader>
+                              <AlertDialogDescription>
+                                {"Bạn có chắc chắn muốn xóa giao dịch này?"}
+                              </AlertDialogDescription>
+                              <AlertDialogFooter>
+                                <AlertDialogAction
+                                  onClick={() => {
+                                    mutateDeleteTransaction.mutate(
+                                      toInteger(log.id)
+                                    );
+                                    setIsBarcodeFocused((prev) => !prev);
+                                  }}
+                                >
+                                  {"Xóa"}
+                                </AlertDialogAction>
+                                <AlertDialogCancel>{"Hủy"}</AlertDialogCancel>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <div className="flex justify-center items-center h-32">
+                <p className="text-gray-600">Không có giao dịch nào</p>
+              </div>
+            )}
 
             {hasViewMore && (
               <div className="w-full flex justify-center mt-2">
@@ -299,30 +274,34 @@ const Page = () => {
       </div>
 
       {cameraAction.action === "start" && (
-        <Dialog defaultOpen>
-          <DialogContent>
+        <Dialog
+          defaultOpen
+          onOpenChange={() => {
+            setCameraAction({ ...cameraAction, action: "idle" });
+            mutateDeleteTransaction.mutate(toInteger(log[0].id));
+            setIsBarcodeFocused((prev) => !prev);
+          }}
+        >
+          <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>Đang đóng hàng</DialogTitle>
               <DialogDescription>
                 <h1>{cameraAction.trackingCode}</h1>
+                {log.length > 0 && (log[0].attributes as any).transaction}
                 Quá trình đóng hàng đang được thực hiện
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button
-                onClick={() =>
-                  setCameraAction({ ...cameraAction, action: "stop" })
+                ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
+                disabled={
+                  log.length > 0 &&
+                  (log[0].attributes as any).transaction !==
+                    cameraAction.trackingCode
                 }
+                onClick={() => handleRecordComplete()}
               >
                 {"Hoàn thành"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setCameraAction({ ...cameraAction, action: "idle" })
-                }
-              >
-                {"Hủy"}
               </Button>
             </DialogFooter>
           </DialogContent>

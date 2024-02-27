@@ -1,6 +1,5 @@
 "use client";
-import React, { use, useEffect, useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
+import React, { useMemo } from "react";
 import { useGetLogs } from "@/query-keys/logs/query";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
@@ -26,24 +25,28 @@ import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
 import { toInteger } from "lodash";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 
 const page = () => {
   const { toast } = useToast();
-  const session = useSession() as any;
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+  const session = useSession() as any;
+  const user = session.data as any;
 
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
       pageSize: PAGE_SIZE_TABLE,
     });
+  if (!user) return <div>loading...</div>;
 
   const {
     data: logs,
     isLoading,
     refetch,
   } = useGetLogs({
+    organization: user.userWithRole.organization.id,
     page: pageIndex,
     pageSize,
     code: keyword,
@@ -145,7 +148,7 @@ const page = () => {
               <Button className="flex gap-2" variant={"destructive"}>
                 <Trash className="h-4 w-4 text-red-50" />
                 {mutateDeleteTransaction.isPending && (
-                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <Loader2Icon className="h-4 w-4 animate-pulse" />
                 )}
               </Button>
             </AlertDialogTrigger>
@@ -197,8 +200,6 @@ const page = () => {
       />
     </div>
   );
-
-  return null;
 };
 
 export default page;

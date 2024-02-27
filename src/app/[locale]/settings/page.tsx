@@ -45,14 +45,21 @@ export default function Settings() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    // console.log(values);
   }
 
   return (
-    <div className="w-60 mx-4 my-3">
+    <div className="w-full mx-4 my-3">
       <Form {...form}>
-        <h1 className="text-2xl">{"Display Information"}</h1>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-4">
+        <h1 className="text-2xl">{"Thông tin tài khoản"}</h1>
+        {/* Display trial account badge  */}
+        <p className="text-sm text-gray-500">
+          {"Tài khoản của bạn đang ở dạng dùng thử"}
+        </p>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8 mt-4 w-full"
+        >
           <FormField
             control={form.control}
             name="username"
@@ -67,35 +74,41 @@ export default function Settings() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            disabled={true}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="FirstName" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            disabled={true}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="LastName" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* grid with 2 columns */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className=" col-span-1">
+              <FormField
+                control={form.control}
+                disabled={true}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tên</FormLabel>
+                    <FormControl>
+                      <Input placeholder="FirstName" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className=" col-span-1">
+              <FormField
+                control={form.control}
+                disabled={true}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Họ</FormLabel>
+                    <FormControl>
+                      <Input placeholder="LastName" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           <Button disabled={true} type="submit">
             Submit

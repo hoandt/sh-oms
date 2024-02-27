@@ -16,14 +16,33 @@ export function transformData(data: any): any {
   return data;
 }
 
-export const getLogs = async ({ code, page = 1, pageSize = 15 }: any) => {
+export const getLogs = async ({
+  organization,
+  code,
+  page = 1,
+  pageSize = 15,
+}: any) => {
   const endpoint = "/wms-logs";
 
   const params: QueryOptions = {
     filters: {
-      transaction: {
-        $eq: code || undefined,
-      },
+      $and: [
+        {
+          transaction: {
+            $eq: code || undefined,
+          },
+        },
+        {
+          organization: {
+            id: {
+              $eq: organization,
+            },
+          },
+        },
+      ],
+    },
+    sort: {
+      createdAt: "desc",
     },
     pagination: {
       page,

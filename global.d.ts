@@ -15,6 +15,7 @@ type ValidRole = {
 
 type UserWithRole = {
   id: number;
+  isTrial: boolean;
   username: string;
   firstName: string;
   lastName: string;
@@ -26,6 +27,9 @@ type UserWithRole = {
   updatedAt: string;
   side: string;
   phone: string;
+  organization: {
+    id: number;
+  };
   role: {
     id: number;
     name: string;

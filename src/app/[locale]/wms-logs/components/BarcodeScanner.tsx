@@ -28,7 +28,9 @@ const InboundIDScan = z.object({
 function BarcodeScanForm({
   isLoading,
   handleScan,
+  isFocused,
 }: {
+  isFocused: boolean;
   isLoading: boolean;
   handleScan: (code: string) => void;
 }) {
@@ -43,6 +45,12 @@ function BarcodeScanForm({
   useEffect(() => {
     form.setFocus("inboundID");
   }, [form]);
+  useEffect(() => {
+    if (isFocused) {
+      form.setFocus("inboundID");
+    }
+  }, [isFocused]);
+
   useEffect(() => {}, []);
   function onSubmit(values: z.infer<typeof InboundIDScan>) {
     form.setValue("inboundID", "");

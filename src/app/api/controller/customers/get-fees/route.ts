@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const responseGHTK = await getGHTKMethod({ payload: payloadGHTK });
   const responseVNPost = await getVNPostMethod({ payload: payloadVNPost });
 
-  console.log({ responseVNPost });
+  // console.log({ responseVNPost });
 
   const response: DataResponseDeliveryMethod[] = [
     {

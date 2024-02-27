@@ -1,5 +1,6 @@
 import { useToast } from "@/components/ui/use-toast";
 import { ProgressiveUploader } from "@api.video/video-uploader";
+import { CameraIcon } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 interface Device {
   deviceId: string;
@@ -42,14 +43,14 @@ const SelectCameraDevice = ({
   };
 
   return (
-    <div>
+    <div className="flex gap-4 items-center">
       {/* Select a video device from list*/}
-
-      <div>
+      <CameraIcon />
+      <div className="flex-1">
         <select
           value={selectedDevice}
           onChange={handleDeviceChange}
-          className="px-2 py-4 rounded"
+          className="px-2 py-4 rounded w-full"
         >
           <option value="" className="px-4 rounded">
             Chọn camera

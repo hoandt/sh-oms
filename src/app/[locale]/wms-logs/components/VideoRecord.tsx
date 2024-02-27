@@ -1,9 +1,13 @@
 import { useToast } from "@/components/ui/use-toast";
-import { ProgressiveUploader } from "@api.video/video-uploader";
+import {
+  ProgressiveUploader,
+  VideoUploadResponse,
+} from "@api.video/video-uploader";
 import { useEffect, useRef, useState } from "react";
 import { CameraActionPayload } from "../page";
 import { updateLogs } from "@/services";
 import { useMutation } from "@tanstack/react-query";
+import { toInteger } from "lodash";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -17,9 +21,11 @@ const bytesToSize = (bytes: number) => {
 function CameraRecorder({
   action,
   handleStream,
+  handleUploading,
 }: {
   action: CameraActionPayload;
   handleStream: (status: boolean) => void;
+  handleUploading: (status: boolean) => void;
 }): JSX.Element {
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
@@ -34,29 +40,36 @@ function CameraRecorder({
   );
   const [recording, setRecording] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [cancelled, setCancelled] = useState<boolean>(false);
-  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [videoUrl, setVideoUrl] = useState<VideoUploadResponse | null>(null);
 
   const mutateUpdateLog = useMutation({
     mutationFn: (id: number) => {
-      return updateLogs({ id, videoUrl });
+      return updateLogs({ id, videoUrl: videoUrl?.assets?.mp4 });
     },
     onSuccess: (data: any) => {
-      toast({
-        duration: 3000,
-        title: "Đã update",
-        description: `Giao dịch ${JSON.stringify(
-          data.data.data.attributes.transaction
-        )} đã được update!`,
-      });
+      // toast({
+      //   duration: 3000,
+      //   title: "Đã upload video",
+      //   description: `Video đóng gói cho đơn ${JSON.stringify(
+      //     data.data.data.attributes.transaction
+      //   )} đã được upload!`,
+      // });
       // refetch();
     },
   });
 
   useEffect(() => {
-    videoUrl && mutateUpdateLog.mutate(295);
-    console.log("res:", { videoUrl });
-  }, [videoUrl]);
+    if (videoUrl) {
+      // find log with same videoUrl.title
+
+      const log = action.log.find(
+        (log) => log.attributes.transaction === action.trackingCode
+      );
+      if (log) {
+        mutateUpdateLog.mutate(toInteger(log.id));
+      }
+    }
+  }, [videoUrl, action.log]);
   //   handle camera recording with action
   useEffect(() => {
     if (action.action === "start") {
@@ -71,13 +84,13 @@ function CameraRecorder({
   }, [action.action]);
   const handleProgressiveUpload = (blob: Blob) => {
     uploader.onProgress((event) => {
-      console.log(
-        `total number of bytes uploaded for this upload: ${bytesToSize(
-          event.uploadedBytes
-        )}.`
-      );
-      console.log(`total size of the file: ${event.totalBytes}.`);
-      console.log(`current part: ${event.part}.`);
+      // console.log(
+      //   `total number of bytes uploaded for this upload: ${bytesToSize(
+      //     event.uploadedBytes
+      //   )}.`
+      // );
+      // console.log(`total size of the file: ${event.totalBytes}.`);
+      // console.log(`current part: ${event.part}.`);
     });
     uploader
       .uploadPart(blob)
@@ -88,12 +101,8 @@ function CameraRecorder({
           .uploadLastPart(blob)
           .then((video) => {
             console.log("Video uploaded:", video);
-            setVideoUrl(video.assets?.mp4 || "");
-            toast({
-              title: "Video uploaded",
-              description: "Video has been uploaded successfully.",
-              duration: 3000,
-            });
+            setVideoUrl(video);
+            handleUploading(false);
           })
           .catch((error) => {
             toast({
@@ -173,6 +182,7 @@ function CameraRecorder({
       recorder.start();
       setMediaRecorder(recorder);
       setRecording(true);
+      handleUploading(true);
     }
   };
 
@@ -186,27 +196,31 @@ function CameraRecorder({
   const cancelRecording = () => {
     if (recording) {
       if (mediaRecorder) {
-        setCancelled(true);
         setRecording(false);
         uploader.cancel();
+        handleUploading(false);
       }
     }
   };
 
   return (
-    <div>
-      {<video className="rounded" ref={videoRef} autoPlay playsInline />}
-      {stream ? (
-        <div>
-          {!recording ? (
-            <button onClick={startRecording}>Start Recording</button>
-          ) : (
-            <button onClick={stopRecording}>Stop Recording</button>
-          )}
-        </div>
-      ) : (
-        "Loading camera..."
+    <div className="relative">
+      {/* display red circle while recording is true */}
+      {recording && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            backgroundColor: "red",
+          }}
+        ></div>
       )}
+      {<video className="rounded" ref={videoRef} autoPlay playsInline />}
+      {!stream && "Loading..."}
     </div>
   );
 }
