@@ -35,7 +35,7 @@ const router = [
         href: "/wms-logs",
       },
       {
-        name: "Search",
+        name: "Giao dịch",
         icon: <SearchIcon />,
         href: "/history",
       },
@@ -45,7 +45,7 @@ const router = [
     title: "More",
     route: [
       {
-        name: "Setting",
+        name: "Cài đặt",
         icon: <SettingsIcon />,
         href: "/settings",
       },

@@ -1,6 +1,6 @@
 "use client";
-
 import Logo from "@/components/Logo";
+import { EyeIcon, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -8,100 +8,102 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 export default function Login() {
-  const locale = useLocale();
-  const t = useTranslations("Login");
-  const [error, setError] = useState<string>();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const router = useRouter();
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (error) setError(undefined);
+    setError(""); // Clear any previous errors
 
     const formData = new FormData(event.currentTarget);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
     signIn("credentials", {
-      username: formData.get("username"),
-      password: formData.get("password"),
+      username,
+      password,
       redirect: false,
     }).then((result) => {
       if (result?.error) {
         setError(result.error);
       } else {
-        //  refresh page to get session
+        // Refresh page to get session
         router.refresh();
       }
     });
   }
 
   return (
-    <div className="w-full flex justify-center items-center mt-10">
-      <div className="w-1/4 flex flex-col">
-        <div className="flex w-full">
+    <div className="flex justify-center items-center h-screen lg:-ml-60">
+      <div className="w-full max-w-md p-8 bg-white rounded shadow-lg">
+        <div className="text-center  ">
           <Link href="/" aria-label="Home">
             <Logo />
           </Link>
         </div>
-        <h2 className="mt-20 text-lg font-semibold text-gray-900">
-          Sign in to your account
+        <h2 className="mt-6 text-xl font-semibold text-gray-900 text-center">
+          Đăng nhập tài khoản
         </h2>
-        <p className="mt-2 text-sm text-gray-700">
-          Don’t have an account?{" "}
+        <p className="mt-2 text-sm text-gray-700 text-center">
+          Chưa có?{" "}
           <Link
-            href="https://swifthub.net/vi/fulfillment-vi/dich-vu-fulfillment-viet-nam/"
+            href="https://swifthub.net/vi/tu-van-dich-vu/"
             className="font-medium text-orange-600 hover:underline"
           >
-            Sign up
+            Đăng ký ngay
           </Link>{" "}
-          for a free trial.
+          dùng thử miễn phí!
         </p>
-        <form
-          action="/api/auth/callback/credentials"
-          className="space-y-6"
-          method="POST"
-          onSubmit={onSubmit}
-        >
+        <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-900"
+            >
               Email
             </label>
-            <div className="mt-2">
-              <input
-                id="username"
-                name="username"
-                type="username"
-                required
-                className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+            />
           </div>
-
           <div>
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium leading-6 text-gray-900">
-                Password
-              </label>
-              <div className="text-sm">
-                {/* <a
-                  href="#"
-                  className="font-semibold text-orange-600 hover:text-orange-500"
-                >
-                  Forgot password?
-                </a> */}
-              </div>
-            </div>
-            <div className="mt-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900"
+            >
+              Password
+            </label>
+            <div className="relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
+                className=" mt-1 block w-full px-3 py-2 border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 px-2 py-2"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <EyeIcon className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
             </div>
           </div>
-
+          {error && <p className="text-red-600 text-sm">{error}</p>}
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
+              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
             >
               Sign in
             </button>

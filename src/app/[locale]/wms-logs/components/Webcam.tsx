@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
-import { ProgressiveUploader } from "@api.video/video-uploader";
 import { CameraIcon } from "lucide-react";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState, useCallback } from "react";
+
 interface Device {
   deviceId: string;
   kind: string;
@@ -16,51 +16,68 @@ const SelectCameraDevice = ({
   const { toast } = useToast();
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>("");
-  useEffect(() => {
-    const getVideoDevices = async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput"
-        );
-        setDevices(videoDevices as Device[]);
-      } catch (error) {
-        toast({
-          title: "Error enumerating video devices",
-          description: "Không tìm thấy thiết bị camera, vui lòng kiểm tra lại.",
-          variant: "destructive",
-        });
-        console.error("Error enumerating video devices:", error);
-      }
-    };
+  let stream: MediaStream | null = null;
 
-    const requestCameraPermission = async () => {
-      try {
-        await navigator.mediaDevices.getUserMedia({ video: true });
-        // Permission granted, now enumerate devices
-        getVideoDevices();
-      } catch (error) {
-        toast({
-          title: "Camera permission denied",
-          description:
-            "Bạn đã từ chối quyền truy cập camera. Vui lòng cấp quyền để tiếp tục sử dụng.",
-          variant: "destructive",
-        });
-        console.error("Camera permission denied:", error);
+  // Function to handle camera permission and enumerate devices
+  // Function to handle camera permission and enumerate devices
+  const initializeCameraDevices = useCallback(async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+      setDevices(videoDevices as Device[]);
+      if (videoDevices.length > 0) {
+        setSelectedDevice(videoDevices[0].deviceId);
+        handleSelect(videoDevices[0].deviceId);
       }
-    };
-
-    requestCameraPermission();
+    } catch (error) {
+      handleCameraError(error);
+    }
   }, []);
 
-  const handleDeviceChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDevice(event.target.value);
-    handleSelect(event.target.value);
-  };
+  // Handle camera permission error
+  const handleCameraError = useCallback(
+    (error: any) => {
+      toast({
+        title: "Camera permission denied",
+        description:
+          "Bạn đã từ chối quyền truy cập camera. Vui lòng cấp quyền để tiếp tục sử dụng.",
+        variant: "destructive",
+      });
+      console.error("Camera permission denied:", error);
+    },
+    [toast]
+  );
+
+  // Handle clearing selected device
+  useEffect(() => {
+    if (!selectedDevice && stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+  }, [selectedDevice]);
+
+  useEffect(() => {
+    initializeCameraDevices();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [initializeCameraDevices]);
+
+  // Handle device change
+  const handleDeviceChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      setSelectedDevice(event.target.value);
+      handleSelect(event.target.value);
+    },
+    [handleSelect]
+  );
 
   return (
     <div className="flex gap-4 items-center">
-      {/* Select a video device from list*/}
       <CameraIcon />
       <div className="flex-1">
         <select
@@ -77,16 +94,9 @@ const SelectCameraDevice = ({
             </option>
           ))}
         </select>
-        {/* Display camera component if has deviceID */}
       </div>
     </div>
   );
 };
 
 export default SelectCameraDevice;
-
-interface Device {
-  deviceId: string;
-  kind: string;
-  label: string;
-}

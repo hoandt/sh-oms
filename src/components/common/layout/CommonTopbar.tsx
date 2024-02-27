@@ -62,23 +62,23 @@ export function CommonTopbar() {
                 </svg>
               </span>
             </PopoverTrigger>
-            <PopoverContent className="w-50">
+            <PopoverContent className="w-60">
               <Link
                 href={"/settings"}
-                className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                className="block px-2 py-1 text-sm leading-6 text-gray-900"
                 role="menuitem"
                 id="user-menu-item-0"
               >
-                Your profile
+                Cài đặt
               </Link>
               <a
                 href="#"
                 onClick={() => signOut()}
-                className="block px-3 py-1 text-sm leading-6 text-gray-900"
+                className="block px-3 py-1 text-sm leading-6 text-red-500"
                 role="menuitem"
                 id="user-menu-item-1"
               >
-                Sign out
+                Thoát
               </a>
             </PopoverContent>
           </Popover>

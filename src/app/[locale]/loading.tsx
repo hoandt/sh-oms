@@ -4,8 +4,8 @@ import React from "react";
 
 const loading = () => {
   return (
-    <div className="flex h-full bg-blue-50 justify-center items-center flex-col">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-400"></div>
+    <div className="flex h-full  justify-center items-center flex-col sx:mt-16">
+      <div className="mt-24 animate-spin rounded-full h-8 w-8 border-t-8 border-b-4 border-orange-400"></div>
     </div>
   );
 };

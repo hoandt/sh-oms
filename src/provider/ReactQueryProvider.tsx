@@ -14,28 +14,19 @@ const queryClient = new QueryClient({
   },
 });
 
-const CACHE_KEY = "QUERY_CACHE";
-const persister = createSyncStoragePersister({
-  key: CACHE_KEY,
-  storage: window.localStorage,
-});
-
 export const ReactQueryProvider = ({ children }: { children: ReactNode }) => {
+  const CACHE_KEY = "QUERY_CACHE";
+  const persister = createSyncStoragePersister({
+    key: CACHE_KEY,
+    storage: window.localStorage,
+  });
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
         persister,
         maxAge: Infinity,
-        dehydrateOptions: {
-          shouldDehydrateQuery: (query) => {
-            const needPersistance =
-              query.queryKey.includes("get-customers") ||
-              query.queryKey.includes("get-organization");
-
-            return needPersistance;
-          },
-        },
       }}
     >
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
