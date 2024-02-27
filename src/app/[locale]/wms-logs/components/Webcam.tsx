@@ -34,7 +34,23 @@ const SelectCameraDevice = ({
       }
     };
 
-    getVideoDevices();
+    const requestCameraPermission = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        // Permission granted, now enumerate devices
+        getVideoDevices();
+      } catch (error) {
+        toast({
+          title: "Camera permission denied",
+          description:
+            "Bạn đã từ chối quyền truy cập camera. Vui lòng cấp quyền để tiếp tục sử dụng.",
+          variant: "destructive",
+        });
+        console.error("Camera permission denied:", error);
+      }
+    };
+
+    requestCameraPermission();
   }, []);
 
   const handleDeviceChange = (event: ChangeEvent<HTMLSelectElement>) => {
