@@ -73,9 +73,9 @@ export function CommonSidebar() {
         onClick={handleExpand}
       >
         <img
-          className="h-8 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-          alt="Your Company"
+          className="h-16 pt-2 w-auto"
+          src="https://app.swifthub.net/swifthub.svg"
+          alt="SwiftHub"
         />
       </div>
       <nav className="mt-8">

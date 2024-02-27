@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Router } from "lucide-react";
+import { Router, Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -36,6 +36,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
+import Timer from "./components/Timer";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -188,43 +189,54 @@ const Page = () => {
             </div>
             {/* Display a simple table show recent log, if log is empty, display placeholder message */}
             {log.length > 0 ? (
-              <table className="w-full">
+              <table className="w-full bg-white rounded border px-2">
                 <thead>
-                  <tr>
-                    <th className="text-left">Mã đơn</th>
-                    <th className="text-left">Nhân viên</th>
-                    <th className="text-left">Thời gian</th>
-                    <th className="text-left">Hành động</th>
+                  <tr className="px-2 py-4">
+                    <th className="text-left px-2 py-3 ">STT</th>
+                    <th className="text-left px-2 py-3">Mã đơn</th>
+                    <th className="text-left px-2 py-3">Nhân viên</th>
+                    <th className="text-left px-2 py-3">Thời gian</th>
+                    <th className="text-left px-2 py-3">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {log.map((log) => {
+                  {log.map((l, i) => {
                     return (
-                      <tr key={log.id}>
-                        <td>
+                      <tr
+                        key={l.id}
+                        className={cn(
+                          //  even odd row color
+                          i % 2 === 0 ? "bg-slate-50" : "bg-slate-200",
+                          "px-2"
+                        )}
+                      >
+                        <td className="px-3">{log.length - i}</td>
+                        <td className="px-3 py-2">
                           <Link
                             target="_blank"
-                            href={`/history?q=${log.attributes.transaction}`}
+                            href={`/history?q=${l.attributes.transaction}`}
                             className={cn(
-                              "text-gray-800 bold   hover:underline cursor-pointer inline-flex items-center gap-2"
+                              "text-gray-800 bold hover:underline cursor-pointer inline-flex items-center gap-2"
                             )}
                           >
-                            {log.attributes.transaction}
+                            {l.attributes.transaction}
                           </Link>
                         </td>
-                        <td>
+                        <td className="px-3 py-2">
                           {currentUser?.lastName} {currentUser?.firstName}
                         </td>
-                        <td>
+                        <td className="px-3 py-2">
                           {format(
-                            new Date(log.attributes.createdAt),
+                            new Date(l.attributes.createdAt),
                             "dd/MM/yyyy hh:MM"
                           )}
                         </td>
-                        <td>
+                        <td className="px-3 py-2">
                           <AlertDialog>
                             <AlertDialogTrigger>
-                              <Button variant="outline">Xóa</Button>
+                              <Button variant="outline">
+                                <Trash2Icon className="w-5 " />
+                              </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -239,7 +251,7 @@ const Page = () => {
                                 <AlertDialogAction
                                   onClick={() => {
                                     mutateDeleteTransaction.mutate(
-                                      toInteger(log.id)
+                                      toInteger(l.id)
                                     );
                                     setIsBarcodeFocused((prev) => !prev);
                                   }}
@@ -284,14 +296,16 @@ const Page = () => {
         >
           <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
             <DialogHeader>
-              <DialogTitle>Đang đóng hàng</DialogTitle>
-              <DialogDescription>
-                <h1>{cameraAction.trackingCode}</h1>
-                {log.length > 0 && (log[0].attributes as any).transaction}
-                Quá trình đóng hàng đang được thực hiện
+              <DialogTitle>
+                Đang đóng hàng {cameraAction.trackingCode}{" "}
+              </DialogTitle>
+              <Timer handleTimeOut={handleRecordComplete} />
+              <DialogDescription className="py-4">
+                <div>Quá trình đóng hàng đang được thực hiện</div>
+                {/* timer */}
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <DialogFooter className="flex content-between  *:">
               <Button
                 ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
                 disabled={

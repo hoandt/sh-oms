@@ -84,13 +84,13 @@ function CameraRecorder({
   }, [action.action]);
   const handleProgressiveUpload = (blob: Blob) => {
     uploader.onProgress((event) => {
-      // console.log(
-      //   `total number of bytes uploaded for this upload: ${bytesToSize(
-      //     event.uploadedBytes
-      //   )}.`
-      // );
-      // console.log(`total size of the file: ${event.totalBytes}.`);
-      // console.log(`current part: ${event.part}.`);
+      console.log(
+        `total number of bytes uploaded for this upload: ${bytesToSize(
+          event.uploadedBytes
+        )}.`
+      );
+      console.log(`total size of the file: ${event.totalBytes}.`);
+      console.log(`current part: ${event.part}.`);
     });
     uploader
       .uploadPart(blob)
@@ -205,20 +205,6 @@ function CameraRecorder({
 
   return (
     <div className="relative">
-      {/* display red circle while recording is true */}
-      {recording && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            width: "20px",
-            height: "20px",
-            borderRadius: "50%",
-            backgroundColor: "red",
-          }}
-        ></div>
-      )}
       {<video className="rounded" ref={videoRef} autoPlay playsInline />}
       {!stream && "Loading..."}
     </div>
