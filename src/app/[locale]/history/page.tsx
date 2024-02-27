@@ -188,7 +188,6 @@ const page = () => {
 
   return (
     <div className="px-4">
-      {JSON.stringify(isOpen)}
       {currentVideo && (
         <Dialog
           defaultOpen={isOpen}
