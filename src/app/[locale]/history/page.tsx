@@ -20,12 +20,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2Icon, Trash } from "lucide-react";
+import { Loader2Icon, PlayCircle, Trash } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
 import { toInteger } from "lodash";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import VideoPlayer from "./component/VideoPlayer";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 const page = () => {
   const { toast } = useToast();
@@ -67,7 +69,7 @@ const page = () => {
       refetch();
     },
   });
-
+  const [currentVideo, setCurrentVideo] = React.useState<string>("");
   const columns = useMemo(() => {
     return [
       {
@@ -109,7 +111,7 @@ const page = () => {
       },
       {
         accessorKey: "user",
-        header: () => <div className="">{"Nhân viên đóng gói"}</div>,
+        header: () => <div className="">{"Bàn đóng"}</div>,
         cell: ({ row }) => {
           const user = row.original.attributes.user;
           return <div>{user}</div>;
@@ -123,14 +125,12 @@ const page = () => {
         cell: ({ row }) => {
           const videoURL = row.original.attributes.videoUrl;
           return videoURL ? (
-            <a
-              href={videoURL}
-              className="text-blue-500"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {videoURL}
-            </a>
+            //  display Camera icon
+
+            <PlayCircle
+              onClick={() => setCurrentVideo(videoURL)}
+              className="h-6 w-6 text-slate-500 cursor-pointer"
+            />
           ) : (
             "-"
           );
@@ -145,8 +145,8 @@ const page = () => {
               className="text-center text-sm leading-6 text-gray-500"
               asChild
             >
-              <Button className="flex gap-2" variant={"destructive"}>
-                <Trash className="h-4 w-4 text-red-50" />
+              <Button className="flex gap-2" variant={"link"}>
+                <Trash className="h-4 w-4 text-red-500" />
                 {mutateDeleteTransaction.isPending && (
                   <Loader2Icon className="h-4 w-4 animate-pulse" />
                 )}
@@ -185,6 +185,14 @@ const page = () => {
 
   return (
     <div className="px-4">
+      {currentVideo && (
+        <Dialog defaultOpen>
+          <DialogHeader>Video</DialogHeader>
+          <DialogContent className="w-[480px]">
+            <VideoPlayer src={currentVideo} />
+          </DialogContent>
+        </Dialog>
+      )}
       <CommonTable
         extraActionTable={[]}
         filterComponent={null}
