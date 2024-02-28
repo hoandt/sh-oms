@@ -5,15 +5,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useSidebarContext } from "@/provider/SidebarProvider";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export function CommonTopbar() {
   const { data } = useSession();
+  const { setToggleSidebar } = useSidebarContext();
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-      <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
+      <button
+        type="button"
+        className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+        onClick={() => setToggleSidebar?.((e) => !e)}
+      >
         <span className="sr-only">Open sidebar</span>
         <svg
           className="h-6 w-6"
