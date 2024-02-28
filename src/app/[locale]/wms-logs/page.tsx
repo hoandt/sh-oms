@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import { createLogs, deleteLogs } from "@/services";
+import { createLogs, deleteLogs, updateLogs } from "@/services";
 import { WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -26,7 +26,6 @@ import SelectCameraDevice from "./components/Webcam";
 import CameraRecorder from "./components/VideoRecord";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -37,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
+import { VideoUploadResponse } from "@api.video/video-uploader";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -55,11 +55,20 @@ const Page = () => {
   const session = useSession() as any;
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
   const [log, setLog] = useState<WMSLog[]>([]);
+  const [video, setVideo] = useState<VideoUploadResponse>();
   const [cameraAction, setCameraAction] = useState<CameraActionPayload>({
     deviceId: "",
     action: "idle",
     trackingCode: "",
     log,
+  });
+  const mutateUpdateLog = useMutation({
+    mutationFn: ({ id, videoUrl }: { id: number; videoUrl: string }) => {
+      return updateLogs({ id, videoUrl });
+    },
+    onSuccess: (data: any) => {
+      // Handle success if needed
+    },
   });
   useEffect(() => {
     if (session.data) {
@@ -71,7 +80,21 @@ const Page = () => {
     cameraAction.action === "start" && finishRecordBtn.current?.focus();
     finishRecordBtn.current?.focus();
   }, [log, cameraAction.action]);
-
+  useEffect(() => {
+    // find log that has the same tracking code with the video title,update the videoUrl
+    if (video) {
+      const trackingCode = video.title;
+      const foundLog = log.find(
+        (l) => (l.attributes as any).transaction === trackingCode
+      );
+      foundLog?.id &&
+        video.assets &&
+        mutateUpdateLog.mutate({
+          id: toInteger(foundLog.id),
+          videoUrl: video.assets?.mp4 || "",
+        });
+    }
+  }, [video, log]);
   useEffect(() => {
     setIsBarcodeFocused(true);
   }, [cameraAction]);
@@ -88,7 +111,10 @@ const Page = () => {
       setLog((prev) => [newData, ...prev].slice(0, 8));
     },
   });
-
+  const handleUploading = (status: boolean, video?: VideoUploadResponse) => {
+    setIsUploading(status);
+    setVideo(video);
+  };
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
       return deleteLogs({ id });
@@ -128,7 +154,7 @@ const Page = () => {
       {/* Add padding-top equivalent to the height of your sticky header */}
       <div className="grid grid-cols-6">
         {/* Sidebar */}
-        <div className="bg-slate-200 h-screen col-span-2 pt-32">
+        <div className="bg-slate-200 h-screen col-span-6 sm:col-span-3 pt-32">
           <div className="p-4">
             <SelectCameraDevice
               handleSelect={(device: string) => {
@@ -137,16 +163,16 @@ const Page = () => {
             />
             {cameraAction.deviceId && (
               <>
-                {" "}
                 <div className="rounded shadow my-2">
                   <CameraRecorder
                     action={cameraAction}
                     handleStream={(status: boolean) => {
                       setScanActive(status);
                     }}
-                    handleUploading={(status: boolean) => {
-                      setIsUploading(status);
-                    }}
+                    handleUploading={(
+                      status: boolean,
+                      video: VideoUploadResponse | undefined
+                    ) => handleUploading(status, video)}
                   />
                 </div>
               </>
@@ -162,7 +188,7 @@ const Page = () => {
         </div>
 
         {/* Main Content */}
-        <div className="col-span-4 pt-32">
+        <div className="col-span-6 sm:col-span-3 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
               Tracking mã đơn{" "}

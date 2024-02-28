@@ -1,10 +1,9 @@
 // timer component
 import React, { useEffect, useState } from "react";
-const LIMIT_TIME = 5 * 60;
+const LIMIT_TIME = 10 * 60;
 const Timer = ({ handleTimeOut }: { handleTimeOut: () => void }) => {
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(true);
-  // limit timer to 30 minutes, then stop
   useEffect(() => {
     if (seconds >= LIMIT_TIME) {
       setIsActive(false);
@@ -20,11 +19,9 @@ const Timer = ({ handleTimeOut }: { handleTimeOut: () => void }) => {
       }, 1000);
     } else if (!isActive && seconds !== 0) {
       clearInterval(interval);
-      console.log("cleared");
     }
     return () => {
       clearInterval(interval);
-      console.log("cleared");
     };
   }, [isActive, seconds]);
 

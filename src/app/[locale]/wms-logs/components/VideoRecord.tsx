@@ -5,9 +5,7 @@ import {
 } from "@api.video/video-uploader";
 import { useEffect, useRef, useState } from "react";
 import { CameraActionPayload } from "../page";
-import { updateLogs } from "@/services";
-import { useMutation } from "@tanstack/react-query";
-import { toInteger } from "lodash";
+// import { BrowserMultiFormatReader } from "@zxing/library";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -25,7 +23,7 @@ function CameraRecorder({
 }: {
   action: CameraActionPayload;
   handleStream: (status: boolean) => void;
-  handleUploading: (status: boolean) => void;
+  handleUploading: (status: boolean, video?: VideoUploadResponse) => void;
 }): JSX.Element {
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
@@ -40,36 +38,9 @@ function CameraRecorder({
   );
   const [recording, setRecording] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoUrl, setVideoUrl] = useState<VideoUploadResponse | null>(null);
+  // const scanner = new BrowserMultiFormatReader(); // Use BrowserMultiFormatReader directly
+  // const [qrCodeResult, setQRCodeResult] = useState("");
 
-  const mutateUpdateLog = useMutation({
-    mutationFn: (id: number) => {
-      return updateLogs({ id, videoUrl: videoUrl?.assets?.mp4 });
-    },
-    onSuccess: (data: any) => {
-      // toast({
-      //   duration: 3000,
-      //   title: "Đã upload video",
-      //   description: `Video đóng gói cho đơn ${JSON.stringify(
-      //     data.data.data.attributes.transaction
-      //   )} đã được upload!`,
-      // });
-      // refetch();
-    },
-  });
-
-  useEffect(() => {
-    if (videoUrl) {
-      // find log with same videoUrl.title
-
-      const log = action.log.find(
-        (log) => log.attributes.transaction === action.trackingCode
-      );
-      if (log) {
-        mutateUpdateLog.mutate(toInteger(log.id));
-      }
-    }
-  }, [videoUrl, action.log]);
   //   handle camera recording with action
   useEffect(() => {
     if (action.action === "start") {
@@ -82,6 +53,7 @@ function CameraRecorder({
       cancelRecording();
     }
   }, [action.action]);
+
   const handleProgressiveUpload = (blob: Blob) => {
     uploader.onProgress((event) => {
       console.log(
@@ -100,9 +72,7 @@ function CameraRecorder({
         uploader
           .uploadLastPart(blob)
           .then((video) => {
-            console.log("Video uploaded:", video);
-            setVideoUrl(video);
-            handleUploading(false);
+            handleUploading(false, video);
           })
           .catch((error) => {
             toast({
@@ -128,8 +98,8 @@ function CameraRecorder({
       audio: false,
       video: {
         deviceId: { exact: action.deviceId },
-        width: { min: 100, ideal: 1280, max: WIDTH },
-        height: { min: 100, ideal: 720, max: HEIGHT },
+        width: { min: 100, ideal: 1920, max: WIDTH },
+        height: { min: 100, ideal: 1080, max: HEIGHT },
         frameRate: { ideal: 25 },
       },
     };
@@ -140,6 +110,7 @@ function CameraRecorder({
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+
         handleStream(true);
         setStream(stream);
       } catch (error) {
@@ -205,7 +176,16 @@ function CameraRecorder({
 
   return (
     <div className="relative">
-      {<video className="rounded" ref={videoRef} autoPlay playsInline />}
+      {
+        <video
+          className="rounded"
+          ref={videoRef}
+          width={WIDTH}
+          height={HEIGHT}
+          autoPlay
+          playsInline
+        />
+      }
       {!stream && "Loading..."}
     </div>
   );

@@ -52,6 +52,7 @@
     "@tanstack/react-query-devtools": "^5.17.1",
     "@tanstack/react-query-persist-client": "^5.20.1",
     "@tanstack/react-table": "^8.11.3",
+    "@zxing/library": "^0.20.0",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",

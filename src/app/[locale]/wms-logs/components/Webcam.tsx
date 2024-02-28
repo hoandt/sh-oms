@@ -19,7 +19,6 @@ const SelectCameraDevice = ({
   let stream: MediaStream | null = null;
 
   // Function to handle camera permission and enumerate devices
-  // Function to handle camera permission and enumerate devices
   const initializeCameraDevices = useCallback(async () => {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true });

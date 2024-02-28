@@ -77,7 +77,11 @@ function BarcodeScanForm({
               </FormControl>
               <FormDescription className="relative mt-2">
                 <span className={isLoading ? "opacity-0" : ""}>
-                  Scan mã vận đơn trên phiếu giao hàng
+                  Scan mã vận đơn trên phiếu giao hàng. Bấm{" "}
+                  <span className="bg-white border rounded shadow px-1">
+                    F9
+                  </span>{" "}
+                  để focus.
                 </span>
                 {isLoading && <Loader2Icon className="h-4 w-4 animate-spin" />}
               </FormDescription>

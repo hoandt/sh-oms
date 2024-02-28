@@ -7,19 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { motion } from "framer-motion";
-import {
-  BoxIcon,
-  ContainerIcon,
-  GalleryVerticalEndIcon,
-  HardDriveUploadIcon,
-  Laptop2Icon,
-  Package2Icon,
-  PieChartIcon,
-  SearchIcon,
-  SettingsIcon,
-  TerminalSquareIcon,
-  UserSquare2Icon,
-} from "lucide-react";
+import { BoxIcon, SearchIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
