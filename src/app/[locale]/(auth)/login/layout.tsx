@@ -6,7 +6,7 @@ import React from "react";
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(auth);
 
-  if (session) redirect("/wms-logs");
+  if (session) redirect("/");
   return <>{children}</>;
 };
 
