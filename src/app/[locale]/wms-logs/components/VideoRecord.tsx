@@ -5,11 +5,12 @@ import {
 } from "@api.video/video-uploader";
 import { useEffect, useRef, useState } from "react";
 import { CameraActionPayload } from "../page";
+import { useSession } from "next-auth/react";
 // import { BrowserMultiFormatReader } from "@zxing/library";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
-const DEFAULT_UPLOAD_TOKEN = process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
+
 const bytesToSize = (bytes: number) => {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   if (bytes === 0) return "0 Byte";
@@ -25,9 +26,26 @@ function CameraRecorder({
   handleStream: (status: boolean) => void;
   handleUploading: (status: boolean, video?: VideoUploadResponse) => void;
 }): JSX.Element {
+  const session = useSession() as any;
+  const user = session.data.userWithRole as UserWithRole;
+
+  const [uploadToken, setUploadToken] = useState<string>(() => {
+    return user?.isTrial
+      ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
+      : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
+  });
+  useEffect(() => {
+    console.log(user?.isTrial);
+    if (user?.isTrial) {
+      setUploadToken(process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!);
+    } else {
+      setUploadToken(process.env.NEXT_PUBLIC_UPLOAD_TOKEN!);
+    }
+  }, [user?.isTrial]);
+
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
-    uploadToken: DEFAULT_UPLOAD_TOKEN,
+    uploadToken: uploadToken,
     retries: 10,
     videoName: action.trackingCode,
   });

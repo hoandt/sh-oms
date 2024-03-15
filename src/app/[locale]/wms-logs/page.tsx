@@ -156,11 +156,14 @@ const Page = () => {
         {/* Sidebar */}
         <div className="bg-slate-200 h-screen col-span-6 sm:col-span-3 pt-32">
           <div className="p-4">
-            <SelectCameraDevice
-              handleSelect={(device: string) => {
-                setCameraAction({ ...cameraAction, deviceId: device });
-              }}
-            />
+            {scanActive && (
+              <BarcodeScanForm
+                handleScan={handleScan}
+                isFocused={isBarcodeFocused}
+                isLoading={mutateTransaction.isPending}
+              />
+            )}
+
             {cameraAction.deviceId && (
               <>
                 <div className="rounded shadow my-2">
@@ -177,13 +180,11 @@ const Page = () => {
                 </div>
               </>
             )}
-            {scanActive && (
-              <BarcodeScanForm
-                handleScan={handleScan}
-                isFocused={isBarcodeFocused}
-                isLoading={mutateTransaction.isPending}
-              />
-            )}
+            <SelectCameraDevice
+              handleSelect={(device: string) => {
+                setCameraAction({ ...cameraAction, deviceId: device });
+              }}
+            />
           </div>
         </div>
 
