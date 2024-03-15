@@ -5,7 +5,7 @@ import {
 } from "@api.video/video-uploader";
 import { useEffect, useRef, useState } from "react";
 import { CameraActionPayload } from "../page";
-// import { BrowserMultiFormatReader } from "@zxing/library";
+import { useSession } from "next-auth/react";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -25,6 +25,10 @@ function CameraRecorder({
   handleStream: (status: boolean) => void;
   handleUploading: (status: boolean, video?: VideoUploadResponse) => void;
 }): JSX.Element {
+  // get current user  session from the server
+  const { data: session } = useSession();
+  // get the toast function from the hook
+
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
     uploadToken: DEFAULT_UPLOAD_TOKEN,
@@ -38,10 +42,7 @@ function CameraRecorder({
   );
   const [recording, setRecording] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  // const scanner = new BrowserMultiFormatReader(); // Use BrowserMultiFormatReader directly
-  // const [qrCodeResult, setQRCodeResult] = useState("");
 
-  //   handle camera recording with action
   useEffect(() => {
     if (action.action === "start") {
       startRecording();
@@ -54,43 +55,51 @@ function CameraRecorder({
     }
   }, [action.action]);
 
-  const handleProgressiveUpload = (blob: Blob) => {
-    uploader.onProgress((event) => {
-      console.log(
-        `total number of bytes uploaded for this upload: ${bytesToSize(
-          event.uploadedBytes
-        )}.`
-      );
-      console.log(`total size of the file: ${event.totalBytes}.`);
-      console.log(`current part: ${event.part}.`);
-    });
-    uploader
-      .uploadPart(blob)
-      .then(() => {
-        // Handle uploading parts
-        // Once all parts uploaded, call uploadLastPart method
-        uploader
-          .uploadLastPart(blob)
-          .then((video) => {
-            handleUploading(false, video);
-          })
-          .catch((error) => {
-            toast({
-              title: "Error uploading video",
-              description: "Please try again.",
-              variant: "destructive",
-            });
-            console.error("Error uploading video:", error);
-          });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error enumerating video devices",
-          description: "Please check your camera and try again.",
-          variant: "destructive",
-        });
-        console.error("Error uploading video parts:", error);
-      });
+  const handleProgressiveUpload = async (blob: Blob) => {
+    handleUploading(true);
+    const fileReader = new FileReader();
+    fileReader.onload = async () => {
+      const fileChunks = [];
+      const chunkSize = 1024 * 1024 * 5; // 5MB chunk size
+      let offset = 0;
+      if (
+        fileReader.result !== null &&
+        fileReader.result instanceof ArrayBuffer
+      ) {
+        while (offset < fileReader.result.byteLength) {
+          const chunk = fileReader.result.slice(offset, offset + chunkSize);
+          fileChunks.push(chunk);
+          offset += chunkSize;
+        }
+
+        for (const chunk of fileChunks) {
+          const blob = new Blob([chunk], { type: "video/webm" });
+
+          const formData = new FormData();
+          formData.append("file", blob);
+          formData.append("upload_preset", "i63skbkc");
+          formData.append("trackingCode", action.trackingCode);
+          formData.append("filename", action.trackingCode); // Add the filename
+
+          const response = await fetch(
+            "https://api.cloudinary.com/v1_1/djdygww0g/video/upload",
+            {
+              method: "POST",
+              body: formData,
+              headers: {
+                //   "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log(response);
+          if (!response.ok) {
+            // Handle upload error
+          }
+        }
+      }
+    };
+
+    fileReader.readAsArrayBuffer(blob);
   };
 
   useEffect(() => {
@@ -110,7 +119,6 @@ function CameraRecorder({
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-
         handleStream(true);
         setStream(stream);
       } catch (error) {
@@ -143,11 +151,13 @@ function CameraRecorder({
         }
       };
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const recordedBlob = new Blob(chunks, { type: "video/webm" });
         // Here, you can handle the recorded blob, e.g., save it to server, download, etc.
         console.log("Recorded Blob:", recordedBlob);
-        handleProgressiveUpload(recordedBlob); // Upload the recorded video
+        handleProgressiveUpload(recordedBlob).then(() => {
+          handleUploading(false);
+        }); // Upload the recorded video
       };
 
       recorder.start();

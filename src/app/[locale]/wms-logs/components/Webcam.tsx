@@ -1,6 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { CameraIcon } from "lucide-react";
 import { ChangeEvent, useEffect, useState, useCallback } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 interface Device {
   deviceId: string;
@@ -14,11 +15,12 @@ const SelectCameraDevice = ({
   handleSelect: (device: string) => void;
 }) => {
   const { toast } = useToast();
+
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>("");
+  const [deviceId, setDeviceId] = useLocalStorage("deviceId", "");
   let stream: MediaStream | null = null;
 
-  // Function to handle camera permission and enumerate devices
   const initializeCameraDevices = useCallback(async () => {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -27,16 +29,21 @@ const SelectCameraDevice = ({
         (device) => device.kind === "videoinput"
       );
       setDevices(videoDevices as Device[]);
-      if (videoDevices.length > 0) {
-        setSelectedDevice(videoDevices[0].deviceId);
-        handleSelect(videoDevices[0].deviceId);
+      if (deviceId) {
+        // find deviceId in videoDevices, if found, set it as selectedDevice
+        const device = videoDevices.find(
+          (device) => device.deviceId === deviceId
+        );
+        if (device) {
+          setSelectedDevice(device.deviceId);
+          handleSelect(device.deviceId);
+        }
       }
     } catch (error) {
       handleCameraError(error);
     }
   }, []);
 
-  // Handle camera permission error
   const handleCameraError = useCallback(
     (error: any) => {
       toast({
@@ -50,7 +57,6 @@ const SelectCameraDevice = ({
     [toast]
   );
 
-  // Handle clearing selected device
   useEffect(() => {
     if (!selectedDevice && stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -64,11 +70,23 @@ const SelectCameraDevice = ({
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [initializeCameraDevices]);
+  }, []);
 
-  // Handle device change
   const handleDeviceChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
+      // if event.target.value is empty, clear selectedDevice and deviceId
+      if (!event.target.value) {
+        // stop the stream
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = null;
+        }
+        setSelectedDevice("");
+        setDeviceId("");
+        handleSelect("");
+        return;
+      }
+      setDeviceId(event.target.value);
       setSelectedDevice(event.target.value);
       handleSelect(event.target.value);
     },

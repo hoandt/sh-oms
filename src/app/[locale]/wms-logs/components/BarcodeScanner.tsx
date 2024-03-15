@@ -39,9 +39,6 @@ function BarcodeScanForm({
     if (isFocused) {
       form.setFocus("inboundID");
     }
-  }, [isFocused, form]);
-  // use F9 to focus on the form when the form is not focused
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "F9") {
         form.setFocus("inboundID");
@@ -51,7 +48,7 @@ function BarcodeScanForm({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [form]);
+  }, [isFocused, form]);
 
   function onSubmit(values: z.infer<typeof InboundIDScan>) {
     form.setValue("inboundID", "");
@@ -68,6 +65,7 @@ function BarcodeScanForm({
             <FormItem>
               <FormControl>
                 <Input
+                  required
                   autoComplete="off"
                   placeholder="Scan mã vận đơn"
                   {...field}

@@ -2,7 +2,6 @@
 import Logo from "@/components/Logo";
 import { EyeIcon, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -48,7 +47,7 @@ export default function Login() {
         <p className="mt-2 text-sm text-gray-700 text-center">
           Chưa có?{" "}
           <Link
-            href="https://swifthub.net/vi/tu-van-dich-vu/"
+            href="https://swifthub.net/vi/order-tracking/"
             className="font-medium text-orange-600 hover:underline"
           >
             Đăng ký ngay
