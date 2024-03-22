@@ -29,8 +29,6 @@ export const getSystemItemMaster = async ({
     method: "GET",
   });
 
-  console.log({ res, ENDPOINT });
-
   const response = { data: res.data, meta: res.meta };
   return response;
 };

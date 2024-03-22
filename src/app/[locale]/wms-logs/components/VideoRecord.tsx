@@ -6,7 +6,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { CameraActionPayload } from "../page";
 import { useSession } from "next-auth/react";
-// import { BrowserMultiFormatReader } from "@zxing/library";
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -35,7 +34,7 @@ function CameraRecorder({
       : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
   });
   useEffect(() => {
-    console.log(user?.isTrial);
+    console.log(user);
     if (user?.isTrial) {
       setUploadToken(process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!);
     } else {
@@ -56,8 +55,6 @@ function CameraRecorder({
   );
   const [recording, setRecording] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  // const scanner = new BrowserMultiFormatReader(); // Use BrowserMultiFormatReader directly
-  // const [qrCodeResult, setQRCodeResult] = useState("");
 
   //   handle camera recording with action
   useEffect(() => {
@@ -73,42 +70,59 @@ function CameraRecorder({
   }, [action.action]);
 
   const handleProgressiveUpload = (blob: Blob) => {
-    uploader.onProgress((event) => {
-      console.log(
-        `total number of bytes uploaded for this upload: ${bytesToSize(
-          event.uploadedBytes
-        )}.`
-      );
-      console.log(`total size of the file: ${event.totalBytes}.`);
-      console.log(`current part: ${event.part}.`);
+    // create file from blob
+    const file = new File([blob], `${action.trackingCode}`, {
+      type: "video/webm",
     });
-    uploader
-      .uploadPart(blob)
-      .then(() => {
-        // Handle uploading parts
-        // Once all parts uploaded, call uploadLastPart method
-        uploader
-          .uploadLastPart(blob)
-          .then((video) => {
-            handleUploading(false, video);
-          })
-          .catch((error) => {
-            toast({
-              title: "Error uploading video",
-              description: "Please try again.",
-              variant: "destructive",
-            });
-            console.error("Error uploading video:", error);
-          });
+
+    //
+    file.stream().pipeTo(
+      new WritableStream({
+        write(chunk) {
+          console.log(chunk);
+        },
+        close() {
+          console.log("done");
+        },
       })
-      .catch((error) => {
-        toast({
-          title: "Error enumerating video devices",
-          description: "Please check your camera and try again.",
-          variant: "destructive",
-        });
-        console.error("Error uploading video parts:", error);
-      });
+    );
+
+    // uploader.onProgress((event) => {
+    //   console.log(
+    //     `total number of bytes uploaded for this upload: ${bytesToSize(
+    //       event.uploadedBytes
+    //     )}.`
+    //   );
+    //   console.log(`total size of the file: ${event.totalBytes}.`);
+    //   console.log(`current part: ${event.part}.`);
+    // });
+    // uploader
+    //   .uploadPart(blob)
+    //   .then(() => {
+    //     // Handle uploading parts
+    //     // Once all parts uploaded, call uploadLastPart method
+    //     uploader
+    //       .uploadLastPart(blob)
+    //       .then((video) => {
+    //         handleUploading(false, video);
+    //       })
+    //       .catch((error) => {
+    //         toast({
+    //           title: "Error uploading video",
+    //           description: "Please try again.",
+    //           variant: "destructive",
+    //         });
+    //         console.error("Error uploading video:", error);
+    //       });
+    //   })
+    //   .catch((error) => {
+    //     toast({
+    //       title: "Error enumerating video devices",
+    //       description: "Please check your camera and try again.",
+    //       variant: "destructive",
+    //     });
+    //     console.error("Error uploading video parts:", error);
+    //   });
   };
 
   useEffect(() => {
@@ -116,8 +130,8 @@ function CameraRecorder({
       audio: false,
       video: {
         deviceId: { exact: action.deviceId },
-        width: { min: 100, ideal: 1920, max: WIDTH },
-        height: { min: 100, ideal: 1080, max: HEIGHT },
+        width: { min: 480, ideal: 1920, max: WIDTH },
+        height: { min: 480, ideal: 1080, max: HEIGHT },
         frameRate: { ideal: 25 },
       },
     };
@@ -194,16 +208,7 @@ function CameraRecorder({
 
   return (
     <div className="relative">
-      {
-        <video
-          className="rounded"
-          ref={videoRef}
-          width={WIDTH}
-          height={HEIGHT}
-          autoPlay
-          playsInline
-        />
-      }
+      {<video className="rounded w-full" ref={videoRef} autoPlay playsInline />}
       {!stream && "Loading..."}
     </div>
   );

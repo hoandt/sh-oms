@@ -18,7 +18,6 @@ export const getLogs = async ({ options }: { options: QueryOptions }) => {
 
     const ENDPOINT = `${BACKEND_URL}${SUB_DOMAIN}${queryOptions}`;
 
-    console.log({ ENDPOINT });
     const res: DataResponseFromBackend<any> = await axios.get(ENDPOINT, {
       headers: adminHeadersList,
     });
@@ -50,7 +49,7 @@ export const updateLogs = async ({
         headers: adminHeadersList,
       }
     );
-    console.log({ res });
+
     return res;
   } catch (error) {
     console.log(error);

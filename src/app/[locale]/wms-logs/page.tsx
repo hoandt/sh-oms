@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Router, Trash2Icon } from "lucide-react";
+import { CheckCheckIcon, CheckCircle, Router, Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -37,13 +37,14 @@ import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
 import { VideoUploadResponse } from "@api.video/video-uploader";
+import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
   deviceId: string;
   action: CameraAction;
   trackingCode: string;
-  log: WMSLog[];
+  log: VideosLog[];
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
@@ -51,11 +52,10 @@ const Page = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { toast } = useToast();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
-
+  const [video, setVideo] = useState<VideoUploadResponse>();
   const session = useSession() as any;
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
-  const [log, setLog] = useState<WMSLog[]>([]);
-  const [video, setVideo] = useState<VideoUploadResponse>();
+  const [log, setLog] = useState<VideosLog[]>([]);
   const [cameraAction, setCameraAction] = useState<CameraActionPayload>({
     deviceId: "",
     action: "idle",
@@ -71,6 +71,21 @@ const Page = () => {
     },
   });
   useEffect(() => {
+    console.log(video);
+    if (video && video.assets?.mp4) {
+      // find the log with the same tracking code and update the video url
+      const uploadedLog = log.find(
+        (l) => (l.attributes as any).transaction === video.title
+      );
+      console.log("    uploading: boolean ");
+      mutateUpdateLog.mutate({
+        id: toInteger(uploadedLog?.id),
+        videoUrl: video.assets?.mp4 || "",
+      });
+    }
+  }, [video]);
+
+  useEffect(() => {
     if (session.data) {
       const user = session.data.userWithRole as UserWithRole;
       setCurrentUser(user);
@@ -80,41 +95,41 @@ const Page = () => {
     cameraAction.action === "start" && finishRecordBtn.current?.focus();
     finishRecordBtn.current?.focus();
   }, [log, cameraAction.action]);
-  useEffect(() => {
-    // find log that has the same tracking code with the video title,update the videoUrl
-    if (video) {
-      const trackingCode = video.title;
-      const foundLog = log.find(
-        (l) => (l.attributes as any).transaction === trackingCode
-      );
-      foundLog?.id &&
-        video.assets &&
-        mutateUpdateLog.mutate({
-          id: toInteger(foundLog.id),
-          videoUrl: video.assets?.mp4 || "",
-        });
-    }
-  }, [video, log]);
+
   useEffect(() => {
     setIsBarcodeFocused(true);
   }, [cameraAction]);
-
-  const hasViewMore = log.length > 7;
 
   const mutateTransaction = useMutation({
     mutationFn: (logs: any) => {
       return createLogs({ logs });
     },
     onSuccess(data, __, _) {
-      const newData = (data.data as any).data as WMSLog;
-      setCameraAction({ ...cameraAction, log: [newData, ...log] });
-      setLog((prev) => [newData, ...prev].slice(0, 8));
+      const newData = (data.data as any).data as VideosLog;
+      setCameraAction({
+        ...cameraAction,
+        log: [newData, ...log],
+      });
+      setLog((prev) => [newData, ...prev]);
     },
   });
-  const handleUploading = (status: boolean, video?: VideoUploadResponse) => {
-    setIsUploading(status);
-    setVideo(video);
+
+  const handleUploadingProgress = (
+    uploading: boolean,
+    trackingCode: string,
+    video?: VideoUploadResponse
+  ) => {
+    video && setVideo(video);
+    setLog((prev) =>
+      prev.map((l) => {
+        if ((l.attributes as any).transaction === trackingCode) {
+          return { ...l, isUploading: uploading };
+        }
+        return l;
+      })
+    );
   };
+
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
       return deleteLogs({ id });
@@ -151,6 +166,8 @@ const Page = () => {
 
   return (
     <div className="-mt-32 ">
+      {/*  */}
+
       {/* Add padding-top equivalent to the height of your sticky header */}
       <div className="grid grid-cols-6">
         {/* Sidebar */}
@@ -167,16 +184,26 @@ const Page = () => {
             {cameraAction.deviceId && (
               <>
                 <div className="rounded shadow my-2">
-                  <CameraRecorder
-                    action={cameraAction}
-                    handleStream={(status: boolean) => {
-                      setScanActive(status);
-                    }}
-                    handleUploading={(
-                      status: boolean,
-                      video: VideoUploadResponse | undefined
-                    ) => handleUploading(status, video)}
-                  />
+                  {currentUser && (
+                    <CanvasVideoRecorder
+                      action={cameraAction}
+                      handleStream={(status: boolean) => {
+                        setScanActive(status);
+                      }}
+                      currentUser={currentUser}
+                      handleUploadingProgress={(
+                        isUploading: boolean,
+                        trackingCode: string,
+                        video?: VideoUploadResponse
+                      ) =>
+                        handleUploadingProgress(
+                          isUploading,
+                          trackingCode,
+                          video
+                        )
+                      }
+                    />
+                  )}
                 </div>
               </>
             )}
@@ -189,6 +216,7 @@ const Page = () => {
         </div>
 
         {/* Main Content */}
+
         <div className="col-span-6 sm:col-span-3 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
@@ -214,6 +242,7 @@ const Page = () => {
                 <Link href={"/history"}>{"Xem toàn bộ"}</Link>
               </Button>
             </div>
+
             {/* Display a simple table show recent log, if log is empty, display placeholder message */}
             {log.length > 0 ? (
               <table className="w-full bg-white rounded border px-2">
@@ -223,11 +252,12 @@ const Page = () => {
                     <th className="text-left px-2 py-3">Mã đơn</th>
                     <th className="text-left px-2 py-3">Nhân viên</th>
                     <th className="text-left px-2 py-3">Thời gian</th>
+                    <th className="text-left px-2 py-3">Lưu video</th>
                     <th className="text-left px-2 py-3">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {log.map((l, i) => {
+                  {log.slice(0, 15).map((l, i) => {
                     return (
                       <tr
                         key={l.id}
@@ -256,6 +286,21 @@ const Page = () => {
                           {format(
                             new Date(l.attributes.createdAt),
                             "dd/MM/yyyy hh:MM"
+                          )}
+                        </td>
+                        <td className="px-3 py-2">
+                          {l.isUploading && l.attributes.videoUrl === null ? (
+                            <div className="flex items-center gap-2">
+                              <Router
+                                strokeWidth={3}
+                                className="animate-pulse text-orange-500 w-8"
+                              />
+                            </div>
+                          ) : (
+                            <CheckCheckIcon
+                              strokeWidth={3}
+                              className="text-green-500 w-8"
+                            />
                           )}
                         </td>
                         <td className="px-3 py-2">
@@ -297,15 +342,7 @@ const Page = () => {
               </table>
             ) : (
               <div className="flex justify-center items-center h-32">
-                <p className="text-gray-600">Không có giao dịch nào</p>
-              </div>
-            )}
-
-            {hasViewMore && (
-              <div className="w-full flex justify-center mt-2">
-                <Button>
-                  <Link href={"/history"}>{"Xem toàn bộ"}</Link>
-                </Button>
+                <p className="text-gray-600"></p>
               </div>
             )}
           </div>
@@ -322,29 +359,31 @@ const Page = () => {
           }}
         >
           <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
-            <DialogHeader>
-              <DialogTitle>
-                Đang đóng hàng {cameraAction.trackingCode}{" "}
-              </DialogTitle>
-              <Timer handleTimeOut={handleRecordComplete} />
-              <DialogDescription className="py-4">
-                <div>Quá trình đóng hàng đang được thực hiện</div>
-                {/* timer */}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex content-between  *:">
-              <Button
-                ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
-                disabled={
-                  log.length > 0 &&
-                  (log[0].attributes as any).transaction !==
-                    cameraAction.trackingCode
-                }
-                onClick={() => handleRecordComplete()}
-              >
-                {"Hoàn thành"}
-              </Button>
-            </DialogFooter>
+            <div>
+              <DialogHeader>
+                <DialogTitle>
+                  Đang đóng hàng {cameraAction.trackingCode}{" "}
+                </DialogTitle>
+                <Timer handleTimeOut={handleRecordComplete} />
+                <DialogDescription className="py-4">
+                  <div>Quá trình đóng hàng đang được thực hiện</div>
+                  {/* timer */}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex content-between  *:">
+                <Button
+                  ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
+                  disabled={
+                    log.length > 0 &&
+                    (log[0].attributes as any).transaction !==
+                      cameraAction.trackingCode
+                  }
+                  onClick={() => handleRecordComplete()}
+                >
+                  {"Hoàn thành"}
+                </Button>
+              </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       )}
@@ -353,3 +392,8 @@ const Page = () => {
 };
 
 export default Page;
+// create type extends WMSLog to keep track uploaded video progress
+type VideosLog = WMSLog & {
+  videoUrl?: string;
+  isUploading?: boolean;
+};
