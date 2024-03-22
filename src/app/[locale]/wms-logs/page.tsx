@@ -289,7 +289,12 @@ const Page = () => {
                           )}
                         </td>
                         <td className="px-3 py-2">
-                          {l.isUploading && l.attributes.videoUrl === null ? (
+                          {l.attributes.videoUrl ? (
+                            <CheckCircle
+                              strokeWidth={3}
+                              className="text-green-500 w-8"
+                            />
+                          ) : l.isUploading ? (
                             <div className="flex items-center gap-2">
                               <Router
                                 strokeWidth={3}
@@ -299,7 +304,7 @@ const Page = () => {
                           ) : (
                             <CheckCheckIcon
                               strokeWidth={3}
-                              className="text-green-500 w-8"
+                              className="text-gray-500 w-8"
                             />
                           )}
                         </td>

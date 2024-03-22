@@ -109,13 +109,15 @@ const CanvasVideoRecorder = ({
 
     recorder.onstop = () => {
       const blob = new Blob(chunks, { type: "video/webm" });
-      // const url = URL.createObjectURL(blob);
-      // const a = document.createElement("a");
-      // document.body.appendChild(a);
-      // a.href = url;
-      // a.download = `${action.trackingCode}.webm`;
-      // a.click();
-      // URL.revokeObjectURL(url);
+      if (currentUser.isTrial) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = url;
+        a.download = `${action.trackingCode}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
       handleProgressiveUpload(blob);
     };
 
@@ -224,6 +226,9 @@ const CanvasVideoRecorder = ({
   return (
     <div>
       <div>
+        <p></p>
+        {/* info color */}
+
         <video
           ref={videoRef}
           style={{
@@ -235,6 +240,19 @@ const CanvasVideoRecorder = ({
           playsInline
           muted
         />
+        {currentUser.isTrial && (
+          <p className="text-sm px-2 py-4 text-gray-500 bg-blue-100">
+            Với tài khoản dùng thử, video sẽ được tự động tải về máy thay vì lưu
+            trên cloud.{" "}
+            <a
+              href="https://swifthub.net/vi/order-tracking/"
+              target="_blank"
+              className="underline text-blue-500"
+            >
+              Nâng cấp tài khoản
+            </a>
+          </p>
+        )}
         <canvas
           ref={canvasRef}
           width={WIDTH}
