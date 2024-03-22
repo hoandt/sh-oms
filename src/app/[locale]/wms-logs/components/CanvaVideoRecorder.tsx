@@ -188,6 +188,15 @@ const CanvasVideoRecorder = ({
     ctx.lineWidth = 2;
     ctx.fillText(`SWIFTHUB`, WIDTH - 96, HEIGHT - 22); //bottom right
     ctx.strokeText(`SWIFTHUB`, WIDTH - 96, HEIGHT - 21); //bottom right
+    if (currentUser.isTrial) {
+      ctx.font = "bold 48px Arial";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "yellow";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 2;
+      // CENTER TRIAL TEXT
+      ctx.fillText(`Tài khoản dùng thử`, WIDTH / 2, HEIGHT / 2); //bottom right
+    }
   };
 
   const handleProgressiveUpload = (blob: Blob) => {
