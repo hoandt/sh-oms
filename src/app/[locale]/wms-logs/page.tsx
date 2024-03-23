@@ -164,7 +164,7 @@ const Page = () => {
       transaction: code,
       type: "outbound",
       status: "packed",
-      user: currentUser?.username || currentUser?.id,
+      user: 1,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
@@ -227,8 +227,8 @@ const Page = () => {
             <h1 className="text-2xl text-slate-600 flex font-bold ">
               Tracking mã đơn
             </h1>
-            {/* make a button inline */}
 
+            {/* make a button inline */}
             {/* View all transaction button  */}
             <div className="flex justify-between mb-2 w-full">
               <h2 className="  text-slate-500">
@@ -238,11 +238,19 @@ const Page = () => {
                 </span>
               </h2>
             </div>
-            {log.length && log.filter((l) => l.isUploading).length > 0 && (
-              <span className="px-2 text-sm">
-                Video đang xử lý tải lên server:{" "}
-                {log.filter((l) => l.isUploading).length}
-              </span>
+            {log.filter((l) => l.isUploading).length ? (
+              <p
+                // status section
+                className="text-slate-500  text-sm "
+              >
+                Đang xử lý tải lên server:{" "}
+                <span className="  p-1  w-2 rounded bg-green-100 text-green-600 ">
+                  {" "}
+                  {log.filter((l) => l.isUploading).length}
+                </span>
+              </p>
+            ) : (
+              ""
             )}
             {/* Display a simple table show recent log, if log is empty, display placeholder message */}
             {log.length > 0 ? (
