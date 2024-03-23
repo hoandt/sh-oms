@@ -34,7 +34,7 @@ const CanvasVideoRecorder = ({
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
-    uploadToken: currentUser
+    uploadToken: currentUser.isTrial
       ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
       : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!,
     retries: 10,
@@ -96,8 +96,9 @@ const CanvasVideoRecorder = ({
     }
     const stream = canvasRef.current.captureStream(30);
     // SET frameRate
+
     const recorder = new MediaRecorder(stream, {
-      mimeType: "video/webm; codecs=h264",
+      mimeType: "video/webm; codecs=vp9",
       videoBitsPerSecond: 3 * 1024 * 1024,
     });
 
@@ -108,7 +109,7 @@ const CanvasVideoRecorder = ({
     };
 
     recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "video/webm" });
+      const blob = new Blob(chunks);
       if (currentUser.isTrial) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
