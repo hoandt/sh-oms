@@ -7,6 +7,8 @@ import { createLogs, deleteLogs, updateLogs } from "@/services";
 import { WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
+// import { signOut } from "next-auth/react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,6 +88,7 @@ const Page = () => {
   useEffect(() => {
     if (session.data) {
       const user = session.data.userWithRole as UserWithRole;
+
       setCurrentUser(user);
     }
   }, [session]);
