@@ -32,7 +32,7 @@ const CanvasVideoRecorder = ({
     null
   );
 
-  const uploadToken = currentUser
+  const uploadToken = currentUser.isTrial
     ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
     : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
@@ -193,8 +193,7 @@ const CanvasVideoRecorder = ({
     ctx.fillStyle = "#DDDDDD";
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
-    ctx.fillText(`SWIFTHUB`, WIDTH - 96, HEIGHT - 22); //bottom right
-    ctx.strokeText(`SWIFTHUB`, WIDTH - 96, HEIGHT - 21); //bottom right
+
     if (currentUser.isTrial) {
       ctx.font = "bold 48px Arial";
       ctx.textAlign = "center";

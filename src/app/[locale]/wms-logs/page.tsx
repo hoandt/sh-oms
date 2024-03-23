@@ -164,7 +164,7 @@ const Page = () => {
       transaction: code,
       type: "outbound",
       status: "packed",
-      user: 1,
+      user: currentUser?.username || currentUser?.id,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
@@ -238,9 +238,8 @@ const Page = () => {
                 </span>
               </h2>
             </div>
-            {log.filter((l) => l.isUploading).length && (
+            {log.length && log.filter((l) => l.isUploading).length > 0 && (
               <span className="px-2 text-sm">
-                {" "}
                 Video đang xử lý tải lên server:{" "}
                 {log.filter((l) => l.isUploading).length}
               </span>
