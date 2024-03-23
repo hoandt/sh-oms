@@ -104,7 +104,7 @@ const CanvasVideoRecorder = ({
     // SET frameRate
 
     const recorder = new MediaRecorder(stream, {
-      mimeType: "video/webm; ",
+      mimeType: "video/webm",
       videoBitsPerSecond: 3 * 1024 * 1024,
     });
 
