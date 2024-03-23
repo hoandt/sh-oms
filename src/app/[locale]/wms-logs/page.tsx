@@ -18,12 +18,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCheckIcon, CheckCircle, Router, Trash2Icon } from "lucide-react";
+import { CheckCheckIcon, Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
 import SelectCameraDevice from "./components/Webcam";
-import CameraRecorder from "./components/VideoRecord";
 import {
   Dialog,
   DialogContent,
@@ -45,11 +44,11 @@ export type CameraActionPayload = {
   action: CameraAction;
   trackingCode: string;
   log: VideosLog[];
+  isSaveToLocal: boolean;
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const { toast } = useToast();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
   const [video, setVideo] = useState<VideoUploadResponse>();
@@ -61,6 +60,7 @@ const Page = () => {
     action: "idle",
     trackingCode: "",
     log,
+    isSaveToLocal: true,
   });
   const mutateUpdateLog = useMutation({
     mutationFn: ({ id, videoUrl }: { id: number; videoUrl: string }) => {
@@ -71,13 +71,11 @@ const Page = () => {
     },
   });
   useEffect(() => {
-    console.log(video);
     if (video && video.assets?.mp4) {
       // find the log with the same tracking code and update the video url
       const uploadedLog = log.find(
         (l) => (l.attributes as any).transaction === video.title
       );
-      console.log("    uploading: boolean ");
       mutateUpdateLog.mutate({
         id: toInteger(uploadedLog?.id),
         videoUrl: video.assets?.mp4 || "",
@@ -121,12 +119,19 @@ const Page = () => {
   ) => {
     video && setVideo(video);
     setLog((prev) =>
-      prev.map((l) => {
-        if ((l.attributes as any).transaction === trackingCode) {
-          return { ...l, isUploading: uploading };
-        }
-        return l;
-      })
+      // filter out log with video url
+      prev
+        .filter((l) => !l.videoUrl)
+        .map((l) => {
+          if ((l.attributes as any).transaction === trackingCode) {
+            return {
+              ...l,
+              isUploading: uploading,
+              videoUrl: video?.assets?.mp4,
+            };
+          }
+          return l;
+        })
     );
   };
 
@@ -171,7 +176,7 @@ const Page = () => {
       {/* Add padding-top equivalent to the height of your sticky header */}
       <div className="grid grid-cols-6">
         {/* Sidebar */}
-        <div className="bg-slate-200 h-screen col-span-6 sm:col-span-3 pt-32">
+        <div className="bg-slate-200 h-screen col-span-6 sm:col-span-2 pt-32">
           <div className="p-4">
             {scanActive && (
               <BarcodeScanForm
@@ -217,38 +222,35 @@ const Page = () => {
 
         {/* Main Content */}
 
-        <div className="col-span-6 sm:col-span-3 pt-32">
+        <div className="col-span-6 sm:col-span-4 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Tracking mã đơn{" "}
-              {isUploading && (
-                <Router
-                  strokeWidth={3}
-                  className="animate-pulse text-orange-500 w-8"
-                />
-              )}
+              Tracking mã đơn
             </h1>
             {/* make a button inline */}
 
             {/* View all transaction button  */}
-            <div className="flex justify-between mb-2">
+            <div className="flex justify-between mb-2 w-full">
               <h2 className="  text-slate-500">
                 {"Nhân viên: "}
                 <span className="text-slate-800">
                   {currentUser?.lastName} {currentUser?.firstName}
                 </span>
               </h2>
-              <Button>
-                <Link href={"/history"}>{"Xem toàn bộ"}</Link>
-              </Button>
             </div>
-
+            {log.filter((l) => l.isUploading).length && (
+              <span className="px-2 text-sm">
+                {" "}
+                Video đang xử lý tải lên server:{" "}
+                {log.filter((l) => l.isUploading).length}
+              </span>
+            )}
             {/* Display a simple table show recent log, if log is empty, display placeholder message */}
             {log.length > 0 ? (
               <table className="w-full bg-white rounded border px-2">
                 <thead>
-                  <tr className="px-2 py-4">
-                    <th className="text-left px-2 py-3 ">STT</th>
+                  <tr className="px-2 py-4 text-sm">
+                    <th className="text-left px-2 py-3">STT</th>
                     <th className="text-left px-2 py-3">Mã đơn</th>
                     <th className="text-left px-2 py-3">Nhân viên</th>
                     <th className="text-left px-2 py-3">Thời gian</th>
@@ -257,7 +259,7 @@ const Page = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {log.slice(0, 15).map((l, i) => {
+                  {log.slice(0, 10).map((l, i) => {
                     return (
                       <tr
                         key={l.id}
@@ -267,7 +269,7 @@ const Page = () => {
                           "px-2"
                         )}
                       >
-                        <td className="px-3">{log.length - i}</td>
+                        <td className="px-3">{i + 1}</td>
                         <td className="px-3 py-2">
                           <Link
                             target="_blank"
@@ -283,29 +285,24 @@ const Page = () => {
                           {currentUser?.lastName} {currentUser?.firstName}
                         </td>
                         <td className="px-3 py-2">
-                          {format(
-                            new Date(l.attributes.createdAt),
-                            "dd/MM/yyyy hh:MM"
-                          )}
+                          {format(new Date(), "dd/MM/yyyy")}
                         </td>
                         <td className="px-3 py-2">
-                          {l.attributes.videoUrl ? (
-                            <CheckCircle
-                              strokeWidth={3}
+                          {l.videoUrl ? (
+                            <CheckCheckIcon
+                              strokeWidth={2}
                               className="text-green-500 w-8"
                             />
                           ) : l.isUploading ? (
                             <div className="flex items-center gap-2">
-                              <Router
-                                strokeWidth={3}
-                                className="animate-pulse text-orange-500 w-8"
-                              />
+                              <span className="text-orange-500 font-bold text-lg animate-pulse">
+                                ...
+                              </span>
                             </div>
                           ) : (
-                            <CheckCheckIcon
-                              strokeWidth={3}
-                              className="text-gray-500 w-8"
-                            />
+                            <span className="text-gray-400 font-bold text-lg animate-pulse">
+                              ...
+                            </span>
                           )}
                         </td>
                         <td className="px-3 py-2">
@@ -348,6 +345,16 @@ const Page = () => {
             ) : (
               <div className="flex justify-center items-center h-32">
                 <p className="text-gray-600"></p>
+              </div>
+            )}
+            {/* if log.length > 5 display fade to indcated more */}
+            {log.length > 5 && (
+              <div
+                className="flex justify-center items-center
+              -mt-2
+              bg-gradient-to-t from-white to-transparent h-12"
+              >
+                <p className="text-gray-600">...</p>
               </div>
             )}
           </div>

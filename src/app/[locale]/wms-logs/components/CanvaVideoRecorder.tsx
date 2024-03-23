@@ -6,6 +6,7 @@ import {
   VideoUploadResponse,
 } from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
+import { Switch } from "@/components/ui/switch";
 const WIDTH = 1280;
 const HEIGHT = 960;
 const CanvasVideoRecorder = ({
@@ -24,21 +25,26 @@ const CanvasVideoRecorder = ({
   currentUser: UserWithRole;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-
+  const [isSaveToLocal, setIsSaveToLocal] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
 
+  const uploadToken = currentUser
+    ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
+    : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
-    uploadToken: currentUser.isTrial
-      ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
-      : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!,
+    uploadToken,
     retries: 10,
     videoName: action.trackingCode,
+    retryStrategy(retryCount, error) {
+      console.log(`Retrying upload. Attempt ${retryCount}. Error:`, error);
+      return 5000; // Retry after 5 seconds
+    },
   });
   useEffect(() => {
     const startCamera = async () => {
@@ -98,7 +104,7 @@ const CanvasVideoRecorder = ({
     // SET frameRate
 
     const recorder = new MediaRecorder(stream, {
-      mimeType: "video/webm; codecs=vp9",
+      mimeType: "video/webm; ",
       videoBitsPerSecond: 3 * 1024 * 1024,
     });
 
@@ -110,7 +116,7 @@ const CanvasVideoRecorder = ({
 
     recorder.onstop = () => {
       const blob = new Blob(chunks);
-      if (currentUser.isTrial) {
+      if (isSaveToLocal) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         document.body.appendChild(a);
@@ -236,9 +242,18 @@ const CanvasVideoRecorder = ({
   return (
     <div>
       <div>
-        <p></p>
-        {/* info color */}
-
+        {currentUser.isTrial && (
+          <p className="text-sm px-2 py-4 text-gray-500 bg-blue-100 rounded-t">
+            Với tài khoản dùng thử, video chỉ có thời lượng tối đa 30s.
+            <a
+              href="https://swifthub.net/vi/order-tracking/"
+              target="_blank"
+              className="underline text-blue-500"
+            >
+              Nâng cấp tài khoản
+            </a>
+          </p>
+        )}
         <video
           ref={videoRef}
           style={{
@@ -250,19 +265,14 @@ const CanvasVideoRecorder = ({
           playsInline
           muted
         />
-        {currentUser.isTrial && (
-          <p className="text-sm px-2 py-4 text-gray-500 bg-blue-100">
-            Với tài khoản dùng thử, video sẽ được tự động tải về máy thay vì lưu
-            trên cloud.{" "}
-            <a
-              href="https://swifthub.net/vi/order-tracking/"
-              target="_blank"
-              className="underline text-blue-500"
-            >
-              Nâng cấp tài khoản
-            </a>
-          </p>
-        )}
+        <div className="flex items-center gap-2 px-2 bg-slate-100 text-sm py-2 rounded-b text-slate-900">
+          Cho phép lưu về máy
+          <Switch
+            defaultChecked={isSaveToLocal}
+            onCheckedChange={(checked) => setIsSaveToLocal(checked)}
+          />
+        </div>
+
         <canvas
           ref={canvasRef}
           width={WIDTH}
