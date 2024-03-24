@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCheckIcon, Trash2Icon } from "lucide-react";
+import { CheckCheckIcon, PlayCircle, Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -264,7 +264,7 @@ const Page = () => {
                     <th className="text-left px-2 py-3">Mã đơn</th>
                     <th className="text-left px-2 py-3">Nhân viên</th>
                     <th className="text-left px-2 py-3">Thời gian</th>
-                    <th className="text-left px-2 py-3">Lưu video</th>
+                    <th className="text-left px-2 py-3">Status</th>
                     <th className="text-left px-2 py-3">Hành động</th>
                   </tr>
                 </thead>
@@ -299,19 +299,23 @@ const Page = () => {
                         </td>
                         <td className="px-3 py-2">
                           {l.videoUrl ? (
-                            <CheckCheckIcon
-                              strokeWidth={2}
-                              className="text-green-500 w-8"
-                            />
+                            // view video with link
+                            <a
+                              href={l.videoUrl}
+                              target="_blank"
+                              className="text-slate-500"
+                            >
+                              <PlayCircle className="w-5 " />
+                            </a>
                           ) : l.isUploading ? (
                             <div className="flex items-center gap-2">
-                              <span className="text-orange-500 font-bold text-lg animate-pulse">
-                                ...
+                              <span className="text-orange-500  animate-pulse">
+                                đang tải lên
                               </span>
                             </div>
                           ) : (
-                            <span className="text-gray-400 font-bold text-lg animate-pulse">
-                              ...
+                            <span className="text-gray-400  ">
+                              đang ghi hình
                             </span>
                           )}
                         </td>

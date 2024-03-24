@@ -92,7 +92,7 @@ const CanvasVideoRecorder = ({
   }, [action.action]);
   useEffect(() => {
     if (isRecording) {
-      const intervalId = setInterval(drawTextOnCanvas, 60); // Redraw text every 120 milliseconds
+      const intervalId = setInterval(drawTextOnCanvas, 80); // Redraw text every 120 milliseconds
       return () => clearInterval(intervalId);
     }
   }, [isRecording]);
@@ -104,7 +104,9 @@ const CanvasVideoRecorder = ({
     // SET frameRate
 
     const recorder = new MediaRecorder(stream, {
-      mimeType: "video/webm",
+      // mimeType: "video/webm",
+      // safari doesn't support mimeType
+
       videoBitsPerSecond: 3 * 1024 * 1024,
     });
 
@@ -155,53 +157,54 @@ const CanvasVideoRecorder = ({
     if (!ctx) {
       return;
     }
+
+    // Cache repeated values
+    const videoWidth = videoRef.current.videoWidth;
+    const videoHeight = videoRef.current.videoHeight;
+
+    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw video frame
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
+    // Set text styles
     ctx.font = "bold 44px Monospace";
     ctx.textAlign = "left";
+    ctx.lineWidth = 2;
+
+    // Draw tracking code
     ctx.fillStyle = "#EEE";
     ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    // add image
+    ctx.fillText(`${action.trackingCode}`, 20, 50); // Adjust position as needed
+    ctx.strokeText(`${action.trackingCode}`, 21, 51); // Adjust position as needed
 
-    // currenttime with date and time and seconds
+    // Draw username
+    ctx.fillText(`${currentUser.username}`, 20, 200); // Bottom left
+    ctx.strokeText(`${currentUser.username}`, 21, 201); // Bottom left
+
+    // Draw current date and time
     const currentTime = new Date().toLocaleString("en-US", {
       hour: "numeric",
       hour12: false,
       minute: "numeric",
       second: "numeric",
     });
-    // current Date
     const currentDate = new Date().toLocaleString("vi-VN", {
       month: "2-digit",
       day: "numeric",
       year: "numeric",
     });
-    ctx.fillText(`${action.trackingCode}`, 20, 50); // Adjust position as needed
-    ctx.strokeText(`${action.trackingCode}`, 21, 51); // Adjust position as needed
-    ctx.fillText(`${currentUser.username}`, 20, HEIGHT - 20); //bottom left
-    ctx.strokeText(`${currentUser.username}`, 21, HEIGHT - 19); //bottom left
-    ctx.fillText(`${currentDate} `, 20, 100); //top right
-    ctx.strokeText(`${currentDate} `, 21, 101); //top right
-    ctx.fillText(`${currentTime} `, 20, 150); //top right
-    ctx.strokeText(`${currentTime} `, 21, 151);
-    // ADD LOGO "SWIFTHUB" text
-    ctx.font = "bold 32px Arial";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#DDDDDD";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
+    ctx.fillText(`${currentDate}`, 20, 100); // Top right
+    ctx.strokeText(`${currentDate}`, 21, 101); // Top right
+    ctx.fillText(`${currentTime}`, 20, 150); // Top right
+    ctx.strokeText(`${currentTime}`, 21, 151); // Top right
 
+    // Draw trial text if applicable
     if (currentUser.isTrial) {
       ctx.font = "bold 48px Arial";
-      ctx.textAlign = "center";
       ctx.fillStyle = "yellow";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 2;
-      // CENTER TRIAL TEXT
-      ctx.fillText(`Tài khoản dùng thử`, WIDTH / 2, HEIGHT / 2); //bottom right
+      ctx.fillText(`Tài khoản dùng thử`, videoWidth / 2, videoHeight / 2); // Center
     }
   };
 
