@@ -48,7 +48,7 @@ export default function Login() {
         <p className="mt-2 text-sm text-gray-700 text-center">
           Chưa có?{" "}
           <Link
-            href="https://swifthub.net/vi/tu-van-dich-vu/"
+            href="/register"
             className="font-medium text-orange-600 hover:underline"
           >
             Đăng ký ngay

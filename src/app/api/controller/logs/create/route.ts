@@ -1,4 +1,3 @@
-import { updateInbound } from "@/app/api/services/inbounds";
 import { postLogs } from "@/app/api/services/logs";
 import { NextResponse, NextRequest } from "next/server";
 

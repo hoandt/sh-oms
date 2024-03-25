@@ -1,9 +1,10 @@
 import { adminHeadersList, BACKEND_URL } from "@/lib/config";
+import { RegisterTenant } from "@/types/authen";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import qs from "qs";
 
-const SUB_DOMAIN = "/api/system-transactions";
+const SUB_DOMAIN = "/api/auth/local";
 
 export const getUser = async ({ options }: { options: QueryOptions }) => {
   try {
@@ -49,25 +50,57 @@ export const updateUser = async ({ id, user }: { id: number; user: any }) => {
   }
 };
 
-export const postUser = async ({ transaction }: { transaction: any }) => {
+export const postUser = async ({ data }: { data: RegisterTenant }) => {
+  const endpoint = `${BACKEND_URL}/api/auth/local/register`;
+
+  const { firstName, lastName, username, password, referralCode, email } = data;
+
   try {
-    const endpoint = `${SUB_DOMAIN}`;
+    let headersList = {
+      Accept: "*/*",
+      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+      "Content-Type": "application/json",
+    };
 
-    const res: DataResponseFromBackend = await axios.post(
-      `${BACKEND_URL}${endpoint}`,
-      {
-        data: {
-          ...transaction,
-        },
-      },
-      {
-        headers: adminHeadersList,
-      }
-    );
+    let bodyContent = JSON.stringify({
+      firstName,
+      lastName,
+      username,
+      password,
+      side: "SHIPPER",
+      email,
+      referralCode,
+    });
 
-    return res;
+    let reqOptions = {
+      url: "http://103.102.46.93:1338/api/auth/local/register",
+      method: "POST",
+      headers: headersList,
+      data: bodyContent,
+    };
+
+    let response = await axios.request(reqOptions);
+    return response;
   } catch (error) {
-    console.log(error);
+    //check if error is AxiosError
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+
+        return axiosError.response.data;
+      } else if (axiosError.request) {
+        // The request was made but no response was received
+        console.log("axiosError.request");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", "axiosError.message");
+      }
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", "error");
+    }
   }
 };
 
@@ -84,6 +117,23 @@ export const deleteUser = async ({ id }: { id: number }) => {
 
     return res;
   } catch (error) {
-    console.log(error);
+    //check if error is AxiosError
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(">>>", axiosError.response.data);
+      } else if (axiosError.request) {
+        // The request was made but no response was received
+        console.log("axiosError.request");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", "axiosError.message");
+      }
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", "error");
+    }
   }
 };
