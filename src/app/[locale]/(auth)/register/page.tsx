@@ -6,14 +6,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import RegisterForm from "./component/RegisterForm";
 
-export function LoginForm() {
+export default function LoginForm() {
   return (
     <div className="flex justify-center items-center h-screen lg:-ml-60">
       <Card className="mx-auto max-w-lg w-4/6">
@@ -30,4 +25,3 @@ export function LoginForm() {
     </div>
   );
 }
-export default LoginForm;
