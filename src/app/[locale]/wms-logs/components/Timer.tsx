@@ -28,7 +28,7 @@ const Timer = ({ handleTimeOut }: { handleTimeOut: () => void }) => {
   return (
     <div className="app relative flex items-center gap-2 ">
       <div
-        className="animate-pulse"
+        className=" "
         style={{
           width: "10px",
           height: "10px",

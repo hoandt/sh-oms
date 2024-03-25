@@ -39,7 +39,7 @@ const CanvasVideoRecorder = ({
   const { toast } = useToast();
   const uploader = new ProgressiveUploader({
     uploadToken,
-    retries: 10,
+    retries: 5,
     videoName: action.trackingCode,
     retryStrategy(retryCount, error) {
       console.log(`Retrying upload. Attempt ${retryCount}. Error:`, error);
@@ -169,19 +169,15 @@ const CanvasVideoRecorder = ({
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     // Set text styles
-    ctx.font = "bold 44px Monospace";
+    ctx.font = "bold 40px Monospace";
     ctx.textAlign = "left";
     ctx.lineWidth = 2;
 
     // Draw tracking code
     ctx.fillStyle = "#EEE";
     ctx.strokeStyle = "black";
-    ctx.fillText(`${action.trackingCode}`, 20, 50); // Adjust position as needed
     ctx.strokeText(`${action.trackingCode}`, 21, 51); // Adjust position as needed
-
-    // Draw username
-    ctx.fillText(`${currentUser.username}`, 20, 200); // Bottom left
-    ctx.strokeText(`${currentUser.username}`, 21, 201); // Bottom left
+    ctx.fillText(`${action.trackingCode}`, 20, 50); // Adjust position as needed
 
     // Draw current date and time
     const currentTime = new Date().toLocaleString("en-US", {
@@ -195,10 +191,18 @@ const CanvasVideoRecorder = ({
       day: "numeric",
       year: "numeric",
     });
-    ctx.fillText(`${currentDate}`, 20, 100); // Top right
     ctx.strokeText(`${currentDate}`, 21, 101); // Top right
-    ctx.fillText(`${currentTime}`, 20, 150); // Top right
-    ctx.strokeText(`${currentTime}`, 21, 151); // Top right
+    ctx.fillText(`${currentDate}`, 20, 100); // Top right
+
+    // calculate currentDate width and adjust position for currentTime
+    const currentDateWidth = ctx.measureText(currentDate).width;
+    ctx.strokeText(`${currentTime}`, 21 + currentDateWidth + 20, 101); // Top right
+    ctx.fillText(`${currentTime}`, 20 + currentDateWidth + 20, 100); // Top right
+
+    // calculate canvas height and adjust position for username
+    const canvasHeight = canvas.height;
+    ctx.strokeText(`${currentUser.username}`, 21, canvasHeight - 51); // Bottom left
+    ctx.fillText(`${currentUser.username}`, 20, canvasHeight - 50); // Bottom left
 
     // Draw trial text if applicable
     if (currentUser.isTrial) {

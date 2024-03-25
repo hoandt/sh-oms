@@ -83,6 +83,12 @@ const Page = () => {
         videoUrl: video.assets?.mp4 || "",
       });
     }
+    // warning user alert if the video is not uploaded and user try to close the tab or navigate away
+    if (video && !video.assets?.mp4) {
+      window.onbeforeunload = function () {
+        return "Bạn có chắc chắn muốn rời khỏi trang này?";
+      };
+    }
   }, [video]);
 
   useEffect(() => {
@@ -300,13 +306,7 @@ const Page = () => {
                         <td className="px-3 py-2">
                           {l.videoUrl ? (
                             // view video with link
-                            <a
-                              href={l.videoUrl}
-                              target="_blank"
-                              className="text-slate-500"
-                            >
-                              <PlayCircle className="w-5 " />
-                            </a>
+                            <a target="_blank">Đã upload</a>
                           ) : l.isUploading ? (
                             <div className="flex items-center gap-2">
                               <span className="text-orange-500  animate-pulse">
@@ -315,7 +315,7 @@ const Page = () => {
                             </div>
                           ) : (
                             <span className="text-gray-400  ">
-                              đang ghi hình
+                              uploading...
                             </span>
                           )}
                         </td>
