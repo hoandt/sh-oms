@@ -73,7 +73,7 @@ export const postUser = async ({ data }: { data: RegisterTenant }) => {
     });
 
     let reqOptions = {
-      url: "http://103.102.46.93:1338/api/auth/local/register",
+      url: `${BACKEND_URL}/api/auth/local/register`,
       method: "POST",
       headers: headersList,
       data: bodyContent,
