@@ -3,6 +3,8 @@ import { RegisterTenant } from "@/types/authen";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
 import axios, { AxiosError } from "axios";
 import qs from "qs";
+import { createOrganization } from "../organization";
+import { toInteger } from "lodash";
 
 const SUB_DOMAIN = "/api/auth/local";
 
@@ -51,9 +53,17 @@ export const updateUser = async ({ id, user }: { id: number; user: any }) => {
 };
 
 export const postUser = async ({ data }: { data: RegisterTenant }) => {
-  const endpoint = `${BACKEND_URL}/api/auth/local/register`;
+  const register_endpoint = `${BACKEND_URL}/api/auth/local/register`;
 
-  const { firstName, lastName, username, password, referralCode, email } = data;
+  const {
+    firstName,
+    lastName,
+    username,
+    password,
+    referralCode,
+    email,
+    phone,
+  } = data;
 
   try {
     let headersList = {
@@ -61,6 +71,13 @@ export const postUser = async ({ data }: { data: RegisterTenant }) => {
       "User-Agent": "Thunder Client (https://www.thunderclient.com)",
       "Content-Type": "application/json",
     };
+    let organizationRes = await createOrganization({
+      data: {
+        name: `${lastName}` || `${username}`,
+        taxcode: toInteger(phone),
+      },
+    });
+    let organizationId = organizationRes.data.id;
 
     let bodyContent = JSON.stringify({
       firstName,
@@ -70,10 +87,12 @@ export const postUser = async ({ data }: { data: RegisterTenant }) => {
       side: "SHIPPER",
       email,
       referralCode,
+      phone,
+      organization: organizationId,
     });
 
     let reqOptions = {
-      url: `${BACKEND_URL}/api/auth/local/register`,
+      url: `${register_endpoint}`,
       method: "POST",
       headers: headersList,
       data: bodyContent,

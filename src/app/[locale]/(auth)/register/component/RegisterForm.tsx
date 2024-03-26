@@ -97,6 +97,7 @@ export default function RegisterForm() {
       console.log(data.user); // Example: Log user details
 
       // redirect to login page
+      window.confirm("Đăng ký thành công. Bạn có muốn đăng nhập ngay?");
       window.location.href = "/login";
 
       toast({
