@@ -1,6 +1,12 @@
 import { WMSLog } from "@/types/todo";
 import { NextResponse, NextRequest } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: "djdygww0g",
+  api_key: "667837554276562",
+  api_secret: "MU1WMg3ejts0pXOytQyZ1p5JdJA",
+  secure: true,
+});
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const logData = (await req.json()) as WMSLog;
