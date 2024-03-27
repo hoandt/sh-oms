@@ -1,31 +1,14 @@
 import { WMSLog } from "@/types/todo";
 import { NextResponse, NextRequest } from "next/server";
-const cloudinary = require("cloudinary").v2;
+import { v2 as cloudinary } from "cloudinary";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const logData = (await req.json()) as WMSLog;
 
-  const sampleLogData = {
-    logData: {
-      id: 1467,
-      attributes: {
-        createdAt: "2024-03-27T14:58:49.843Z",
-        transaction: "eww",
-        type: "return",
-        updatedAt: "2024-03-27T14:59:11.570Z",
-        user: 4,
-        status: "packed",
-        history: null,
-        videoUrl:
-          "http://res.cloudinary.com/djdygww0g/video/upload/v1711551549/eww.webm",
-      },
-    },
-  };
-
   //   extract videoname from videoUrl
   const transaction = logData.attributes.transaction;
   const user = logData.attributes.user;
-  const videoName = logData.attributes.videoUrl.split("/").pop();
+  const videoName = logData.attributes.videoUrl.split("/").pop()!;
   const type = logData.attributes.type;
   // datetime   createdAt dd/mm/yyyy hh:mm (27/03/2024 14:58)
   const createdDate = new Date(logData.attributes.createdAt);
