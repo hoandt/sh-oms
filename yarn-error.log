@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/Cellar/yarn/1.22.19/libexec/bin/yarn.js add q-queue
+  /usr/local/bin/node /usr/local/Cellar/yarn/1.22.19/libexec/bin/yarn.js add @types/cloudinary
 
 PATH: 
   /usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/mysql/bin/:/usr/local/mysql/bin/
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/q-queue: Not found
+  Error: https://registry.yarnpkg.com/@types%2fcloudinary: Not found
       at params.callback [as _callback] (/usr/local/Cellar/yarn/1.22.19/libexec/lib/cli.js:66145:18)
       at self.callback (/usr/local/Cellar/yarn/1.22.19/libexec/lib/cli.js:140890:22)
       at Request.emit (node:events:514:28)
@@ -47,6 +47,7 @@ npm manifest:
     "dependencies": {
       "@api.video/media-stream-composer": "^0.2.3",
       "@api.video/video-uploader": "^1.1.6",
+      "@cloudinary/url-gen": "^1.19.0",
       "@headlessui/react": "^1.7.17",
       "@hookform/resolvers": "^3.3.3",
       "@radix-ui/react-accordion": "^1.1.2",
@@ -86,6 +87,7 @@ npm manifest:
       "autoprefixer": "^10.4.16",
       "axios": "^1.6.3",
       "class-variance-authority": "^0.7.0",
+      "cloudinary": "^2.0.3",
       "clsx": "^2.1.0",
       "cmdk": "^0.2.0",
       "date-fns": "^3.0.6",
@@ -98,6 +100,7 @@ npm manifest:
       "next-auth": "^4.24.4",
       "next-intl": "latest",
       "next-themes": "^0.2.1",
+      "p-queue": "^8.0.1",
       "postcss": "^8.4.32",
       "qs": "^6.11.2",
       "react": "^18.2.0",
@@ -397,6 +400,20 @@ Lockfile:
       nanoid "^3.1.28"
       readable-stream "^4.4.2"
       wasm-feature-detect "^1.2.11"
+  
+  "@cloudinary/transformation-builder-sdk@^1.13.0":
+    version "1.13.2"
+    resolved "https://registry.yarnpkg.com/@cloudinary/transformation-builder-sdk/-/transformation-builder-sdk-1.13.2.tgz#77d5eaa61cfae4e766497e6b50a35db2c18ac2e0"
+    integrity sha512-GuM+gItKLR7GGYr4IFNQ2ALaykz7jjqqeycJacoN5p0Cswm+S2bA2x0P3I/Wq8V1WWqmW/TC82m0+1zhPIzGRg==
+    dependencies:
+      "@cloudinary/url-gen" "^1.7.0"
+  
+  "@cloudinary/url-gen@^1.19.0", "@cloudinary/url-gen@^1.7.0":
+    version "1.19.0"
+    resolved "https://registry.yarnpkg.com/@cloudinary/url-gen/-/url-gen-1.19.0.tgz#da8b0ec12a33301482a71e309a19401d241b1770"
+    integrity sha512-3WSqYAMEe8lcYMFmkNPhOfv6Ql76mpf8O7YEC+CCaoIYrfBubzzeF8yENCaZK9tFJEHvMepI+uWWfilNrz48XA==
+    dependencies:
+      "@cloudinary/transformation-builder-sdk" "^1.13.0"
   
   "@emotion/is-prop-valid@^0.8.2":
     version "0.8.8"
@@ -2192,6 +2209,14 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/client-only/-/client-only-0.0.1.tgz#38bba5d403c41ab150bff64a95c85013cf73bca1"
     integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
   
+  cloudinary@^2.0.3:
+    version "2.0.3"
+    resolved "https://registry.yarnpkg.com/cloudinary/-/cloudinary-2.0.3.tgz#10a0b0239120aec26655fe91fef67ce68ae0fcc9"
+    integrity sha512-2JPxAUuV4iHwiW4ATSOZvii6+BhhKI9+9KscgUkxJPKa6V6wOnZJHlYyovBGrrIbIgEdmGSZgqEsLfD0wWBhBg==
+    dependencies:
+      lodash "^4.17.21"
+      q "^1.5.1"
+  
   clsx@2.0.0:
     version "2.0.0"
     resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.0.0.tgz#12658f3fd98fafe62075595a5c30e43d18f3d00b"
@@ -2869,6 +2894,11 @@ Lockfile:
     version "5.0.1"
     resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
     integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
+  
+  eventemitter3@^5.0.1:
+    version "5.0.1"
+    resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+    integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
   
   events@^3.3.0:
     version "3.3.0"
@@ -4094,6 +4124,19 @@ Lockfile:
     dependencies:
       p-limit "^2.2.0"
   
+  p-queue@^8.0.1:
+    version "8.0.1"
+    resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-8.0.1.tgz#718b7f83836922ef213ddec263ff4223ce70bef8"
+    integrity sha512-NXzu9aQJTAzbBqOt2hwsR63ea7yvxJc0PwN/zobNAudYfb1B7R08SzB4TsLeSbUCuG467NhnoT0oO6w1qRO+BA==
+    dependencies:
+      eventemitter3 "^5.0.1"
+      p-timeout "^6.1.2"
+  
+  p-timeout@^6.1.2:
+    version "6.1.2"
+    resolved "https://registry.yarnpkg.com/p-timeout/-/p-timeout-6.1.2.tgz#22b8d8a78abf5e103030211c5fc6dee1166a6aa5"
+    integrity sha512-UbD77BuZ9Bc9aABo74gfXhNvzC9Tx7SxtHSh1fxvx3jTLLYvmVhiQZZrJzqqU0jKbN32kb5VOKiLEQI/3bIjgQ==
+  
   p-try@^2.0.0:
     version "2.2.0"
     resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
@@ -4312,6 +4355,11 @@ Lockfile:
     version "2.3.1"
     resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
     integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
+  
+  q@^1.5.1:
+    version "1.5.1"
+    resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
+    integrity sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==
   
   qs@^6.11.2:
     version "6.11.2"

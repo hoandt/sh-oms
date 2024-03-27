@@ -18,6 +18,7 @@
   "dependencies": {
     "@api.video/media-stream-composer": "^0.2.3",
     "@api.video/video-uploader": "^1.1.6",
+    "@cloudinary/url-gen": "^1.19.0",
     "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.3.3",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -57,6 +58,7 @@
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.3",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.0.3",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.0",
     "date-fns": "^3.0.6",

@@ -53,7 +53,25 @@ const page = () => {
     pageSize,
     code: keyword,
   });
+  const handleVideoUrl = async (log: WMSLog) => {
+    // check url is valid and contain cloudinary
+    if (log.attributes.videoUrl.includes("cloudinary")) {
+      // encode url for get params
 
+      const cloudinaryUrl = await fetch("/api/controller/download", {
+        method: "POST",
+        body: JSON.stringify(log),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await cloudinaryUrl.json();
+      // console.log({ data });
+      setCurrentVideo(data);
+    } else {
+      setCurrentVideo(log.attributes.videoUrl);
+    }
+  };
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
       return deleteLogs({ id });
@@ -130,7 +148,7 @@ const page = () => {
             <PlayCircle
               onClick={() => {
                 setIsOpen(true);
-                setCurrentVideo(videoURL);
+                handleVideoUrl(row.original);
               }}
               className="h-6 w-6 text-slate-500 cursor-pointer"
             />
@@ -139,50 +157,61 @@ const page = () => {
           );
         },
       },
+      // type
       {
-        accessorKey: "actions",
-        header: () => <div className="">{"Hành Động"}</div>,
-        cell: ({ row }) => (
-          <AlertDialog>
-            <AlertDialogTrigger
-              className="text-center text-sm leading-6 text-gray-500"
-              asChild
-            >
-              <Button className="flex gap-2" variant={"link"}>
-                <Trash className="h-4 w-4 text-red-500" />
-                {mutateDeleteTransaction.isPending && (
-                  <Loader2Icon className="h-4 w-4 animate-pulse" />
-                )}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Xóa giao dịch?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Hành động này không thể hoàn tác, bạn phải thực hiện đóng gói
-                  lại.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-500 text-red-50"
-                  onClick={() => {
-                    mutateDeleteTransaction.mutate(toInteger(row.original.id));
-                  }}
-                >
-                  {mutateDeleteTransaction.isPending && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Xác nhận
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        ),
-        enableSorting: false,
+        accessorKey: "type",
+        header: () => <div className="">{"Type"}</div>,
+        cell: ({ row }) => {
+          const type = row.original.attributes.type;
+          return <div>{type}</div>;
+        },
+        enableSorting: true,
         enableHiding: false,
       },
+      // {
+      //   accessorKey: "actions",
+      //   header: () => <div className="">{"Hành Động"}</div>,
+      //   cell: ({ row }) => (
+      //     <AlertDialog>
+      //       <AlertDialogTrigger
+      //         className="text-center text-sm leading-6 text-gray-500"
+      //         asChild
+      //       >
+      //         <Button className="flex gap-2" variant={"link"}>
+      //           <Trash className="h-4 w-4 text-red-500" />
+      //           {mutateDeleteTransaction.isPending && (
+      //             <Loader2Icon className="h-4 w-4 animate-pulse" />
+      //           )}
+      //         </Button>
+      //       </AlertDialogTrigger>
+      //       <AlertDialogContent>
+      //         <AlertDialogHeader>
+      //           <AlertDialogTitle>Xóa giao dịch?</AlertDialogTitle>
+      //           <AlertDialogDescription>
+      //             Hành động này không thể hoàn tác, bạn phải thực hiện đóng gói
+      //             lại.
+      //           </AlertDialogDescription>
+      //         </AlertDialogHeader>
+      //         <AlertDialogFooter>
+      //           <AlertDialogCancel>Cancel</AlertDialogCancel>
+      //           <AlertDialogAction
+      //             className="bg-red-500 text-red-50"
+      //             onClick={() => {
+      //               mutateDeleteTransaction.mutate(toInteger(row.original.id));
+      //             }}
+      //           >
+      //             {mutateDeleteTransaction.isPending && (
+      //               <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+      //             )}
+      //             Xác nhận
+      //           </AlertDialogAction>
+      //         </AlertDialogFooter>
+      //       </AlertDialogContent>
+      //     </AlertDialog>
+      //   ),
+      //   enableSorting: false,
+      //   enableHiding: false,
+      // },
     ] as ColumnDef<WMSLog>[];
   }, []);
 

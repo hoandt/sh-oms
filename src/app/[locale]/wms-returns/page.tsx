@@ -37,8 +37,9 @@ import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
-import { CloudVideoUploadResponse } from "../wms-returns/components/CanvaVideoRecorderCloudinary";
-import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
+import CanvasVideoRecorderReturn, {
+  CloudVideoUploadResponse,
+} from "./components/CanvaVideoRecorderCloudinary";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -165,8 +166,8 @@ const Page = () => {
   const handleScan = (code: string) => {
     mutateTransaction.mutate({
       organization: currentUser?.organization.id,
-      transaction: `${code}`,
-      type: "outbound",
+      transaction: code,
+      type: "return",
       status: "packed",
       user: currentUser?.id,
     });
@@ -194,7 +195,7 @@ const Page = () => {
               <>
                 <div className="rounded shadow my-2">
                   {currentUser && (
-                    <CanvasVideoRecorder
+                    <CanvasVideoRecorderReturn
                       action={cameraAction}
                       handleStream={(status: boolean) => {
                         setScanActive(status);
@@ -229,7 +230,7 @@ const Page = () => {
         <div className="col-span-6 sm:col-span-4 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Tracking Đóng Hàng
+              Tracking hàng hoàn
             </h1>
 
             {/* make a button inline */}

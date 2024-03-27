@@ -7,7 +7,12 @@ import {
 import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { AnimatePresence, motion } from "framer-motion";
-import { BoxIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import {
+  ArrowRightSquare,
+  BoxIcon,
+  SearchIcon,
+  SettingsIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
@@ -18,6 +23,11 @@ const router = [
         name: "Packing",
         icon: <BoxIcon />,
         href: "/wms-logs",
+      },
+      {
+        name: "Return",
+        icon: <ArrowRightSquare />,
+        href: "/wms-returns",
       },
       {
         name: "Giao dịch",
