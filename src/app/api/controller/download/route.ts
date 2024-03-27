@@ -92,6 +92,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     .split("src='")
     .pop()!
     .split("'")[0];
-  console.log(url);
+
   return NextResponse.json(url);
 }
