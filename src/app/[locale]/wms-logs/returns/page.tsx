@@ -234,7 +234,7 @@ const Page = () => {
         <div className="col-span-6 sm:col-span-4 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Tracking mã đơn
+              Hàng hoàn
             </h1>
 
             {/* make a button inline */}
@@ -388,11 +388,11 @@ const Page = () => {
             <div>
               <DialogHeader>
                 <DialogTitle>
-                  Đang đóng hàng {cameraAction.trackingCode}{" "}
+                  Đang kiểm hàng hoàn {cameraAction.trackingCode}{" "}
                 </DialogTitle>
                 <Timer handleTimeOut={handleRecordComplete} />
                 <DialogDescription className="py-4">
-                  <div>Quá trình đóng hàng đang được thực hiện</div>
+                  <div>Quá trình kiểm hàng hoàn đang được thực hiện</div>
                   {/* timer */}
                 </DialogDescription>
               </DialogHeader>
