@@ -37,6 +37,7 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 const page = () => {
   const { toast } = useToast();
+
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
   const session = useSession() as any;
@@ -59,20 +60,32 @@ const page = () => {
     pageSize,
     code: keyword,
   });
+  const [isLoadingURL, setIsLoading] = React.useState(false);
   const handleDownload = async (log: WMSLog) => {
-    const cloudinaryUrl = await fetch("/api/controller/download", {
-      method: "POST",
-      body: JSON.stringify(log),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await cloudinaryUrl.json();
+    // check log history
+    let videoUrl = "";
+    if (log.attributes.history && log.attributes.history.disputed) {
+      videoUrl = log.attributes.videoUrl;
+    } else {
+      setIsLoading(true);
+      const cloudinaryUrl = await fetch("/api/controller/download", {
+        method: "POST",
+        body: JSON.stringify(log),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await cloudinaryUrl.json();
+      if (data.url) {
+        videoUrl = data.url;
+      }
+      setIsLoading(false);
+    }
 
     const a = document.createElement("a");
-    a.href = data;
+    a.href = videoUrl;
     a.target = "_blank";
-    a.download = "SPX.mp4";
+    a.download = `video-${log.attributes.transaction}.mp4`;
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
@@ -170,30 +183,31 @@ const page = () => {
           );
         },
       },
-      // {
-      //   accessorKey: "actions",
-      //   header: () => <div className="">{"Download"}</div>,
-      //   cell: ({ row }) => {
-      //     const videoURL = row.original.attributes.videoUrl;
-      //     return videoURL ? (
-      //       //  display Download icon
-      //       <Button
-      //         className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
-      //         variant={"outline"}
-      //         onClick={() => {
-      //           handleDownload(row.original);
-      //         }}
-      //       >
-      //         <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
-      //         Tải về
-      //       </Button>
-      //     ) : (
-      //       "-"
-      //     );
-      //   },
-      //   enableSorting: false,
-      //   enableHiding: false,
-      // },
+      {
+        accessorKey: "actions",
+        header: () => <div className="">{"Download"}</div>,
+        cell: ({ row }) => {
+          const videoURL = row.original.attributes.videoUrl;
+          return videoURL ? (
+            //  display Download icon
+            <Button
+              disabled={isLoadingURL}
+              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
+              variant={"outline"}
+              onClick={() => {
+                handleDownload(row.original);
+              }}
+            >
+              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
+              {isLoadingURL ? "Đang xử lý..." : "Tải về"}
+            </Button>
+          ) : (
+            "-"
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
       // {
       //   accessorKey: "actions",
       //   header: () => <div className="">{"Hành Động"}</div>,

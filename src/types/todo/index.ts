@@ -693,6 +693,11 @@ export interface WMSLog {
     user: number;
     status: string;
     videoUrl: string;
+    history: {
+      disputed: boolean;
+      originalUrl: string;
+    };
+    }
   };
 }
 

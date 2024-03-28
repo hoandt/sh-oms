@@ -7,8 +7,8 @@ import {
 } from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
 import { Switch } from "@/components/ui/switch";
-const WIDTH = 1280;
-const HEIGHT = 720;
+const WIDTH = 800;
+const HEIGHT = 600;
 const CanvasVideoRecorder = ({
   action,
   handleStream,
@@ -26,7 +26,6 @@ const CanvasVideoRecorder = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isSaveToLocal, setIsSaveToLocal] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
@@ -136,20 +135,17 @@ const CanvasVideoRecorder = ({
 
     recorder.start();
     setMediaRecorder(recorder);
-    setIsRecording(true);
   };
 
   const stopRecording = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
-      setIsRecording(false);
     }
   };
 
   const cancelRecording = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
-      setIsRecording(false);
     }
   };
   const drawTextOnCanvas = () => {

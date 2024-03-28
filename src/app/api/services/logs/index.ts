@@ -31,9 +31,11 @@ export const getLogs = async ({ options }: { options: QueryOptions }) => {
 export const updateLogs = async ({
   id,
   videoUrl,
+  history,
 }: {
   id: number;
   videoUrl: string;
+  history?: WMSLogHistory;
 }) => {
   try {
     const endpoint = `${SUB_DOMAIN}/${id}`;
@@ -43,6 +45,7 @@ export const updateLogs = async ({
       {
         data: {
           videoUrl,
+          history,
         },
       },
       {
@@ -54,6 +57,11 @@ export const updateLogs = async ({
   } catch (error) {
     console.log(error);
   }
+};
+
+type WMSLogHistory = {
+  disputed: boolean;
+  originalUrl: string;
 };
 
 export const postLogs = async ({ logs }: { logs: any }) => {
