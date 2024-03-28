@@ -1,5 +1,6 @@
 import { WMSLog } from "@/types/todo";
 import { NextResponse, NextRequest } from "next/server";
+import { unlink } from "node:fs";
 import { v2 as cloudinary } from "cloudinary";
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -9,9 +10,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     api_secret: "MU1WMg3ejts0pXOytQyZ1p5JdJA",
     secure: true,
   });
-
   const logData = (await req.json()) as WMSLog;
+  const url = await getCloudinaryVideo(logData);
 
+  return NextResponse.json(url);
+}
+
+const getCloudinaryVideo = async (logData: WMSLog) => {
   //   extract videoname from videoUrl
   const transaction = logData.attributes.transaction;
   const user = logData.attributes.user;
@@ -19,8 +24,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const type = logData.attributes.type;
   // datetime   createdAt dd/mm/yyyy hh:mm (27/03/2024 14:58)
   const createdDate = new Date(logData.attributes.createdAt);
-  const fcreatedDate = `${createdDate.getDate()}/${createdDate.getMonth()}/${createdDate.getFullYear()}`;
+  // date with leading zero
+  const leadingZeroDate = (date: number) => {
+    return date < 10 ? `0${date}` : date;
+  };
 
+  const fcreatedDate = `${leadingZeroDate(
+    createdDate.getDate()
+  )}/${leadingZeroDate(createdDate.getMonth())}/${createdDate.getFullYear()}`;
   const url = cloudinary
     .video(videoName, {
       fetch_format: "mp4",
@@ -31,18 +42,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
           overlay: {
             font_family: "Arial",
             font_size: 35,
-            font_weight: "bold",
+
             letter_spacing: 3,
             text: `${transaction}\n${fcreatedDate}\n${user}`,
           },
         },
-        { flags: "layer_apply", gravity: "north_west", x: 21, y: 21 },
+        { flags: "layer_apply", gravity: "north_west", x: 20, y: 20 },
         {
           color: "#FFFFFF",
           overlay: {
             font_family: "Arial",
             font_size: 35,
-            font_weight: "bold",
+
             letter_spacing: 3,
             text: `${transaction}\n${fcreatedDate}\n${user}`,
           },
@@ -53,23 +64,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
           overlay: {
             font_family: "Arial",
             font_size: 35,
-            font_weight: "bold",
             letter_spacing: 3,
             text: `${type}`,
           },
         },
-        { flags: "layer_apply", gravity: "south_west", x: 21, y: 21 },
+        { flags: "layer_apply", gravity: "south_west", x: 19, y: 22 },
         {
           color: "#FFFFFF",
           overlay: {
             font_family: "Arial",
             font_size: 35,
-            font_weight: "bold",
             letter_spacing: 3,
             text: `${type}`,
           },
         },
-        { flags: "layer_apply", gravity: "south_west", x: 19, y: 19 },
+        { flags: "layer_apply", gravity: "south_west", x: 21, y: 21 },
 
         //   {
         //     overlay: {
@@ -82,6 +91,5 @@ export async function POST(req: NextRequest, res: NextResponse) {
     .split("src='")
     .pop()!
     .split("'")[0];
-
-  return NextResponse.json(url);
-}
+  return url;
+};

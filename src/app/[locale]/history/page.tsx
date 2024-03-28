@@ -58,7 +58,7 @@ const page = () => {
     if (log.attributes.videoUrl.includes("cloudinary")) {
       // encode url for get params
 
-      const cloudinaryUrl = await fetch("/api/controller/download/get", {
+      const cloudinaryUrl = await fetch("/api/controller/download", {
         method: "POST",
         body: JSON.stringify(log),
         headers: {

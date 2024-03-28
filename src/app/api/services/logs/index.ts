@@ -71,7 +71,7 @@ export const postLogs = async ({ logs }: { logs: any }) => {
         headers: adminHeadersList,
       }
     );
-    console.log({ res2: res });
+
     return res;
   } catch (error) {
     console.log(error);
