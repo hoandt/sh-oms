@@ -108,7 +108,7 @@ const page = () => {
         enableSorting: false,
       },
       {
-        accessorKey: "status",
+        accessorKey: "transaction",
         header: () => <div className="">{"Transaction"}</div>,
         cell: ({ row }) => {
           const transaction = row.original.attributes.transaction;
@@ -117,16 +117,7 @@ const page = () => {
         enableSorting: false,
         enableHiding: false,
       },
-      {
-        accessorKey: "status",
-        header: () => <div className="">{"Status"}</div>,
-        cell: ({ row }) => {
-          const status = row.original.attributes.status;
-          return <div>{status}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
+
       {
         accessorKey: "note",
         header: () => <div className="">{"Ngày đóng gói"}</div>,
