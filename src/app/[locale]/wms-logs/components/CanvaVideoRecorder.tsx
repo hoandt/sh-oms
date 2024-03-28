@@ -14,7 +14,7 @@ const CLOUD_NAME = "djdygww0g";
 const UPLOAD_PRESET = "pjcpjz1a";
 const WIDTH = 1280;
 const HEIGHT = 960;
-const CanvasVideoRecorderReturn = ({
+const CanvasVideoRecorder = ({
   action,
   handleStream,
   handleUploadingProgress,
@@ -337,7 +337,7 @@ const CanvasVideoRecorderReturn = ({
   );
 };
 
-export default CanvasVideoRecorderReturn;
+export default CanvasVideoRecorder;
 
 // CloudVideoUploadResponse from cloudinary
 export type CloudVideoUploadResponse = {

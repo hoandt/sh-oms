@@ -37,8 +37,10 @@ import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
-import { CloudVideoUploadResponse } from "../wms-returns/components/CanvaVideoRecorderCloudinary";
-import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
+
+import CanvasVideoRecorder, {
+  CloudVideoUploadResponse,
+} from "./components/CanvaVideoRecorder";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {

@@ -37,9 +37,10 @@ import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
-import CanvasVideoRecorderReturn, {
+
+import CanvasVideoRecorder, {
   CloudVideoUploadResponse,
-} from "./components/CanvaVideoRecorderCloudinary";
+} from "../components/CanvaVideoRecorder";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -195,7 +196,7 @@ const Page = () => {
               <>
                 <div className="rounded shadow my-2">
                   {currentUser && (
-                    <CanvasVideoRecorderReturn
+                    <CanvasVideoRecorder
                       action={cameraAction}
                       handleStream={(status: boolean) => {
                         setScanActive(status);
