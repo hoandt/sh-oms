@@ -20,7 +20,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2Icon, PlayCircle, Trash } from "lucide-react";
+import {
+  DownloadCloud,
+  DownloadCloudIcon,
+  Loader2Icon,
+  PlayCircle,
+  Trash,
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
 import { toInteger } from "lodash";
@@ -53,24 +59,28 @@ const page = () => {
     pageSize,
     code: keyword,
   });
-  const handleVideoUrl = async (log: WMSLog) => {
-    // check url is valid and contain cloudinary
-    if (log.attributes.videoUrl.includes("cloudinary")) {
-      // encode url for get params
+  const handleDownload = async (log: WMSLog) => {
+    const cloudinaryUrl = await fetch("/api/controller/download", {
+      method: "POST",
+      body: JSON.stringify(log),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await cloudinaryUrl.json();
 
-      const cloudinaryUrl = await fetch("/api/controller/download", {
-        method: "POST",
-        body: JSON.stringify(log),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await cloudinaryUrl.json();
-      // console.log({ data });
-      setCurrentVideo(data);
-    } else {
-      setCurrentVideo(log.attributes.videoUrl);
-    }
+    const a = document.createElement("a");
+    a.href = data;
+    a.target = "_blank";
+    a.download = "SPX.mp4";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleVideoUrl = async (log: WMSLog) => {
+    setCurrentVideo(log.attributes.videoUrl);
   };
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
@@ -108,7 +118,7 @@ const page = () => {
         enableHiding: false,
       },
       {
-        accessorKey: "priority",
+        accessorKey: "status",
         header: () => <div className="">{"Status"}</div>,
         cell: ({ row }) => {
           const status = row.original.attributes.status;
@@ -137,9 +147,21 @@ const page = () => {
         enableSorting: false,
         enableHiding: false,
       },
+
+      // type
+      {
+        accessorKey: "type",
+        header: () => <div className="">{"Type"}</div>,
+        cell: ({ row }) => {
+          const type = row.original.attributes.type;
+          return <div>{type}</div>;
+        },
+        enableSorting: true,
+        enableHiding: false,
+      },
       {
         accessorKey: "videoURL",
-        header: () => <div className="">{"Video"}</div>,
+        header: () => <div className="">{"Preview"}</div>,
         cell: ({ row }) => {
           const videoURL = row.original.attributes.videoUrl;
           return videoURL ? (
@@ -150,22 +172,35 @@ const page = () => {
                 setIsOpen(true);
                 handleVideoUrl(row.original);
               }}
-              className="h-6 w-6 text-slate-500 cursor-pointer"
+              className="h-6 w-6 text-slate-600 cursor-pointer"
             />
           ) : (
             "-"
           );
         },
       },
-      // type
       {
-        accessorKey: "type",
-        header: () => <div className="">{"Type"}</div>,
+        accessorKey: "actions",
+        header: () => <div className="">{"Download"}</div>,
         cell: ({ row }) => {
-          const type = row.original.attributes.type;
-          return <div>{type}</div>;
+          const videoURL = row.original.attributes.videoUrl;
+          return videoURL ? (
+            //  display Download icon
+            <Button
+              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
+              variant={"outline"}
+              onClick={() => {
+                handleDownload(row.original);
+              }}
+            >
+              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
+              Tải về
+            </Button>
+          ) : (
+            "-"
+          );
         },
-        enableSorting: true,
+        enableSorting: false,
         enableHiding: false,
       },
       // {
@@ -225,7 +260,7 @@ const page = () => {
             setCurrentVideo("");
           }}
         >
-          <DialogHeader>Video</DialogHeader>
+          <DialogHeader>Preview</DialogHeader>
           <DialogContent className="w-[480px]">
             <VideoPlayer src={currentVideo} />
           </DialogContent>
