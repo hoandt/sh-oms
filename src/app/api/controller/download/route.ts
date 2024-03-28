@@ -5,15 +5,18 @@ import { v2 as cloudinary } from "cloudinary";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   cloudinary.config({
-    cloud_name: "djdygww0g",
-    api_key: "667837554276562",
-    api_secret: "MU1WMg3ejts0pXOytQyZ1p5JdJA",
+    cloud_name: "dfo55d4yi",
+    api_key: "835479918789953",
+    api_secret: "gK7AezRTS4T4Y-R7FRX0BTCOZzA",
     secure: true,
   });
   const logData = (await req.json()) as WMSLog;
-  const url = await getCloudinaryVideo(logData);
-
-  return NextResponse.json(url);
+  // const url = await getCloudinaryVideo(logData);
+  const url = await uploadVideoRemoteURL(
+    "https://vod.api.video/vod/vi1ozzvYMKyf2C1NUjvH57D2/mp4/source.mp4"
+  );
+  console.log({ url });
+  return NextResponse.json({ url });
 }
 
 const getCloudinaryVideo = async (logData: WMSLog) => {
@@ -92,4 +95,9 @@ const getCloudinaryVideo = async (logData: WMSLog) => {
     .pop()!
     .split("'")[0];
   return url;
+};
+
+const uploadVideoRemoteURL = async (url: string) => {
+  const data = cloudinary.uploader.upload(url).then((result) => result);
+  return data;
 };

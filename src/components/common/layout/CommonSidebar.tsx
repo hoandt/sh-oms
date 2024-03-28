@@ -27,7 +27,7 @@ const router = [
       {
         name: "Return",
         icon: <ArrowRightSquare />,
-        href: "/wms-returns",
+        href: "/wms-logs/returns",
       },
       {
         name: "Giao dịch",

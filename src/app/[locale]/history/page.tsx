@@ -170,30 +170,30 @@ const page = () => {
           );
         },
       },
-      {
-        accessorKey: "actions",
-        header: () => <div className="">{"Download"}</div>,
-        cell: ({ row }) => {
-          const videoURL = row.original.attributes.videoUrl;
-          return videoURL ? (
-            //  display Download icon
-            <Button
-              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
-              variant={"outline"}
-              onClick={() => {
-                handleDownload(row.original);
-              }}
-            >
-              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
-              Tải về
-            </Button>
-          ) : (
-            "-"
-          );
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
+      // {
+      //   accessorKey: "actions",
+      //   header: () => <div className="">{"Download"}</div>,
+      //   cell: ({ row }) => {
+      //     const videoURL = row.original.attributes.videoUrl;
+      //     return videoURL ? (
+      //       //  display Download icon
+      //       <Button
+      //         className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
+      //         variant={"outline"}
+      //         onClick={() => {
+      //           handleDownload(row.original);
+      //         }}
+      //       >
+      //         <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
+      //         Tải về
+      //       </Button>
+      //     ) : (
+      //       "-"
+      //     );
+      //   },
+      //   enableSorting: false,
+      //   enableHiding: false,
+      // },
       // {
       //   accessorKey: "actions",
       //   header: () => <div className="">{"Hành Động"}</div>,

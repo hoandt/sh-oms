@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2Icon } from "lucide-react";
+import { CheckCheckIcon, PlayCircle, Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -37,10 +37,8 @@ import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 import Timer from "./components/Timer";
-
-import CanvasVideoRecorder, {
-  CloudVideoUploadResponse,
-} from "./components/CanvaVideoRecorder";
+import { VideoUploadResponse } from "@api.video/video-uploader";
+import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -55,7 +53,7 @@ const Page = () => {
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
-  const [video, setVideo] = useState<CloudVideoUploadResponse>();
+  const [video, setVideo] = useState<VideoUploadResponse>();
   const session = useSession() as any;
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
   const [log, setLog] = useState<VideosLog[]>([]);
@@ -75,15 +73,21 @@ const Page = () => {
     },
   });
   useEffect(() => {
-    if (video && video.url) {
+    if (video && video.assets?.mp4) {
       // find the log with the same tracking code and update the video url
       const uploadedLog = log.find(
-        (l) => (l.attributes as any).transaction === video.public_id
+        (l) => (l.attributes as any).transaction === video.title
       );
       mutateUpdateLog.mutate({
         id: toInteger(uploadedLog?.id),
-        videoUrl: video.url || "",
+        videoUrl: video.assets?.mp4 || "",
       });
+    }
+    // warning user alert if the video is not uploaded and user try to close the tab or navigate away
+    if (video && !video.assets?.mp4) {
+      window.onbeforeunload = function () {
+        return "Bạn có chắc chắn muốn rời khỏi trang này?";
+      };
     }
   }, [video]);
 
@@ -113,7 +117,6 @@ const Page = () => {
         ...cameraAction,
         log: [newData, ...log],
       });
-      console.log(data);
       setLog((prev) => [newData, ...prev]);
     },
   });
@@ -121,7 +124,7 @@ const Page = () => {
   const handleUploadingProgress = (
     uploading: boolean,
     trackingCode: string,
-    video?: CloudVideoUploadResponse
+    video?: VideoUploadResponse
   ) => {
     video && setVideo(video);
     setLog((prev) =>
@@ -133,7 +136,7 @@ const Page = () => {
             return {
               ...l,
               isUploading: uploading,
-              videoUrl: video?.url,
+              videoUrl: video?.assets?.mp4,
             };
           }
           return l;
@@ -167,10 +170,10 @@ const Page = () => {
   const handleScan = (code: string) => {
     mutateTransaction.mutate({
       organization: currentUser?.organization.id,
-      transaction: `${code}`,
+      transaction: code,
       type: "outbound",
       status: "packed",
-      user: currentUser?.id,
+      user: 1,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
@@ -205,7 +208,7 @@ const Page = () => {
                       handleUploadingProgress={(
                         isUploading: boolean,
                         trackingCode: string,
-                        video?: CloudVideoUploadResponse
+                        video?: VideoUploadResponse
                       ) =>
                         handleUploadingProgress(
                           isUploading,
@@ -231,7 +234,7 @@ const Page = () => {
         <div className="col-span-6 sm:col-span-4 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Tracking Đóng Hàng
+              Tracking mã đơn
             </h1>
 
             {/* make a button inline */}

@@ -1,19 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
-import { source } from "@cloudinary/url-gen/actions/overlay";
-import { text } from "@cloudinary/url-gen/qualifiers/source";
-import { Position } from "@cloudinary/url-gen/qualifiers/position";
-import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
-import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
-import { CloudinaryVideo } from "@cloudinary/url-gen/assets/CloudinaryVideo";
 
 import { useToast } from "@/components/ui/use-toast";
-
+import {
+  ProgressiveUploader,
+  VideoUploadResponse,
+} from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
-import { Switch } from "@/components/ui/switch"; // Set your cloud name and unsigned upload preset here:
-const CLOUD_NAME = "djdygww0g";
-const UPLOAD_PRESET = "pjcpjz1a";
+import { Switch } from "@/components/ui/switch";
 const WIDTH = 1280;
-const HEIGHT = 960;
+const HEIGHT = 720;
 const CanvasVideoRecorder = ({
   action,
   handleStream,
@@ -25,7 +20,7 @@ const CanvasVideoRecorder = ({
   handleUploadingProgress: (
     uploading: boolean,
     trackingCode: string,
-    video?: CloudVideoUploadResponse
+    video?: VideoUploadResponse
   ) => void;
   currentUser: UserWithRole;
 }) => {
@@ -36,10 +31,20 @@ const CanvasVideoRecorder = ({
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-
+  const uploadToken = currentUser.isTrial
+    ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
+    : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
   const { toast } = useToast();
-
+  const uploader = new ProgressiveUploader({
+    uploadToken,
+    retries: 5,
+    videoName: action.trackingCode,
+    retryStrategy(retryCount, error) {
+      console.log(`Retrying upload. Attempt ${retryCount}. Error:`, error);
+      return 5000; // Retry after 5 seconds
+    },
+  });
   useEffect(() => {
     const startCamera = async () => {
       try {
@@ -48,7 +53,7 @@ const CanvasVideoRecorder = ({
           video: {
             facingMode: "user",
 
-            aspectRatio: 1920 / 1080,
+            aspectRatio: WIDTH / HEIGHT,
             deviceId: { exact: action.deviceId },
             frameRate: { ideal: 24 },
             width: {
@@ -61,7 +66,7 @@ const CanvasVideoRecorder = ({
               ideal: HEIGHT,
               max: 1080,
             },
-            sampleSize: 4,
+            sampleSize: 3,
             // facingMode:
           },
         };
@@ -104,8 +109,8 @@ const CanvasVideoRecorder = ({
     }
 
     const recorder = new MediaRecorder(mediaStream, {
-      videoBitsPerSecond: 3 * 1024 * 1024,
-      // check if mimeType is supported
+      // videoBitsPerSecond: 3 * 1024 * 1024,
+      // // check if mimeType is supported
       mimeType: "video/webm; codecs=vp9",
     });
 
@@ -213,85 +218,37 @@ const CanvasVideoRecorder = ({
 
   //type for event
 
-  const handleProgressiveUpload = async (blob: Blob) => {
-    // Create a file from the blob, with name
-
-    const file = new File([blob], `${action.trackingCode}`);
-
-    const uniqueUploadId = generateUniqueUploadId();
-    const chunkSize = 5 * 1024 * 1024;
-    const totalChunks = Math.ceil(file.size / chunkSize);
-    let currentChunk = 0;
-
-    const uploadChunk = async (start: number, end: number) => {
-      const formData = new FormData();
-      formData.append("file", file.slice(start, end));
-      formData.append("cloud_name", CLOUD_NAME);
-      formData.append("upload_preset", UPLOAD_PRESET);
-      formData.append("public_id", `${action.trackingCode}`);
-      formData.append(
-        "tags",
-        [
-          `${currentUser.organization.id}_${currentUser.username}`,
-          "return",
-        ].join(",")
-      );
-      const contentRange = `bytes ${start}-${end - 1}/${file.size}`;
+  const handleProgressiveUpload = (blob: Blob) => {
+    uploader.onProgress((event) => {
       handleUploadingProgress(true, action.trackingCode);
-      console.log(
-        `Uploading chunk for uniqueUploadId: ${uniqueUploadId}; start: ${start}, end: ${
-          end - 1
-        }`
-      );
-
-      try {
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
-          {
-            method: "POST",
-            body: formData,
-            headers: {
-              "X-Unique-Upload-Id": `${uniqueUploadId}`,
-              "Content-Range": contentRange,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Chunk upload failed.");
-        }
-
-        currentChunk++;
-
-        if (currentChunk < totalChunks) {
-          const nextStart = currentChunk * chunkSize;
-          const nextEnd = Math.min(nextStart + chunkSize, blob.size);
-          uploadChunk(nextStart, nextEnd);
-        } else {
-          const fetchResponse =
-            (await response.json()) as CloudVideoUploadResponse;
-          handleUploadingProgress(false, action.trackingCode, fetchResponse);
-
-          console.info("File upload complete.", fetchResponse);
-        }
-      } catch (error) {
-        console.error("Error uploading chunk:", error);
+    });
+    uploader
+      .uploadPart(blob)
+      .then(() => {
+        // Handle uploading parts
+        // Once all parts uploaded, call uploadLastPart method
+        uploader
+          .uploadLastPart(blob)
+          .then((video) => {
+            handleUploadingProgress(false, action.trackingCode, video);
+          })
+          .catch((error) => {
+            toast({
+              title: "Error uploading video",
+              description: "Please try again.",
+              variant: "destructive",
+            });
+            console.error("Error uploading video:", error);
+          });
+      })
+      .catch((error) => {
         toast({
-          title: "Error uploading video",
-          description: "Please try again.",
+          title: "Error enumerating video devices",
+          description: "Please check your camera and try again.",
           variant: "destructive",
         });
-        console.error("Error uploading video:", error);
-      }
-    };
-
-    const start = 0;
-    const end = Math.min(chunkSize, blob.size);
-    uploadChunk(start, end);
-  };
-
-  const generateUniqueUploadId = () => {
-    return `uqid-${Date.now()}`;
+        console.error("Error uploading video parts:", error);
+      });
   };
 
   return (
