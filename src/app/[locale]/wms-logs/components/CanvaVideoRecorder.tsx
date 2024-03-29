@@ -65,7 +65,9 @@ const CanvasVideoRecorder = ({
               ideal: HEIGHT,
               max: 1080,
             },
-            sampleSize: 3,
+
+            sampleRate: 44100 / 5,
+
             // facingMode:
           },
         };
