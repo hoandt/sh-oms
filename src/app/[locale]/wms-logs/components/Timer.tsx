@@ -1,7 +1,14 @@
 // timer component
 import React, { useEffect, useState } from "react";
-const LIMIT_TIME = 10 * 60;
-const Timer = ({ handleTimeOut }: { handleTimeOut: () => void }) => {
+
+const Timer = ({
+  handleTimeOut,
+  isTrial,
+}: {
+  isTrial: boolean;
+  handleTimeOut: () => void;
+}) => {
+  const LIMIT_TIME = isTrial ? 30 : 10 * 60; //30 seconds for trial, 10 minutes for premium
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(true);
   useEffect(() => {

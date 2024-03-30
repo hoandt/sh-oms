@@ -76,7 +76,7 @@ const Page = () => {
     if (video && video.assets?.mp4) {
       // find the log with the same tracking code and update the video url
       const uploadedLog = log.find(
-        (l) => (l.attributes as any).transaction === video.title
+        (l) => (l.attributes as any).transaction === video.videoId
       );
       mutateUpdateLog.mutate({
         id: toInteger(uploadedLog?.id),
@@ -390,7 +390,10 @@ const Page = () => {
                 <DialogTitle>
                   Đang đóng hàng {cameraAction.trackingCode}{" "}
                 </DialogTitle>
-                <Timer handleTimeOut={handleRecordComplete} />
+                <Timer
+                  handleTimeOut={handleRecordComplete}
+                  isTrial={currentUser?.isTrial || true}
+                />
                 <DialogDescription className="py-4">
                   <div>Quá trình đóng hàng đang được thực hiện</div>
                   {/* timer */}

@@ -36,9 +36,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
-import Timer from "./components/Timer";
+import Timer from "./../components/Timer";
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import CanvasVideoRecorder from "../components/CanvaVideoRecorder";
+import Chunked from "./components/Chunks";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -76,7 +77,7 @@ const Page = () => {
     if (video && video.assets?.mp4) {
       // find the log with the same tracking code and update the video url
       const uploadedLog = log.find(
-        (l) => (l.attributes as any).transaction === video.title
+        (l) => (l.attributes as any).transaction === video.videoId
       );
       mutateUpdateLog.mutate({
         id: toInteger(uploadedLog?.id),
@@ -246,6 +247,7 @@ const Page = () => {
                   {currentUser?.lastName} {currentUser?.firstName}
                 </span>
               </h2>
+              <Chunked />
             </div>
             {log.filter((l) => l.isUploading).length ? (
               <p
@@ -390,7 +392,10 @@ const Page = () => {
                 <DialogTitle>
                   Đang kiểm hàng hoàn {cameraAction.trackingCode}{" "}
                 </DialogTitle>
-                <Timer handleTimeOut={handleRecordComplete} />
+                <Timer
+                  handleTimeOut={handleRecordComplete}
+                  isTrial={currentUser?.isTrial || true}
+                />
                 <DialogDescription className="py-4">
                   <div>Quá trình kiểm hàng hoàn đang được thực hiện</div>
                   {/* timer */}

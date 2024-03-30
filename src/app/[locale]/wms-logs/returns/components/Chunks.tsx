@@ -1,9 +1,5 @@
 import { ChangeEvent, useState } from "react";
 
-// Set your cloud name and unsigned upload preset here:
-const CLOUD_NAME = "djdygww0g";
-const UPLOAD_PRESET = "pjcpjz1a";
-
 const Chunked = () => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -12,7 +8,12 @@ const Chunked = () => {
   //type for event
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    event.target.files && setFile(event.target.files[0]);
+    // create a blob object from the file
+
+    if (event.target.files) {
+      const file = event.target.files[0];
+      setFile(file);
+    }
   };
 
   const uploadFile = async () => {
@@ -22,18 +23,31 @@ const Chunked = () => {
     }
 
     const uniqueUploadId = generateUniqueUploadId();
-    const chunkSize = 5 * 1024 * 1024;
+    const chunkSize = 100 * 1024 * 1024;
     const totalChunks = Math.ceil(file.size / chunkSize);
     let currentChunk = 0;
 
     setUploading(true);
 
     const uploadChunk = async (start: number, end: number) => {
+      //return if file is null
+      if (!file) {
+        return;
+      }
+      //max 100mb size
+      if (file.size > 100 * 1024 * 1024) {
+        console.error("File is too large. Max size is 100MB.");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("file", file.slice(start, end));
-      formData.append("cloud_name", CLOUD_NAME);
-      formData.append("upload_preset", UPLOAD_PRESET);
-      const contentRange = `bytes ${start}-${end - 1}/${file.size}`;
+      formData.append("filename", file.name);
+      formData.append("uniqueId", uniqueUploadId);
+      // MIME type
+      formData.append("mimeType", file.type);
+      // formData.append("totalChunks", totalChunks.toString());
+      // formData.append("chunkIndex", currentChunk.toString());
 
       console.log(
         `Uploading chunk for uniqueUploadId: ${uniqueUploadId}; start: ${start}, end: ${
@@ -43,14 +57,10 @@ const Chunked = () => {
 
       try {
         const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+          `${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/upload`,
           {
             method: "POST",
             body: formData,
-            headers: {
-              "X-Unique-Upload-Id": uniqueUploadId,
-              "Content-Range": contentRange,
-            },
           }
         );
 
@@ -67,7 +77,6 @@ const Chunked = () => {
         } else {
           setUploadComplete(true);
           setUploading(false);
-
           const fetchResponse = await response.json();
           setCldResponse(fetchResponse);
           console.info("File upload complete.");

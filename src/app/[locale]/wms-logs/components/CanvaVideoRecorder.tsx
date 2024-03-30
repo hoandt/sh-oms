@@ -216,39 +216,115 @@ const CanvasVideoRecorder = ({
 
   //type for event
 
+  // const handleProgressiveUpload = (blob: Blob) => {
+  //   uploader.onProgress((event) => {
+  //     handleUploadingProgress(true, action.trackingCode);
+  //   });
+  //   uploader
+  //     .uploadPart(blob)
+  //     .then(() => {
+  //       // Handle uploading parts
+  //       // Once all parts uploaded, call uploadLastPart method
+  //       uploader
+  //         .uploadLastPart(blob)
+  //         .then((video) => {
+  //           handleUploadingProgress(false, action.trackingCode, video);
+  //         })
+  //         .catch((error) => {
+  //           toast({
+  //             title: "Error uploading video",
+  //             description: "Please try again.",
+  //             variant: "destructive",
+  //           });
+  //           console.error("Error uploading video:", error);
+  //         });
+  //     })
+  //     .catch((error) => {
+  //       toast({
+  //         title: "Error enumerating video devices",
+  //         description: "Please check your camera and try again.",
+  //         variant: "destructive",
+  //       });
+  //       console.error("Error uploading video parts:", error);
+  //     });
+  // };
   const handleProgressiveUpload = (blob: Blob) => {
-    uploader.onProgress((event) => {
-      handleUploadingProgress(true, action.trackingCode);
+    const formData = new FormData();
+    const file = new File([blob], `${action.trackingCode}.webm`, {
+      type: "video/webm",
     });
-    uploader
-      .uploadPart(blob)
-      .then(() => {
-        // Handle uploading parts
-        // Once all parts uploaded, call uploadLastPart method
-        uploader
-          .uploadLastPart(blob)
-          .then((video) => {
-            handleUploadingProgress(false, action.trackingCode, video);
-          })
-          .catch((error) => {
-            toast({
-              title: "Error uploading video",
-              description: "Please try again.",
-              variant: "destructive",
-            });
-            console.error("Error uploading video:", error);
-          });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error enumerating video devices",
-          description: "Please check your camera and try again.",
-          variant: "destructive",
-        });
-        console.error("Error uploading video parts:", error);
-      });
-  };
+    formData.append("file", file);
+    const uniqueUploadId = generateUniqueUploadId();
+    const chunkSize = 100 * 1024 * 1024;
+    const totalChunks = Math.ceil(file.size / chunkSize);
+    let currentChunk = 0;
+    const uploadChunk = async (start: number, end: number) => {
+      //return if file is null
+      if (!file) {
+        return;
+      }
+      //max 100mb size
+      if (file.size > 100 * 1024 * 1024) {
+        console.error("File is too large. Max size is 100MB.");
+        return;
+      }
 
+      const formData = new FormData();
+      formData.append("file", file.slice(start, end));
+      formData.append("filename", file.name);
+      formData.append("organization", `${currentUser.organization.id}`);
+      formData.append("uniqueId", uniqueUploadId);
+      // MIME type
+      formData.append("mimeType", file.type);
+      // formData.append("totalChunks", totalChunks.toString());
+      // formData.append("chunkIndex", currentChunk.toString());
+
+      console.log(
+        `Uploading chunk for uniqueUploadId: ${uniqueUploadId}; start: ${start}, end: ${
+          end - 1
+        }`
+      );
+
+      try {
+        handleUploadingProgress(true, action.trackingCode);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Chunk upload failed.");
+        }
+
+        currentChunk++;
+
+        if (currentChunk < totalChunks) {
+          const nextStart = currentChunk * chunkSize;
+          const nextEnd = Math.min(nextStart + chunkSize, file.size);
+          uploadChunk(nextStart, nextEnd);
+        } else {
+          const fetchResponse = await response.json();
+          console.log(fetchResponse.data);
+          handleUploadingProgress(false, action.trackingCode, {
+            videoId: action.trackingCode,
+            assets: {
+              mp4: fetchResponse.data.assets.mp4,
+            },
+          });
+          console.info("File upload complete.");
+        }
+      } catch (error) {
+        console.error("Error uploading chunk:", error);
+      }
+    };
+
+    const start = 0;
+    const end = Math.min(chunkSize, file.size);
+    uploadChunk(start, end);
+  };
   return (
     <div>
       <div>
@@ -325,4 +401,7 @@ export type CloudVideoUploadResponse = {
   rotation: number;
   original_filename: string;
   done: boolean;
+};
+const generateUniqueUploadId = () => {
+  return `uqid-${Date.now()}`;
 };
