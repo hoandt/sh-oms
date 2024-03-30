@@ -697,7 +697,6 @@ export interface WMSLog {
       disputed: boolean;
       originalUrl: string;
     };
-    }
   };
 }
 
