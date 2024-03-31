@@ -9,7 +9,6 @@ const Timer = ({
   handleTimeOut: () => void;
 }) => {
   const LIMIT_TIME = isTrial === null || !isTrial ? 10 * 60 : 30; //30 seconds for trial, 10 minutes for premium
-  console.log(isTrial, "isTrial", LIMIT_TIME);
 
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(true);
