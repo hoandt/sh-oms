@@ -39,7 +39,6 @@ import { cn } from "@/lib/utils";
 import Timer from "./../components/Timer";
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import CanvasVideoRecorder from "../components/CanvaVideoRecorder";
-import Chunked from "./components/Chunks";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -247,7 +246,6 @@ const Page = () => {
                   {currentUser?.lastName} {currentUser?.firstName}
                 </span>
               </h2>
-              <Chunked />
             </div>
             {log.filter((l) => l.isUploading).length ? (
               <p

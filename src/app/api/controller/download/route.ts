@@ -56,7 +56,8 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
           color: "#000000",
           overlay: {
             font_family: "Arial",
-            font_size: 28,
+            font_size: 26,
+            font_weight: "bold",
             letter_spacing: 2,
             text: `${transaction}\n${fcreatedDate}\n${user} - ${type}`,
           },
@@ -66,8 +67,8 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
           color: "#FFFFFF",
           overlay: {
             font_family: "Arial",
-            font_size: 28,
-
+            font_size: 26,
+            font_weight: "bold",
             letter_spacing: 2,
             text: `${transaction}\n${fcreatedDate}\n${user} - ${type}`,
           },
