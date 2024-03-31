@@ -30,20 +30,9 @@ const CanvasVideoRecorder = ({
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
-  const uploadToken = currentUser.isTrial
-    ? process.env.NEXT_PUBLIC_TRIAL_UPLOAD_TOKEN!
-    : process.env.NEXT_PUBLIC_UPLOAD_TOKEN!;
+
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
-  const { toast } = useToast();
-  const uploader = new ProgressiveUploader({
-    uploadToken,
-    retries: 5,
-    videoName: action.trackingCode,
-    retryStrategy(retryCount, error) {
-      console.log(`Retrying upload. Attempt ${retryCount}. Error:`, error);
-      return 5000; // Retry after 5 seconds
-    },
-  });
+
   useEffect(() => {
     const startCamera = async () => {
       try {
