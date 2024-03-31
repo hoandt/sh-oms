@@ -177,7 +177,7 @@ const Page = () => {
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
-
+  console.log(currentUser);
   return (
     <div className="-mt-32 ">
       {/*  */}
@@ -390,10 +390,13 @@ const Page = () => {
                 <DialogTitle>
                   Đang đóng hàng {cameraAction.trackingCode}{" "}
                 </DialogTitle>
-                <Timer
-                  handleTimeOut={handleRecordComplete}
-                  isTrial={currentUser?.isTrial || true}
-                />
+
+                {currentUser && (
+                  <Timer
+                    handleTimeOut={handleRecordComplete}
+                    isTrial={currentUser?.isTrial}
+                  />
+                )}
                 <DialogDescription className="py-4">
                   <div>Quá trình đóng hàng đang được thực hiện</div>
                   {/* timer */}

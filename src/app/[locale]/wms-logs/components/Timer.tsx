@@ -5,10 +5,12 @@ const Timer = ({
   handleTimeOut,
   isTrial,
 }: {
-  isTrial: boolean;
+  isTrial: boolean | null;
   handleTimeOut: () => void;
 }) => {
-  const LIMIT_TIME = isTrial ? 30 : 10 * 60; //30 seconds for trial, 10 minutes for premium
+  const LIMIT_TIME = isTrial === null || !isTrial ? 10 * 60 : 30; //30 seconds for trial, 10 minutes for premium
+  console.log(isTrial, "isTrial", LIMIT_TIME);
+
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(true);
   useEffect(() => {
