@@ -96,6 +96,7 @@ const page = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    setIsLoading(false);
   };
 
   const handleVideoUrl = async (log: WMSLog) => {
