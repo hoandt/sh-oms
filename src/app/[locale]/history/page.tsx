@@ -62,24 +62,30 @@ const page = () => {
   });
   const [isLoadingURL, setIsLoading] = React.useState(false);
   const handleDownload = async (log: WMSLog) => {
+    setIsLoading(true);
     // check log history
     let videoUrl = "";
     if (log.attributes.history && log.attributes.history.disputed) {
       videoUrl = log.attributes.videoUrl;
     } else {
-      setIsLoading(true);
-      const cloudinaryUrl = await fetch("/api/controller/download", {
-        method: "POST",
-        body: JSON.stringify(log),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await cloudinaryUrl.json();
-      if (data.url) {
-        videoUrl = data.url;
+      try {
+        const cloudinaryUrl = await fetch("/api/controller/download", {
+          method: "POST",
+          body: JSON.stringify(log),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await cloudinaryUrl.json();
+
+        if (data.url) {
+          videoUrl = data.url;
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        console.log("error", error);
       }
-      setIsLoading(false);
     }
 
     const a = document.createElement("a");
@@ -271,6 +277,13 @@ const page = () => {
           </DialogContent>
         </Dialog>
       )}
+      {isLoadingURL && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-50 flex items-center justify-center  text-white gap-2">
+          <Loader2Icon className="h-8 w-8 animate-spin" />
+          <p>Đang xử lý...</p>
+        </div>
+      )}
+
       <CommonTable
         extraActionTable={[]}
         filterComponent={null}
