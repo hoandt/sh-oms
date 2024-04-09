@@ -1,8 +1,7 @@
 "use client";
 import Logo from "@/components/Logo";
 import { EyeIcon, EyeOff } from "lucide-react";
-import { signIn } from "next-auth/react";
-import { useLocale, useTranslations } from "next-intl";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -11,7 +10,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();
-
+  const session = useSession();
+  // If session exists, redirect to home
+  if (session && session.data) {
+    router.push("/");
+    return null;
+  }
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(""); // Clear any previous errors

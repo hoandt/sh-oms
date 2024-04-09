@@ -36,9 +36,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
-import Timer from "./components/Timer";
+
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
+import Timer from "./components/Timer";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -177,7 +178,6 @@ const Page = () => {
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
-  console.log(currentUser);
   return (
     <div className="-mt-32 ">
       {/*  */}

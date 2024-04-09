@@ -15,10 +15,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldErrors, useForm } from "react-hook-form";
 import * as z from "zod";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
 
 export const registerSchema = z.object({
   username: z.string().min(2, {
@@ -42,6 +43,12 @@ export const registerSchema = z.object({
 });
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const session = useSession();
+  // If session exists, redirect to home
+  if (session && session.data) {
+    redirect("/");
+    return null;
+  }
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -91,10 +98,6 @@ export default function RegisterForm() {
       }
 
       const data = await res.json();
-
-      // Handle success here, e.g., redirect to another page or set some state.
-      console.log(data.jwt); // Example: Log JWT token
-      console.log(data.user); // Example: Log user details
 
       // redirect to login page
       window.confirm("Đăng ký thành công. Bạn có muốn đăng nhập ngay?");

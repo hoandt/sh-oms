@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { createLogs, deleteLogs, updateLogs } from "@/services";
@@ -20,11 +19,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCheckIcon, PlayCircle, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
-import SelectCameraDevice from "./components/Webcam";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +37,8 @@ import { cn } from "@/lib/utils";
 import Timer from "./../components/Timer";
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import CanvasVideoRecorder from "../components/CanvaVideoRecorder";
+import BarcodeScanForm from "../components/BarcodeScanner";
+import SelectCameraDevice from "../components/Webcam";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -390,10 +390,12 @@ const Page = () => {
                 <DialogTitle>
                   Đang kiểm hàng hoàn {cameraAction.trackingCode}{" "}
                 </DialogTitle>
-                <Timer
-                  handleTimeOut={handleRecordComplete}
-                  isTrial={currentUser?.isTrial || true}
-                />
+                {currentUser && (
+                  <Timer
+                    handleTimeOut={handleRecordComplete}
+                    isTrial={currentUser?.isTrial}
+                  />
+                )}
                 <DialogDescription className="py-4">
                   <div>Quá trình kiểm hàng hoàn đang được thực hiện</div>
                   {/* timer */}

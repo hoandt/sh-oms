@@ -262,12 +262,10 @@ const CanvasVideoRecorder = ({
       formData.append("file", file.slice(start, end));
       formData.append("filename", file.name);
       formData.append("organization", `${currentUser.organization.id}`);
+      formData.append("isTrial", `${currentUser.isTrial}`);
       formData.append("uniqueId", uniqueUploadId);
       // MIME type
       formData.append("mimeType", file.type);
-      // formData.append("totalChunks", totalChunks.toString());
-      // formData.append("chunkIndex", currentChunk.toString());
-
       console.log(
         `Uploading chunk for uniqueUploadId: ${uniqueUploadId}; start: ${start}, end: ${
           end - 1
