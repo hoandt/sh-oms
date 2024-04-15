@@ -53,7 +53,7 @@ export default function Settings() {
       <Form {...form}>
         <h1 className="text-2xl">{"Thông tin tài khoản"}</h1>
         {/* Display trial account badge  */}
-        <p className="text-sm text-gray-500">{"BASIC PACKAGE"}</p>
+        {/* <p className="text-sm text-gray-500">{"BASIC PACKAGE"}</p> */}
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 mt-4 w-full"

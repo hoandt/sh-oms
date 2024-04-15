@@ -1,12 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
-
-import { useToast } from "@/components/ui/use-toast";
-import {
-  ProgressiveUploader,
-  VideoUploadResponse,
-} from "@api.video/video-uploader";
+import { VideoUploadResponse } from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
 import { Switch } from "@/components/ui/switch";
+
 const WIDTH = 800;
 const HEIGHT = 600;
 const CanvasVideoRecorder = ({
@@ -39,8 +35,6 @@ const CanvasVideoRecorder = ({
         const constraints: MediaStreamConstraints = {
           audio: false,
           video: {
-            facingMode: "user",
-
             aspectRatio: WIDTH / HEIGHT,
             deviceId: { exact: action.deviceId },
             frameRate: { ideal: 24 },

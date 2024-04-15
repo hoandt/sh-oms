@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { createLogs, deleteLogs, updateLogs } from "@/services";
@@ -20,11 +19,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCheckIcon, PlayCircle, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
-import SelectCameraDevice from "./components/Webcam";
 import {
   Dialog,
   DialogContent,
@@ -36,10 +34,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
-
+import Timer from "./../components/Timer";
 import { VideoUploadResponse } from "@api.video/video-uploader";
-import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
-import Timer from "./components/Timer";
+import CanvasVideoRecorder from "../components/CanvaVideoRecorder";
+import BarcodeScanForm from "../components/BarcodeScanner";
+import SelectCameraDevice from "../components/Webcam";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -51,6 +50,8 @@ export type CameraActionPayload = {
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
+  const [disableHandleDialog, setDisableHandleDialog] = useState(true);
+
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
@@ -101,8 +102,19 @@ const Page = () => {
   }, [session]);
   useEffect(() => {
     cameraAction.action === "start" && finishRecordBtn.current?.focus();
-    finishRecordBtn.current?.focus();
-  }, [log, cameraAction.action]);
+
+    if (cameraAction.action === "start") {
+      // Set a timer to enable the button after 5 seconds
+      const timerId = setTimeout(() => {
+        setDisableHandleDialog(false);
+      }, 2500);
+
+      // Return a cleanup function to clear the timer when the component unmounts or when the dependencies change
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+  }, [cameraAction.action]);
 
   useEffect(() => {
     setIsBarcodeFocused(true);
@@ -164,20 +176,25 @@ const Page = () => {
     },
   });
   const handleRecordComplete = () => {
-    setCameraAction({ ...cameraAction, action: "stop" });
-    setIsBarcodeFocused((prev) => !prev);
+    if (disableHandleDialog) {
+      return;
+    } else {
+      setCameraAction({ ...cameraAction, action: "stop" });
+      setIsBarcodeFocused((prev) => !prev);
+    }
   };
 
   const handleScan = (code: string) => {
     mutateTransaction.mutate({
       organization: currentUser?.organization.id,
       transaction: code,
-      type: "return",
-      status: "received",
+      type: "inbound",
+      status: "inspected",
       user: 1,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
+
   return (
     <div className="-mt-32 ">
       {/*  */}
@@ -234,7 +251,7 @@ const Page = () => {
         <div className="col-span-6 sm:col-span-4 pt-32">
           <div className="p-4 ">
             <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Đóng hàng
+              Nhập hàng
             </h1>
 
             {/* make a button inline */}
@@ -387,10 +404,7 @@ const Page = () => {
           <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
             <div>
               <DialogHeader>
-                <DialogTitle>
-                  Đang đóng hàng {cameraAction.trackingCode}
-                </DialogTitle>
-
+                <DialogTitle>Recording {cameraAction.trackingCode}</DialogTitle>
                 {currentUser && (
                   <Timer
                     handleTimeOut={handleRecordComplete}
@@ -398,7 +412,7 @@ const Page = () => {
                   />
                 )}
                 <DialogDescription className="py-4">
-                  <div>Quá trình hoàn hàng đang được thực hiện</div>
+                  <div>Quá trình nhập hàng đang được thực hiện</div>
                   {/* timer */}
                 </DialogDescription>
               </DialogHeader>
@@ -407,10 +421,11 @@ const Page = () => {
                   ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
                   disabled={
                     log.length > 0 &&
-                    (log[0].attributes as any).transaction !==
-                      cameraAction.trackingCode
+                    log[0].attributes?.transaction !== cameraAction.trackingCode
                   }
-                  onClick={() => handleRecordComplete()}
+                  onClick={() => {
+                    handleRecordComplete();
+                  }}
                 >
                   {"Hoàn thành"}
                 </Button>

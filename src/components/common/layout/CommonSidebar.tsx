@@ -8,8 +8,11 @@ import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowLeftSquare,
   ArrowRightSquare,
   BoxIcon,
+  HandIcon,
+  RotateCcwIcon,
   SearchIcon,
   SettingsIcon,
 } from "lucide-react";
@@ -17,20 +20,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
   {
-    title: "Main",
+    title: "CAM",
     route: [
+      {
+        name: "Inbound",
+        icon: <ArrowRightSquare />,
+        href: "/wms-logs/inbound",
+      },
       {
         name: "Packing",
         icon: <BoxIcon />,
         href: "/wms-logs",
       },
       {
-        name: "Return",
-        icon: <ArrowRightSquare />,
-        href: "/wms-logs/returns",
+        name: "Outbound",
+        icon: <ArrowLeftSquare />,
+        href: "/wms-logs/outbound",
       },
       {
-        name: "Giao dịch",
+        name: "Return",
+        icon: <RotateCcwIcon />,
+        href: "/wms-logs/returns",
+      },
+
+      {
+        name: "Logs",
         icon: <SearchIcon />,
         href: "/history",
       },
@@ -84,12 +98,12 @@ export function CommonSidebar() {
               return (
                 <li key={index} className="w-full">
                   <span className="text-slate-700 font-bold">
-                    {" "}
                     {value.title}
                   </span>
                   <div className="flex flex-col gap-2">
                     {value.route.map((valueP, indexP) => {
-                      const active = path.includes(valueP.href);
+                      const active = path === valueP.href;
+
                       return (
                         <Link
                           key={indexP}
@@ -99,7 +113,7 @@ export function CommonSidebar() {
                           }}
                           className={cn(
                             " text-white group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-semibold",
-                            active && "bg-gray-800"
+                            active && "bg-gray-800 text-orange-500"
                           )}
                         >
                           <TooltipProvider delayDuration={0}>

@@ -50,6 +50,8 @@ export type CameraActionPayload = {
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
+  const [disableHandleDialog, setDisableHandleDialog] = useState(true);
+
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
@@ -100,8 +102,19 @@ const Page = () => {
   }, [session]);
   useEffect(() => {
     cameraAction.action === "start" && finishRecordBtn.current?.focus();
-    finishRecordBtn.current?.focus();
-  }, [log, cameraAction.action]);
+
+    if (cameraAction.action === "start") {
+      // Set a timer to enable the button after 5 seconds
+      const timerId = setTimeout(() => {
+        setDisableHandleDialog(false);
+      }, 2500);
+
+      // Return a cleanup function to clear the timer when the component unmounts or when the dependencies change
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+  }, [cameraAction.action]);
 
   useEffect(() => {
     setIsBarcodeFocused(true);
@@ -163,8 +176,12 @@ const Page = () => {
     },
   });
   const handleRecordComplete = () => {
-    setCameraAction({ ...cameraAction, action: "stop" });
-    setIsBarcodeFocused((prev) => !prev);
+    if (disableHandleDialog) {
+      return;
+    } else {
+      setCameraAction({ ...cameraAction, action: "stop" });
+      setIsBarcodeFocused((prev) => !prev);
+    }
   };
 
   const handleScan = (code: string) => {
@@ -406,10 +423,11 @@ const Page = () => {
                   ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
                   disabled={
                     log.length > 0 &&
-                    (log[0].attributes as any).transaction !==
-                      cameraAction.trackingCode
+                    log[0].attributes?.transaction !== cameraAction.trackingCode
                   }
-                  onClick={() => handleRecordComplete()}
+                  onClick={() => {
+                    handleRecordComplete();
+                  }}
                 >
                   {"Hoàn thành"}
                 </Button>
