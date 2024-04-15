@@ -39,8 +39,6 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
   const type = logData.attributes.type;
   // datetime   createdAt dd/mm/yyyy hh:mm (27/03/2024 14:58)
   const createdDate = new Date(logData.attributes.createdAt);
-
-  console.log("createdDate", createdDate);
   // date with leading zero
   const leadingZeroDate = (date: number) => {
     return date < 10 ? `0${date}` : date;
