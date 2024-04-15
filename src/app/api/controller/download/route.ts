@@ -49,7 +49,7 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
   )}.${leadingZeroDate(
     createdDate.getMonth() + 1
   )}.${createdDate.getFullYear()}`;
-  console.log(fcreatedDate);
+
   const data = cloudinary.uploader
     .upload(url, {
       resource_type: "video",
