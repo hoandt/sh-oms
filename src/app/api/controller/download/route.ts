@@ -14,6 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const logData = (await req.json()) as WMSLog;
   // const url = await getCloudinaryVideo(logData);
   const url = await uploadVideoRemoteURL(logData);
+  console.log(url);
   if (!url) {
     return NextResponse.error();
   }
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       originalUrl: logData.attributes.videoUrl,
     },
   });
-
+  console.log(resUpdateTransaction);
   return NextResponse.json({ url: url.secure_url });
 }
 
