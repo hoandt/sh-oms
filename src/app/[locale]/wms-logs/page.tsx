@@ -172,8 +172,8 @@ const Page = () => {
     mutateTransaction.mutate({
       organization: currentUser?.organization.id,
       transaction: code,
-      type: "return",
-      status: "received",
+      type: "packing",
+      status: "done",
       user: 1,
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
