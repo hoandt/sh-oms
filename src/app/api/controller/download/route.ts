@@ -53,6 +53,9 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
   const data = cloudinary.uploader
     .upload(url, {
       resource_type: "video",
+      use_filename: true,
+      filename_override: `${transaction}`,
+      public_id: `${transaction}`,
       transformation: [
         {
           color: "#000000",
