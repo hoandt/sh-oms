@@ -9,23 +9,12 @@ import { CommonTable } from "@/components/common/table/CommonTable";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 import { deleteLogs } from "@/services";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import {
   DownloadCloud,
   DownloadCloudIcon,
   Loader2Icon,
   PlayCircle,
-  Trash,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
@@ -69,13 +58,24 @@ const page = () => {
       videoUrl = log.attributes.videoUrl;
     } else {
       try {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        // Set a timeout of 5 minutes (300,000 milliseconds)
+        const timeoutId = setTimeout(() => {
+          controller.abort(); // Abort the fetch request after 5 minutes
+          setIsLoading(false); // Update isLoading state
+          console.log("Request timed out"); // Log a timeout message
+        }, 300000);
         const cloudinaryUrl = await fetch("/api/controller/download", {
           method: "POST",
           body: JSON.stringify(log),
           headers: {
             "Content-Type": "application/json",
           },
+          signal: signal, // Pass the AbortController's signal to the fetch request
         });
+        clearTimeout(timeoutId); // Clear the timeout if the request completes before timeout
+
         const data = await cloudinaryUrl.json();
 
         if (data.url) {
