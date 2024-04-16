@@ -14,7 +14,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const logData = (await req.json()) as WMSLog;
   // const url = await getCloudinaryVideo(logData);
   const url = await uploadVideoRemoteURL(logData);
-  console.log(url);
   if (!url) {
     return NextResponse.error();
   }
@@ -55,8 +54,8 @@ const uploadVideoRemoteURL = async (logData: WMSLog) => {
     .upload(url, {
       resource_type: "video",
       use_filename: true,
-      filename_override: `${transaction}`,
-      public_id: `${transaction}`,
+      filename_override: `${logData.id}_${transaction}`,
+      public_id: `${logData.id}_${transaction}`,
       transformation: [
         {
           color: "#000000",
