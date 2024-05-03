@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
 import { Switch } from "@/components/ui/switch";
+import slugify from "slugify";
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -254,10 +255,16 @@ const CanvasVideoRecorder = ({
 
       const formData = new FormData();
       formData.append("file", file.slice(start, end));
-      formData.append("filename", file.name);
+      formData.append(
+        "filename",
+        slugify(file.name, {
+          locale: "vi",
+        })
+      );
       formData.append("organization", `${currentUser.organization.id}`);
       formData.append("isTrial", `${currentUser.isTrial}`);
       formData.append("uniqueId", uniqueUploadId);
+
       // MIME type
       formData.append("mimeType", file.type);
       console.log(
@@ -384,5 +391,7 @@ export type CloudVideoUploadResponse = {
   done: boolean;
 };
 const generateUniqueUploadId = () => {
-  return `uqid-${Date.now()}`;
+  const offsetTimezone = new Date().getTimezoneOffset() * 60 * -1;
+  const timestamp = Math.floor(Date.now() / 1000);
+  return `uqid-${timestamp + offsetTimezone}`;
 };

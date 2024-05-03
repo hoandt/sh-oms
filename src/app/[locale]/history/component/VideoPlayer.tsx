@@ -4,7 +4,6 @@ import { DownloadCloudIcon } from "lucide-react";
 const VideoPlayer = ({ src }: { src: string }) => {
   return (
     <div>
-      Preview
       <video controls autoPlay muted>
         <source src={src} type="video/mp4" />
         Your browser does not support the video tag.

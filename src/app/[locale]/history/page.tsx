@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useGetLogs } from "@/query-keys/logs/query";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
@@ -18,15 +18,13 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
-import { toInteger } from "lodash";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import VideoPlayer from "./component/VideoPlayer";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 const page = () => {
   const { toast } = useToast();
-
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
   const session = useSession() as any;
@@ -50,13 +48,29 @@ const page = () => {
     code: keyword,
   });
   const [isLoadingURL, setIsLoading] = React.useState(false);
+
+  // useEffect to check user's subscription
+  // useEffect(() => {
+  //   if (user) {
+  //     signOut();
+  //   }
+  // }, [user]);
+
   const handleDownload = async (log: WMSLog) => {
-    setIsLoading(true);
     // check log history
     let videoUrl = "";
     if (log.attributes.history && log.attributes.history.disputed) {
       videoUrl = log.attributes.videoUrl;
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.target = "_blank";
+      a.download = `video-${log.attributes.transaction}.mp4`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } else {
+      setIsLoading(true);
       try {
         const controller = new AbortController();
         const signal = controller.signal;
@@ -81,22 +95,29 @@ const page = () => {
         if (data.url) {
           videoUrl = data.url;
           setIsLoading(false);
+          const a = document.createElement("a");
+          a.href = videoUrl;
+          a.target = "_blank";
+          a.download = `video-${log.attributes.transaction}.mp4`;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+          toast({
+            duration: DURATION_TOAST,
+            title: "Không tải được video",
+            description: `Video của giao dịch ${log.attributes.transaction} bị lỗi! `,
+            variant: "destructive",
+          });
         }
       } catch (error) {
         setIsLoading(false);
         console.log("error", error);
       }
     }
-
-    const a = document.createElement("a");
-    a.href = videoUrl;
-    a.target = "_blank";
-    a.download = `video-${log.attributes.transaction}.mp4`;
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setIsLoading(false);
   };
 
   const handleVideoUrl = async (log: WMSLog) => {
@@ -272,9 +293,13 @@ const page = () => {
             setCurrentVideo("");
           }}
         >
-          <DialogHeader>Preview</DialogHeader>
+          <DialogHeader></DialogHeader>
           <DialogContent className="w-[480px]">
             <VideoPlayer src={currentVideo} />
+            {/* open video in a new tab */}
+            <a href={currentVideo} target="_blank" className="text-blue-500  ">
+              Download Preview
+            </a>
           </DialogContent>
         </Dialog>
       )}

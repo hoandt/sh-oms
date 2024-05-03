@@ -27,6 +27,7 @@ import { useToast } from "@/components/ui/use-toast";
 import SelectCameraDevice from "./components/Webcam";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -384,25 +385,24 @@ const Page = () => {
             setIsBarcodeFocused((prev) => !prev);
           }}
         >
-          <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
-            <div>
-              <DialogHeader>
-                <DialogTitle>
-                  Đang đóng hàng {cameraAction.trackingCode}
-                </DialogTitle>
-
-                {currentUser && (
-                  <Timer
-                    handleTimeOut={handleRecordComplete}
-                    isTrial={currentUser?.isTrial}
-                  />
-                )}
-                <DialogDescription className="py-4">
-                  <div>Quá trình hoàn hàng đang được thực hiện</div>
-                  {/* timer */}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex content-between  *:">
+          <DialogContent
+            onPointerDownOutside={(e) => e.preventDefault()}
+            hideCloseButton
+          >
+            <DialogHeader>
+              {currentUser && (
+                <Timer
+                  handleTimeOut={handleRecordComplete}
+                  isTrial={currentUser?.isTrial}
+                />
+              )}
+              <DialogDescription className="py-4">
+                <div>Quá trình hoàn hàng đang được thực hiện</div>
+                {/* timer */}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <div className="w-full flex justify-between">
                 <Button
                   ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
                   disabled={
@@ -414,8 +414,13 @@ const Page = () => {
                 >
                   {"Hoàn thành"}
                 </Button>
-              </DialogFooter>
-            </div>
+                <DialogClose tabIndex={-1}>
+                  <div className="bg-slate-50 border rounded shadow px-4 py-3 text-sm text-red-500 cursor-pointer inline-flex justify-center items-center">
+                    Cancel
+                  </div>
+                </DialogClose>
+              </div>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}

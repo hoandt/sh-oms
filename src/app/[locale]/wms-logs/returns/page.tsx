@@ -25,6 +25,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -401,7 +402,10 @@ const Page = () => {
             setIsBarcodeFocused((prev) => !prev);
           }}
         >
-          <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
+          <DialogContent
+            hideCloseButton
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <div>
               <DialogHeader>
                 <DialogTitle>
@@ -418,19 +422,25 @@ const Page = () => {
                   {/* timer */}
                 </DialogDescription>
               </DialogHeader>
-              <DialogFooter className="flex content-between  *:">
-                <Button
-                  ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
-                  disabled={
-                    log.length > 0 &&
-                    log[0].attributes?.transaction !== cameraAction.trackingCode
-                  }
-                  onClick={() => {
-                    handleRecordComplete();
-                  }}
-                >
-                  {"Hoàn thành"}
-                </Button>
+              <DialogFooter>
+                <div className="w-full flex justify-between">
+                  <Button
+                    ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
+                    disabled={
+                      log.length > 0 &&
+                      (log[0].attributes as any).transaction !==
+                        cameraAction.trackingCode
+                    }
+                    onClick={() => handleRecordComplete()}
+                  >
+                    {"Hoàn thành"}
+                  </Button>
+                  <DialogClose tabIndex={-1}>
+                    <div className="bg-slate-50 border rounded shadow px-4 py-3 text-sm text-red-500 cursor-pointer inline-flex justify-center items-center">
+                      Cancel
+                    </div>
+                  </DialogClose>
+                </div>
               </DialogFooter>
             </div>
           </DialogContent>

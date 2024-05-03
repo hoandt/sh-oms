@@ -2,14 +2,18 @@ import auth from "@/auth";
 import { Card } from "@/components/ui/card";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-
+const checkSubcription = async (userId: number) => {
+  return userId;
+};
 export default async function IndexPage() {
-  const session = await getServerSession(auth);
+  const session = (await getServerSession(auth)) as any;
 
   if (!session) {
     return redirect("/login");
   }
-
+  const userId = session.userWithRole.id;
+  const subscription = await checkSubcription(userId);
+  console.log(subscription, userId);
   return (
     <>
       {/* display me 2 cards, show PACKING and VIEW actions */}

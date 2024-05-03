@@ -4,7 +4,6 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextRequest } from "next/server";
 
 const publicPages = [
-  "/",
   "/login",
   "/register",
   "/forgot-password",
