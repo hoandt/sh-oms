@@ -318,7 +318,7 @@ const CanvasVideoRecorder = ({
       <div>
         {currentUser.isTrial && (
           <p className="text-sm px-2 py-4 text-gray-500 bg-blue-100 rounded-t">
-            Với tài khoản dùng thử, video chỉ có thời lượng tối đa 30s.
+            Với tài khoản dùng thử, video chỉ có thời lượng tối đa 15s.
             <a
               href="https://swifthub.net/vi/order-tracking/"
               target="_blank"

@@ -1,16 +1,16 @@
 import { WMSLog } from "@/types/todo";
 import { NextResponse, NextRequest } from "next/server";
-import { unlink } from "node:fs";
-import { v2 as cloudinary } from "cloudinary";
+// import { unlink } from "node:fs";
+// import { v2 as cloudinary } from "cloudinary";
 import { toInteger } from "lodash";
 import { updateLogs } from "../../services/logs";
 
-cloudinary.config({
-  cloud_name: "dfo55d4yi",
-  api_key: "835479918789953",
-  api_secret: "gK7AezRTS4T4Y-R7FRX0BTCOZzA",
-  secure: true,
-});
+// cloudinary.config({
+//   cloud_name: "dfo55d4yi",
+//   api_key: "835479918789953",
+//   api_secret: "gK7AezRTS4T4Y-R7FRX0BTCOZzA",
+//   secure: true,
+// });
 export async function POST(req: NextRequest, res: NextResponse) {
   const logData = (await req.json()) as WMSLog;
   let headersList = {
