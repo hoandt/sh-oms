@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic"; // defaults to auto
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const urlPath = req.nextUrl.search;
   const subcriberId = urlPath.replace("?subscription=", "");
 
   try {
-    const response = await fetch(`https://tracking.swifthub.net/report.txt`);
+    const response = await fetch(`https://tracking.swifthub.net/report.txt`, {
+      cache: "no-store",
+    });
     const data = await response.text();
     const obj = subscriptionData(data);
 

@@ -297,9 +297,6 @@ const page = () => {
           <DialogContent className="w-[480px]">
             <VideoPlayer src={currentVideo} />
             {/* open video in a new tab */}
-            <a href={currentVideo} target="_blank" className="text-blue-500  ">
-              Download Preview
-            </a>
           </DialogContent>
         </Dialog>
       )}
