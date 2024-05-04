@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const data = await response.text();
     const obj = subscriptionData(data);
 
-    return NextResponse.json({ txt: Number.parseInt(obj[subcriberId]) || -1 });
+    return NextResponse.json({ txt: Number.parseInt(obj[subcriberId]) });
   } catch (error) {
     console.error(error);
   }
