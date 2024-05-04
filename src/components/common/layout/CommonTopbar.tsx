@@ -74,7 +74,7 @@ export function CommonTopbar() {
             {isTrial && (
               <span>
                 <FileVideo className="w-4 text-slate-400" />
-                `${credits}/10`
+                {credits}/10
               </span>
             )}
           </div>
