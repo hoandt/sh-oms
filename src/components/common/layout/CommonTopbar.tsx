@@ -28,9 +28,6 @@ export function CommonTopbar() {
     fetch("/api/reports?subscription=" + organizationId)
       .then((res) => res.json())
       .then((data: any) => {
-        if (data.txt === -1) {
-          signOut();
-        }
         const usage = data.txt as number;
         //  if trial and usage > TRIAL_LIMIT then signOut
         if (isTrial && usage > TRIAL_LIMIT) {
