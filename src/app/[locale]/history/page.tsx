@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteLogs } from "@/services";
 
 import {
+  CopyIcon,
   DownloadCloud,
   DownloadCloudIcon,
   Loader2Icon,
@@ -161,7 +162,7 @@ const page = () => {
 
       {
         accessorKey: "note",
-        header: () => <div className="">{"Ngày đóng gói"}</div>,
+        header: () => <div className="">{"Date"}</div>,
         cell: ({ row }) => {
           const date = row.original.attributes.createdAt;
           return <div>{format(date, "HH:mm dd/MM/yyyy")}</div>;
@@ -171,7 +172,7 @@ const page = () => {
       },
       {
         accessorKey: "user",
-        header: () => <div className="">{"Bàn đóng"}</div>,
+        header: () => <div className="">{"Station"}</div>,
         cell: ({ row }) => {
           const user = row.original.attributes.user;
           return <div>{user}</div>;
@@ -216,19 +217,43 @@ const page = () => {
         header: () => <div className="">{"Download"}</div>,
         cell: ({ row }) => {
           const videoURL = row.original.attributes.videoUrl;
+          const isDisputed = row.original.attributes.history?.disputed;
           return videoURL ? (
             //  display Download icon
-            <Button
-              disabled={isLoadingURL}
-              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
-              variant={"outline"}
-              onClick={() => {
-                handleDownload(row.original);
-              }}
-            >
-              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
-              {isLoadingURL ? "Đang xử lý..." : "Tải về"}
-            </Button>
+            <div className="flex">
+              <Button
+                disabled={isLoadingURL}
+                className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
+                variant={"outline"}
+                onClick={() => {
+                  handleDownload(row.original);
+                }}
+              >
+                <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
+                {isLoadingURL ? "Processing..." : "Download"}
+              </Button>
+              {isDisputed && (
+                <Button
+                  variant={"link"}
+                  size={"sm"}
+                  className="text-blue-500"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      getVerifyLink(`${row.original.id}`)
+                    );
+                    toast({
+                      duration: DURATION_TOAST,
+                      title: "Copied",
+                      variant: "default",
+                      description: `Video link of transaction ${row.original.attributes.transaction} has been copied!`,
+                    });
+                  }}
+                >
+                  <CopyIcon className="h-4 w-4 cursor-pointer mr-2 text-blue-400" />{" "}
+                  Verification Link
+                </Button>
+              )}
+            </div>
           ) : (
             "-"
           );
@@ -325,3 +350,25 @@ const page = () => {
 };
 
 export default page;
+
+const getVerifyLink = (id: string) => {
+  const shiftedId = shiftId(id, 2);
+  const link = `https://swifthub.net/tracking/?id=${shiftedId}`;
+  return link;
+};
+
+function shiftId(id: string, offset: number) {
+  const alphabet = "a9B1c2D8e3F7g4H6j5KmNpQrSTUvWxYz";
+  const idString = id.toString();
+  let shiftedId = "";
+
+  for (let i = 0; i < idString.length; i++) {
+    let digit = parseInt(idString[i]) + offset;
+    // Ensure the digit wraps around if it goes beyond 9
+    const adjustedDigit = digit % 10;
+    digit = adjustedDigit < 0 ? adjustedDigit + 10 : adjustedDigit;
+    shiftedId += alphabet[digit];
+  }
+
+  return shiftedId;
+}
