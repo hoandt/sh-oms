@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 interface IGetLogs {
   organization: number;
   code?: string;
+  status?: string;
   page?: number;
   pageSize?: number;
 }
@@ -12,12 +13,13 @@ interface IGetLogs {
 export const useGetLogs = ({
   organization,
   code,
+  status,
   page,
   pageSize,
 }: IGetLogs) => {
   const query = useQuery({
-    queryKey: logQueryKeys.getLogs({ pageParam: page, code }),
-    queryFn: () => getLogs({ organization, code, page, pageSize }),
+    queryKey: logQueryKeys.getLogs({ pageParam: page, code, status }),
+    queryFn: () => getLogs({ organization, code, page, pageSize, status }),
   });
   return query;
 };

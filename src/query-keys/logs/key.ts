@@ -1,7 +1,11 @@
 export const logQueryKeys = {
-  getLogs: ({ pageParam, code }: { pageParam?: number; code?: string }) => [
-    "get-logs",
+  getLogs: ({
     pageParam,
     code,
-  ],
+    status
+  }: {
+    pageParam?: number;
+    code?: string;
+    status?: string;
+  }) => ["get-logs", pageParam, code, status],
 };

@@ -23,11 +23,13 @@ import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import VideoPlayer from "./component/VideoPlayer";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Filter } from "./component/Filter";
 
 const page = () => {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+  const status = searchParams.get("status") || "";
   const session = useSession() as any;
   const user = session.data as any;
   const [isOpen, setIsOpen] = React.useState(false);
@@ -44,18 +46,15 @@ const page = () => {
     refetch,
   } = useGetLogs({
     organization: user.userWithRole.organization.id,
-    page: pageIndex,
+    page: pageIndex + 1,
     pageSize,
     code: keyword,
+    status,
   });
-  const [isLoadingURL, setIsLoading] = React.useState(false);
 
-  // useEffect to check user's subscription
-  // useEffect(() => {
-  //   if (user) {
-  //     signOut();
-  //   }
-  // }, [user]);
+  console.log({ status });
+
+  const [isLoadingURL, setIsLoading] = React.useState(false);
 
   const handleDownload = async (log: WMSLog) => {
     // check log history
@@ -334,7 +333,7 @@ const page = () => {
 
       <CommonTable
         extraActionTable={[]}
-        filterComponent={null}
+        filterComponent={<Filter />}
         data={(logs?.data as WMSLog[]) || []}
         columns={columns}
         isLoading={isLoading}

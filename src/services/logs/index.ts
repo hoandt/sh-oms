@@ -19,6 +19,7 @@ export function transformData(data: any): any {
 export const getLogs = async ({
   organization,
   code,
+  status,
   page = 1,
   pageSize = 15,
 }: any) => {
@@ -37,6 +38,11 @@ export const getLogs = async ({
             id: {
               $eq: organization,
             },
+          },
+        },
+        {
+          type: {
+            $eq: status || undefined,
           },
         },
       ],
