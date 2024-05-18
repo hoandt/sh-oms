@@ -3,9 +3,11 @@ import { VideoUploadResponse } from "@api.video/video-uploader";
 import { CameraActionPayload } from "../page";
 import { Switch } from "@/components/ui/switch";
 import slugify from "slugify";
+import { toast } from "@/components/ui/use-toast";
 
 const WIDTH = 800;
 const HEIGHT = 600;
+const MAX_SIZE = 200 * 1024 * 1024; // 200MB
 const CanvasVideoRecorder = ({
   action,
   handleStream,
@@ -239,7 +241,7 @@ const CanvasVideoRecorder = ({
     });
     formData.append("file", file);
     const uniqueUploadId = generateUniqueUploadId();
-    const chunkSize = 100 * 1024 * 1024;
+    const chunkSize = MAX_SIZE;
     const totalChunks = Math.ceil(file.size / chunkSize);
     let currentChunk = 0;
     const uploadChunk = async (start: number, end: number) => {
@@ -248,8 +250,14 @@ const CanvasVideoRecorder = ({
         return;
       }
       //max 100mb size
-      if (file.size > 100 * 1024 * 1024) {
+      if (file.size > MAX_SIZE) {
         console.error("File is too large. Max size is 100MB.");
+        toast({
+          title: "File is too large",
+          description: "Max size is 200MB.",
+          variant: "destructive",
+        });
+
         return;
       }
 
