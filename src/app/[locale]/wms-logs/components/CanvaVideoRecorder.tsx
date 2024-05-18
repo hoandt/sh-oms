@@ -40,7 +40,7 @@ const CanvasVideoRecorder = ({
           video: {
             aspectRatio: WIDTH / HEIGHT,
             deviceId: { exact: action.deviceId },
-            frameRate: { ideal: 24 },
+            frameRate: { ideal: 20 },
             width: {
               min: 480,
               ideal: WIDTH,
