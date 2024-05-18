@@ -55,7 +55,7 @@ export const getLogs = async ({
       pageSize,
     },
   };
-
+  console.log(params);
   const queryOptions = qs.stringify(params, {
     encodeValuesOnly: true,
     addQueryPrefix: true,

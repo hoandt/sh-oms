@@ -11,6 +11,7 @@ import { z } from "zod";
 
 export const formFilterInboundSchema = z.object({
   status: z.coerce.string().optional(),
+  organization: z.coerce.string().optional(),
 });
 
 const OptionsType = [
