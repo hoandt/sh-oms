@@ -200,40 +200,6 @@ const CanvasVideoRecorder = ({
     }
   };
 
-  //type for event
-
-  // const handleProgressiveUpload = (blob: Blob) => {
-  //   uploader.onProgress((event) => {
-  //     handleUploadingProgress(true, action.trackingCode);
-  //   });
-  //   uploader
-  //     .uploadPart(blob)
-  //     .then(() => {
-  //       // Handle uploading parts
-  //       // Once all parts uploaded, call uploadLastPart method
-  //       uploader
-  //         .uploadLastPart(blob)
-  //         .then((video) => {
-  //           handleUploadingProgress(false, action.trackingCode, video);
-  //         })
-  //         .catch((error) => {
-  //           toast({
-  //             title: "Error uploading video",
-  //             description: "Please try again.",
-  //             variant: "destructive",
-  //           });
-  //           console.error("Error uploading video:", error);
-  //         });
-  //     })
-  //     .catch((error) => {
-  //       toast({
-  //         title: "Error enumerating video devices",
-  //         description: "Please check your camera and try again.",
-  //         variant: "destructive",
-  //       });
-  //       console.error("Error uploading video parts:", error);
-  //     });
-  // };
   const handleProgressiveUpload = (blob: Blob) => {
     const formData = new FormData();
     const file = new File([blob], `${action.trackingCode}.webm`, {
@@ -251,7 +217,7 @@ const CanvasVideoRecorder = ({
       }
       //max 100mb size
       if (file.size > MAX_SIZE) {
-        console.error("File is too large. Max size is 100MB.");
+        console.error("File is too large. Max size is 200MB.");
         toast({
           title: "File is too large",
           description: "Max size is 200MB.",
