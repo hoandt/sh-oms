@@ -13,7 +13,7 @@ import {
 import { IVariantInventory, Variant } from "@/types/inventories";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
 
 enum INVENTORY_STATUS_PARAMS {
@@ -54,18 +54,26 @@ const Page = ({ params }: { params: { id: string } }) => {
       pageIndex: 0,
       pageSize: PAGE_SIZE_TABLE,
     });
-  const { data, isLoading } = useGetInventoryDetailBySapo({
+  const { data } = useGetInventoryDetailBySapo({
     id,
   });
 
-  const selectdVariantIndex = data?.data?.variants.findIndex(
-    (e) => e.id == Number(queryParams?.variantId)
-  );
+  const selectdVariantIndex =
+    data?.data?.variants.findIndex(
+      (e) => e.id == Number(queryParams?.variantId)
+    ) || 0;
   const selectedVariant =
     selectdVariantIndex !== -1
-      ? data?.data?.variants[selectdVariantIndex || 0]
+      ? data?.data?.variants[selectdVariantIndex]
       : ({} as Variant);
+
   const variantId = data?.data.variants[0].id;
+
+  useEffect(() => {
+    if (data?.data?.variants.length) {
+      setQueryParams({ variantId: data?.data?.variants[0]?.id.toString() });
+    }
+  }, [data?.data?.variants.length]);
 
   const { data: reports, isLoading: isLoadingReports } =
     useGetInventoryTransactionBySapo({
@@ -187,8 +195,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     setQueryParams({ status: option });
   };
 
-  console.log({ selectedVariant });
-
   return (
     <div className="p-4 flex flex-col gap-2">
       <div className="flex flex-row gap-2">
@@ -249,7 +255,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             <CardContent className="p-4">
               <div className="flex-[0.3] flex flex-col gap-2">
                 {data?.data.variants.map((value, index) => {
-                  console.log({ first: queryParams.variantId });
                   const selected =
                     value.id.toString() === queryParams.variantId ||
                     (!queryParams.variantId && index === 0);
