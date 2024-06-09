@@ -36,7 +36,7 @@ const Page = () => {
       },
       {
         accessorKey: "transaction",
-        header: () => <div className="">{"Tên phiên bản sản phẩm"}</div>,
+        header: () => <div className="">{"Item"}</div>,
         cell: ({ row }) => {
           const productName = row.original.product_name || "-";
           return <div className="flex space-x-2">{productName}</div>;
@@ -45,10 +45,10 @@ const Page = () => {
         enableHiding: false,
       },
       {
-        accessorKey: "user",
-        header: () => <div className="">{"Có thể bán"}</div>,
+        accessorKey: "sku",
+        header: () => <div className="">{"SKU"}</div>,
         cell: ({ row }) => {
-          const user = row.original.init_stock || "-";
+          const user = row.original.sku || "-";
           return <div>{user}</div>;
         },
         enableSorting: false,
@@ -56,10 +56,13 @@ const Page = () => {
       },
       {
         accessorKey: "user",
-        header: () => <div className="">{"Tồn kho"}</div>,
+        header: () => <div className="">{"Onhands"}</div>,
         cell: ({ row }) => {
-          const user = row.original.init_stock || "-";
-          return <div>{user}</div>;
+          const inventory =
+            row.original.inventories!.reduce((acc, cur) => {
+              return acc + cur.on_hand;
+            }, 0) || "-";
+          return <div>{inventory}</div>;
         },
         enableSorting: false,
         enableHiding: false,

@@ -21,51 +21,25 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
   {
-    title: "CAM",
+    title: "NAV",
     route: [
-      {
-        name: "Inbound",
-        icon: <ArrowRightSquare />,
-        href: "/wms-logs/inbound",
-      },
       {
         name: "Inventory",
         icon: <PanelTopInactiveIcon />,
         href: "/wms-logs/inventory",
       },
-      {
-        name: "Packing",
-        icon: <BoxIcon />,
-        href: "/wms-logs",
-      },
-      {
-        name: "Outbound",
-        icon: <ArrowLeftSquare />,
-        href: "/wms-logs/outbound",
-      },
-      {
-        name: "Return",
-        icon: <RotateCcwIcon />,
-        href: "/wms-logs/returns",
-      },
-
-      {
-        name: "Logs",
-        icon: <SearchIcon />,
-        href: "/history",
-      },
     ],
   },
-  {
-    title: "More",
-    route: [
-      {
-        name: "Cài đặt",
-        icon: <SettingsIcon />,
-        href: "/settings",
-      },
-    ],
-  },
+  // {
+  //   title: "More",
+  //   route: [
+  //     {
+  //       name: "Cài đặt",
+  //       icon: <SettingsIcon />,
+  //       href: "/settings",
+  //     },
+  //   ],
+  // },
 ];
 
 export function CommonSidebar() {
