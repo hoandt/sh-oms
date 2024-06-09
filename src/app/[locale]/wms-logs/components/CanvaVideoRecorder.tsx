@@ -40,7 +40,7 @@ const CanvasVideoRecorder = ({
           video: {
             aspectRatio: WIDTH / HEIGHT,
             deviceId: { exact: action.deviceId },
-            frameRate: { ideal: 20 },
+            frameRate: { max: 20 },
             width: {
               min: 480,
               ideal: WIDTH,
@@ -51,10 +51,6 @@ const CanvasVideoRecorder = ({
               ideal: HEIGHT,
               max: 1080,
             },
-
-            sampleRate: 44100 / 5,
-
-            // facingMode:
           },
         };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
