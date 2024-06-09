@@ -56,6 +56,7 @@ interface DataTableProps<TData, TValue> {
   }) => void;
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
   getRowCanExpand?: (row: Row<TData>) => boolean;
+  onClickRow?: (row: Row<TData>) => void;
 }
 
 export function CommonTable<TData, TValue>({
@@ -71,6 +72,7 @@ export function CommonTable<TData, TValue>({
   setPagination,
   renderSubComponent,
   getRowCanExpand,
+  onClickRow,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -152,6 +154,10 @@ export function CommonTable<TData, TValue>({
                     key={index}
                     data-state={row.getIsSelected() && "selected"}
                     className="h-12 py-4"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClickRow?.(row);
+                    }}
                   >
                     {row.getVisibleCells().map((cell, i) => (
                       <TableCell key={i}>

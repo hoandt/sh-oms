@@ -19,6 +19,14 @@ export type DataResponseFromBackend<T = {}> = {
   meta: any;
 };
 
+export type DataResponseFromBackendSapo<T = {}> = {
+  total?: number;
+  responseStatus?: number;
+  success: boolean;
+  variants: T;
+  metadata: any;
+};
+
 export enum TabSideBarInfor {
   PRODUCT = "PRODUCT",
   TRACKING = "TRACKING",

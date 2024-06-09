@@ -12,6 +12,7 @@ import {
   ArrowRightSquare,
   BoxIcon,
   HandIcon,
+  PanelTopInactiveIcon,
   RotateCcwIcon,
   SearchIcon,
   SettingsIcon,
@@ -26,6 +27,11 @@ const router = [
         name: "Inbound",
         icon: <ArrowRightSquare />,
         href: "/wms-logs/inbound",
+      },
+      {
+        name: "Inventory",
+        icon: <PanelTopInactiveIcon />,
+        href: "/wms-logs/inventory",
       },
       {
         name: "Packing",
