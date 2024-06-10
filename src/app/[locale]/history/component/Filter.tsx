@@ -11,7 +11,6 @@ import { z } from "zod";
 
 export const formFilterInboundSchema = z.object({
   status: z.coerce.string().optional(),
-  organization: z.coerce.string().optional(),
 });
 
 const OptionsType = [
@@ -29,7 +28,7 @@ export const Filter = () => {
   const form = useForm<z.infer<typeof formFilterInboundSchema>>({
     resolver: zodResolver(formFilterInboundSchema),
     defaultValues: {
-      status: searchParams.get("status") || OptionsType[0].value,
+      status: searchParams.get("status") || (OptionsType[0].value as string),
     },
   });
 

@@ -1,5 +1,7 @@
 import { inventoryQueryKeys } from "./key";
 import {
+  getBrandBySapo,
+  getCategoryBySapo,
   getInventoryTransactionBySapo,
   getSystemInventories,
   getSystemInventoriesSapo,
@@ -21,23 +23,45 @@ export const useGetInventories = ({ code, page, pageSize }: IGetInventory) => {
   return query;
 };
 
-interface IGetInventorySapo {
+export interface IGetInventorySapo {
   keyword?: string;
   page?: number;
   pageSize?: number;
+  created_on_max?: string;
+  created_on_min?: string;
+  created_on_predefined?: string;
+  brand_ids?: string;
+  category_ids?: string;
 }
 
 export const useGetInventoriesBySapo = ({
   keyword,
   page,
   pageSize,
+  created_on_max,
+  created_on_min,
+  brand_ids,
+  category_ids,
 }: IGetInventorySapo) => {
   const query = useQuery({
     queryKey: inventoryQueryKeys.getInventoriesSapo({
-      pageParam: page,
+      page,
       keyword,
+      created_on_max,
+      created_on_min,
+      brand_ids,
+      category_ids,
     }),
-    queryFn: () => getSystemInventoriesSapo({ page, pageSize, keyword }),
+    queryFn: () =>
+      getSystemInventoriesSapo({
+        page,
+        pageSize,
+        keyword,
+        created_on_max,
+        created_on_min,
+        brand_ids,
+        category_ids,
+      }),
   });
   return query;
 };
@@ -73,4 +97,68 @@ export const useGetInventoryTransactionBySapo = ({
     enabled: !!variantId,
   });
   return query;
+};
+
+export const useGetCategoryBySapo = ({
+  page,
+  pageSize,
+  query,
+  status,
+}: {
+  page: number;
+  pageSize: number;
+  query?: string;
+  status: string;
+}) => {
+  const queryData = useQuery({
+    queryKey: inventoryQueryKeys.getCategorySapo({
+      page,
+      query,
+      status,
+    }),
+    queryFn: () => getCategoryBySapo({ page, pageSize, query, status }),
+    select: (data) => {
+      const newData = data.data.map((e) => {
+        return {
+          label: e.name,
+          value: e.id,
+        };
+      });
+      return newData;
+    },
+  });
+
+  return queryData;
+};
+
+export const useGetBrandsBySapo = ({
+  page,
+  pageSize,
+  query,
+  status,
+}: {
+  page: number;
+  pageSize: number;
+  query?: string;
+  status: string;
+}) => {
+  const queryData = useQuery({
+    queryKey: inventoryQueryKeys.getBrandSapo({
+      page,
+      query,
+      status,
+    }),
+    queryFn: () => getBrandBySapo({ page, pageSize, query, status }),
+    select: (data) => {
+      const newData = data.data.map((e) => {
+        return {
+          label: e.name,
+          value: e.id,
+        };
+      });
+      return newData;
+    },
+  });
+
+  return queryData;
 };

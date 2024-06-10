@@ -62,8 +62,8 @@ export const formShippingSchema = z.object({
 });
 
 export type DataOptions = {
-  label: string;
-  value: string;
+  label: string | number;
+  value: string | number;
 };
 
 export type Option = {

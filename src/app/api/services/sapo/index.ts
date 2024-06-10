@@ -14,7 +14,6 @@ const fetchCookies = async () => {
 export const fetchInventoriesSapo = async (path: string) => {
   const cookie = await fetchCookies();
 
-  console.log({first: `https://swifthub2.mysapogo.com/admin/variants/search.json${path}`})
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/variants/search.json${path}`,
     {
@@ -53,6 +52,42 @@ export const fetchReportInventorySapo = async (path: string) => {
   
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/reports/inventories/variants/${path}`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        cookie,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+
+  return response.json();
+};
+
+export const fetchCaterogyInventorySapo = async (path: string) => {
+  const cookie = await fetchCookies();
+  
+  const response = await fetch(
+    `https://swifthub2.mysapogo.com/admin/categories/search.json${path}`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        cookie,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+
+  return response.json();
+};
+
+export const fetchBrandsInventorySapo = async (path: string) => {
+  const cookie = await fetchCookies();
+  
+  const response = await fetch(
+    `https://swifthub2.mysapogo.com/admin/brands/search.json${path}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
