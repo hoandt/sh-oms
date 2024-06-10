@@ -8,6 +8,7 @@ import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
+import { Filter } from "./components/Filter";
 
 const Page = () => {
   const router = useRouter();
@@ -16,13 +17,22 @@ const Page = () => {
       pageIndex: 0,
       pageSize: PAGE_SIZE_TABLE,
     });
+
   const params = useSearchParams();
   const keyword = params.get("q") || "";
+  const created_on_max = params.get("created_on_max") || "";
+  const created_on_min = params.get("created_on_min") || "";
+  const brand_ids = params.get("brand_ids") || "";
+  const category_ids = params.get("category_ids") || "";
 
   const { data: inventories, isLoading } = useGetInventoriesBySapo({
     page: pageIndex + 1,
     pageSize,
     keyword,
+    created_on_max,
+    created_on_min,
+    brand_ids,
+    category_ids,
   });
 
   const columns = useMemo(() => {
@@ -113,7 +123,7 @@ const Page = () => {
         <CardContent>
           <CommonTable
             extraActionTable={[]}
-            filterComponent={<></>}
+            filterComponent={<Filter />}
             onClickRow={(e) => {
               router.push(
                 `/wms-logs/inventory/detail/${e.original.product_id}`

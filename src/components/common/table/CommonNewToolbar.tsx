@@ -47,8 +47,11 @@ import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
 import { useQueryClient } from "@tanstack/react-query";
-import { mappingFilterDynamic } from "@/lib/utils";
-import { capitalizeFirstLetter } from "@/lib/helpers";
+// import { mappingFilterDynamic } from "@/lib/utils";
+// import { capitalizeFirstLetter } from "@/lib/helpers";
+import { format, parseISO } from "date-fns";
+import { inventoryQueryKeys } from "@/query-keys";
+import { IBrandsSapo, ICategorySapo } from "@/types/inventories";
 
 export interface DataTableSearchableColumn<TData> {
   id: keyof TData;
@@ -82,10 +85,6 @@ export const schema = z.object({
 const enum TypeFilter {
   NEW = "NEW",
   EXIST = "EXIST",
-}
-
-const enum FILTERBAR_DYNAMIC {
-  "ORAGNIZATION" = "ORAGNIZATION",
 }
 
 const SavedFilterComponent = () => {
@@ -210,22 +209,92 @@ const SavedFilterComponent = () => {
   );
 };
 
+const formatDate = (dateString: string) => {
+  const date = parseISO(dateString);
+  return format(date, "dd/MM/yyyy");
+};
+
+function mappingFilter(
+  filterList: [
+    string,
+    string | string[] | qs.ParsedQs | qs.ParsedQs[] | undefined
+  ][]
+) {
+  const queryClient = useQueryClient();
+  let processedFilters = [];
+  let fromDate = "";
+  let toDate = "";
+
+  const dataBrand = queryClient.getQueryData(
+    inventoryQueryKeys.getBrandSapo({
+      page: 1,
+      query: "",
+      status: "active",
+    })
+  ) as { data: IBrandsSapo[] };
+
+  const dataCategory = queryClient.getQueryData(
+    inventoryQueryKeys.getCategorySapo({
+      page: 1,
+      query: "",
+      status: "active",
+    })
+  ) as { data: ICategorySapo[] };
+
+  filterList.forEach((filter) => {
+    const [key, value] = filter;
+    if (key === "created_on_min") {
+      fromDate = formatDate(value as string);
+    } else if (key === "created_on_max") {
+      toDate = formatDate(value as string);
+    } else if (key === "brand_ids") {
+      const findBrand = dataBrand?.data.find(
+        (e) => e.id === Number(value as string)
+      );
+      processedFilters.push({
+        key,
+        label: "Nhãn hiệu",
+        value: findBrand?.name || "-",
+      });
+    } else if (key === "category_ids") {
+      const findCategory = dataCategory?.data.find(
+        (e) => e.id === Number(value as string)
+      );
+      processedFilters.push({
+        key,
+        label: "Loại sản phẩm",
+        value: findCategory?.name || "-",
+      });
+    }
+  });
+
+  if (fromDate && toDate) {
+    processedFilters.push({
+      key: "date_range",
+      label: "Ngày tạo sản phẩm",
+      value: `Từ ${fromDate} đến ${toDate}`,
+    });
+  }
+
+  return processedFilters;
+}
+
 export function CommonNewToolbar<TData>({
   filterComponent,
   onCallbackSelection,
   rowSelection,
   rows,
 }: DataTableToolbarProps<TData>) {
-  const queryClient = useQueryClient();
+  const inputRef = useRef<any>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") || "";
 
   const isShowSubComponent = Object.keys(rowSelection).length;
   const originalRows = [
     { label: "Bulk Delete", value: "DELETE" },
   ] as Array<Row>;
-  const inputRef = useRef<any>(null);
 
   function onSearch() {
     const val = inputRef.current?.value;
@@ -244,31 +313,51 @@ export function CommonNewToolbar<TData>({
     params.delete("q");
     params.delete("status");
 
-    mappingFilterDynamic(params, "organization");
-    mappingFilterDynamic(params, "users");
-
     const arraySearchParams = qs.parse(params.toString());
     return Object.entries(arraySearchParams);
   }, [searchParams]);
 
-  function removeQueryParams(field: string) {
+  function removeQueryParams(fields: string[]) {
     const params = new URLSearchParams(searchParams);
-    params.delete(field);
+    fields.map((e) => {
+      params.delete(e);
+    });
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
+  function onRemove() {
+    inputRef.current.value = "";
+    const params = new URLSearchParams(searchParams);
+    params.delete("q");
     router.replace(`${pathname}?${params.toString()}`);
   }
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <div className="flex flex-row justify-between gap-2">
-        <div className="flex items-center justify-between gap-2">
-          <Input
-            ref={inputRef}
-            key={searchParams?.get("q")}
-            className="h-8 w-[150px] lg:w-[250px]"
-            defaultValue={searchParams.get("q")?.toString()}
-            placeholder="Searching..."
-          />
-
+    <div className="flex flex-col gap-2 p-2 mt-2">
+      <div className="flex h-8 items-center w-full justify-between gap-2">
+        <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row h-8 w-[150px] px-0 pr-2 py-4 rounded-xl items-center lg:w-[250px] border-red-100 border">
+            <Input
+              ref={inputRef}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSearch();
+                }
+              }}
+              key={searchParams?.get("q")}
+              placeholder={`Searching...`}
+              defaultValue={searchParams.get("q")?.toString()}
+              className="border-0 bg-transparent focus-visible:ring-0 shadow-none rounded-none"
+            />
+            {(!!inputRef.current?.value.length || !!keyword.length) && (
+              <div
+                onClick={onRemove}
+                className="cursor-pointer rounded-full h-4 w-4 rounded-1/2 bg-neutral-950 flex justify-center items-center"
+              >
+                <XIcon color="white" height={8} width={8} />
+              </div>
+            )}
+          </div>
           <Button className="h-8" onClick={onSearch}>
             Tìm kiếm
           </Button>
@@ -324,20 +413,22 @@ export function CommonNewToolbar<TData>({
       </div>
 
       <div className="flex gap-2">
-        {filterList.map((filter, index) => {
-          const key = capitalizeFirstLetter(filter[0]);
-          const value = filter[1];
+        {mappingFilter(filterList).map((filter, index) => {
           return (
             <Badge
               key={index}
               onClick={() => {
-                removeQueryParams(filter[0]);
+                if (filter.key === "date_range") {
+                  removeQueryParams(["created_on_max", "created_on_min"]);
+                } else {
+                  removeQueryParams([filter.key]);
+                }
               }}
-              className="cursor-pointer px-4 py-2 flex gap-2"
+              className="cursor-pointer px-4 py-2 flex gap-2 hover:bg-primary"
             >
               <div className="flex flex-row gap-1">
-                <div className="font-bold">{`${key}:`}</div>
-                <div className="font-bold">{`${value}`}</div>
+                <div className="font-bold">{`${filter.label}:`}</div>
+                <div className="font-bold">{`${filter.value}`}</div>
               </div>
               <XIcon width={12} height={12} />
             </Badge>

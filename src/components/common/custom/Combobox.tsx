@@ -63,7 +63,7 @@ export const Combobox = ({
                   className={cn("w-fill justify-between bg-white")}
                 >
                   {value
-                    ? dataOptions?.find((option) => option.value === value)
+                    ? dataOptions?.find((option) => option.value == value)
                         ?.label
                     : placeholder}
                   {isLoading ? (

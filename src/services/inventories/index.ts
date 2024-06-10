@@ -1,11 +1,18 @@
 import { API_ADMIN_ENDPOINT } from "@/lib/config";
 import { fetchData } from "@/lib/helpers";
+import { IGetInventorySapo } from "@/query-keys";
 import {
   DataResponseFromBackend,
   DataResponseFromBackendSapo,
   QueryOptions,
 } from "@/types/common";
-import { IIventoriesSapo, IIventorySapo, IVariantInventory } from "@/types/inventories";
+import {
+  IBrandsSapo,
+  ICategorySapo,
+  IIventoriesSapo,
+  IIventorySapo,
+  IVariantInventory,
+} from "@/types/inventories";
 import qs from "qs";
 
 function transformData(data: any): any {
@@ -61,11 +68,19 @@ export const getSystemInventoriesSapo = async ({
   page = 1,
   pageSize = 15,
   keyword,
-}: any) => {
+  created_on_min,
+  created_on_max,
+  brand_ids,
+  category_ids,
+}: IGetInventorySapo) => {
   const params = {
     page,
     pageSize,
     query: keyword,
+    created_on_min,
+    created_on_max,
+    brand_ids,
+    category_ids,
   };
 
   const queryOptions = qs.stringify(params, {
@@ -132,13 +147,81 @@ export const getInventoryTransactionBySapo = async ({
   });
 
   const ENDPOINT = `/api/controller/inventories/getReportsInventory${queryOptions}`;
-  const res: { variant_inventories: IVariantInventory[]; metadata: any} = await fetchData(
+  const res: { variant_inventories: IVariantInventory[]; metadata: any } =
+    await fetchData(ENDPOINT, {
+      method: "GET",
+    });
+
+  const responses = { data: res?.variant_inventories, meta: res?.metadata };
+  return responses;
+};
+
+export const getCategoryBySapo = async ({
+  page,
+  pageSize,
+  query,
+  status,
+}: {
+  page: number;
+  pageSize: number;
+  query?: string;
+  status?: string;
+}) => {
+  const params = {
+    page,
+    pageSize,
+    query,
+    status,
+  };
+
+  const queryOptions = qs.stringify(params, {
+    encodeValuesOnly: true,
+    addQueryPrefix: true,
+  });
+
+  const ENDPOINT = `/api/controller/inventories/getCategoryInventory${queryOptions}`;
+  const res: { categories: ICategorySapo[]; metadata: any } = await fetchData(
     ENDPOINT,
     {
       method: "GET",
     }
   );
 
-  const responses = { data: res?.variant_inventories,  meta: res?.metadata };
+  const responses = { data: res?.categories, meta: res?.metadata };
+  return responses;
+};
+
+export const getBrandBySapo = async ({
+  page,
+  pageSize,
+  query,
+  status,
+}: {
+  page: number;
+  pageSize: number;
+  query?: string;
+  status?: string;
+}) => {
+  const params = {
+    page,
+    pageSize,
+    query,
+    status,
+  };
+
+  const queryOptions = qs.stringify(params, {
+    encodeValuesOnly: true,
+    addQueryPrefix: true,
+  });
+
+  const ENDPOINT = `/api/controller/inventories/getBrandInventory${queryOptions}`;
+  const res: { brands: IBrandsSapo[]; metadata: any } = await fetchData(
+    ENDPOINT,
+    {
+      method: "GET",
+    }
+  );
+
+  const responses = { data: res?.brands };
   return responses;
 };
