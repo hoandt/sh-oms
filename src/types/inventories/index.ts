@@ -41,7 +41,11 @@ export interface IIventoriesSapo {
   output_vat_rate: null;
   product_type: string;
   variant_prices: VariantPrice[];
+<<<<<<< HEAD
   inventories: IInventory[] | null;
+=======
+  inventories: { [key: string]: number | null }[];
+>>>>>>> 79f2dbcdbb51fafbe75716ad527c319a13714196
   images: null;
   composite_items: null;
   warranty: boolean;
@@ -174,6 +178,7 @@ export interface IVariantInventory {
   mac: number;
   id: number;
 }
+<<<<<<< HEAD
 const sampleInventory = [
   {
     location_id: 719032,
@@ -208,4 +213,26 @@ export interface IInventory {
   bin_location: string | null;
   wait_to_pack: number;
   modified_on: string | null;
+=======
+
+export interface IBrandsSapo {
+  id: number;
+  tenant_id: number;
+  name: string;
+  created_on: Date;
+  modified_on: Date;
+  is_deleted: boolean;
+}
+
+export interface ICategorySapo {
+    id:          number;
+    tenant_id:   number;
+    description: string;
+    name:        string;
+    created_on:  Date;
+    modified_on: Date;
+    code:        string;
+    status:      string;
+    default:     boolean;
+>>>>>>> 79f2dbcdbb51fafbe75716ad527c319a13714196
 }

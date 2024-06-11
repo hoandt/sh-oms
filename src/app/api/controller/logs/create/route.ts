@@ -6,7 +6,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const logData = await req.json();
     const response = await postLogs({ logs: logData });
 
-    // console.log({response})
     return NextResponse.json(
       { message: "Successfully", data: response?.data },
       { status: 200 }
