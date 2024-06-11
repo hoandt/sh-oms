@@ -45,10 +45,10 @@ const Page = () => {
         enableHiding: false,
       },
       {
-        accessorKey: "sku",
-        header: () => <div className="">{"SKU"}</div>,
+        accessorKey: "user",
+        header: () => <div className="">{"On Hand"}</div>,
         cell: ({ row }) => {
-          const user = row.original.sku || "-";
+          const user = row.original.init_stock || "-";
           return <div>{user}</div>;
         },
         enableSorting: false,
@@ -56,13 +56,10 @@ const Page = () => {
       },
       {
         accessorKey: "user",
-        header: () => <div className="">{"Onhands"}</div>,
+        header: () => <div className="">{"On hands"}</div>,
         cell: ({ row }) => {
-          const inventory =
-            row.original.inventories!.reduce((acc, cur) => {
-              return acc + cur.on_hand;
-            }, 0) || "-";
-          return <div>{inventory}</div>;
+          const user = row.original.init_stock || "-";
+          return <div>{user}</div>;
         },
         enableSorting: false,
         enableHiding: false,
@@ -118,9 +115,7 @@ const Page = () => {
             extraActionTable={[]}
             filterComponent={<></>}
             onClickRow={(e) => {
-              router.push(
-                `/wms-logs/inventory/detail/${e.original.product_id}`
-              );
+              router.push(`/inventory/detail/${e.original.product_id}`);
             }}
             data={(inventories?.data as any[]) || []}
             columns={columns}

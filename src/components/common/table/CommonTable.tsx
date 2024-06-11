@@ -153,7 +153,7 @@ export function CommonTable<TData, TValue>({
                   <TableRow
                     key={index}
                     data-state={row.getIsSelected() && "selected"}
-                    className="h-12 py-4"
+                    className="h-12 py-4 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       onClickRow?.(row);

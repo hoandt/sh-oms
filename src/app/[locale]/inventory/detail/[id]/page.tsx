@@ -113,7 +113,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       },
       {
         accessorKey: "onhand",
-        header: () => <div>{"Tồn kho"}</div>,
+        header: () => <div>{"On hands"}</div>,
         cell: ({ row }) => <div>{row.original.onhand}</div>,
         enableSorting: false,
       },
@@ -125,8 +125,8 @@ const Page = ({ params }: { params: { id: string } }) => {
       },
       {
         accessorKey: "location_label",
-        header: () => <div>{"Chi nhánh"}</div>,
-        cell: ({ row }) => <div>{row.original.location_label}</div>,
+        header: () => <div>{"Warehouse ID"}</div>,
+        cell: ({ row }) => <div>{row.original.id}</div>,
         enableSorting: false,
       },
     ] as ColumnDef<IVariantInventory>[];
@@ -136,25 +136,25 @@ const Page = ({ params }: { params: { id: string } }) => {
     return [
       {
         accessorKey: "id",
-        header: () => <div>{"Chi nhánh"}</div>,
+        header: () => <div>{"Warehouse ID"}</div>,
         cell: ({ row }) => <div>{row.original.id}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "on_hand",
-        header: () => <div>{"Tồn kho"}</div>,
+        header: () => <div>{"On hands"}</div>,
         cell: ({ row }) => <div>{row.original.on_hand}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "available",
-        header: () => <div>{"Có thể bán"}</div>,
+        header: () => <div>{"Available"}</div>,
         cell: ({ row }) => <div>{row.original.available}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "id",
-        header: () => <div>{"Đang giao dịch"}</div>,
+        header: () => <div>{"Delivering"}</div>,
         cell: ({ row }) => <div>{row.original.committed || 0}</div>,
         enableSorting: false,
       },
@@ -201,7 +201,56 @@ const Page = ({ params }: { params: { id: string } }) => {
         <span>{data?.data?.name || "-"}</span>
         <Badge>{data?.data?.status || "-"}</Badge>
       </div>
+      <Card className="w-full">
+        <CardContent className="space-y-2 p-4">
+          <Tabs
+            className="flex w-full flex-col gap-4"
+            onValueChange={onSelect}
+            value={queryParams?.status}
+          >
+            <div className="flex flex-row">
+              <TabsList
+                className={cn(
+                  "flex",
+                  optionsTabs.length && `grid-cols-${optionsTabs.length}`
+                )}
+              >
+                {optionsTabs.map((option, index) => {
+                  return (
+                    <TabsTrigger
+                      className="w-full"
+                      key={index}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
 
+            {queryParams.status === INVENTORY_STATUS_PARAMS.INVENTORY ? (
+              <CommonTable
+                columns={columnsVariantInventory}
+                data={selectedVariant?.inventories || []}
+                isLoading={false}
+              />
+            ) : (
+              <CommonTable
+                columns={columns}
+                data={reports?.data || []}
+                isLoading={isLoadingReports}
+                setPagination={setPagination}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                pageCount={
+                  Math.ceil((reports?.meta?.total || 0) / pageSize) || 1
+                }
+              />
+            )}
+          </Tabs>
+        </CardContent>
+      </Card>
       <Card className="w-full">
         <CardContent className="mt-4 space-y-4">
           <div className="flex flex-row justify-between gap-2">
@@ -270,8 +319,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                       key={index}
                     >
                       <div>{value.opt1 || value.unit}</div>
-                      <div>{`Tồn kho: ${value.inventories[0].on_hand}`}</div>
-                      <div>{`Có thể bán: ${value.inventories[0].available}`}</div>
+                      <div>{`On hands: ${value.inventories[0].on_hand}`}</div>
+                      <div>{`Available: ${value.inventories[0].available}`}</div>
                     </div>
                   );
                 })}
@@ -355,57 +404,6 @@ const Page = ({ params }: { params: { id: string } }) => {
           </Card>
         </div>
       </div>
-
-      <Card className="w-full">
-        <CardContent className="space-y-2 p-4">
-          <Tabs
-            className="flex w-full flex-col gap-4"
-            onValueChange={onSelect}
-            value={queryParams?.status}
-          >
-            <div className="flex flex-row">
-              <TabsList
-                className={cn(
-                  "flex",
-                  optionsTabs.length && `grid-cols-${optionsTabs.length}`
-                )}
-              >
-                {optionsTabs.map((option, index) => {
-                  return (
-                    <TabsTrigger
-                      className="w-full"
-                      key={index}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
-
-            {queryParams.status === INVENTORY_STATUS_PARAMS.INVENTORY ? (
-              <CommonTable
-                columns={columnsVariantInventory}
-                data={selectedVariant?.inventories || []}
-                isLoading={false}
-              />
-            ) : (
-              <CommonTable
-                columns={columns}
-                data={reports?.data || []}
-                isLoading={isLoadingReports}
-                setPagination={setPagination}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                pageCount={
-                  Math.ceil((reports?.meta?.total || 0) / pageSize) || 1
-                }
-              />
-            )}
-          </Tabs>
-        </CardContent>
-      </Card>
     </div>
   );
 };

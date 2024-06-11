@@ -26,7 +26,7 @@ const router = [
       {
         name: "Inventory",
         icon: <PanelTopInactiveIcon />,
-        href: "/wms-logs/inventory",
+        href: "/inventory",
       },
     ],
   },
