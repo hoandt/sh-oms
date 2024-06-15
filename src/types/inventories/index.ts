@@ -175,7 +175,40 @@ export interface IVariantInventory {
   mac: number;
   id: number;
 }
-
+export interface CompositeItem {
+  sub_product_id: number;
+  sub_variant_id: number;
+  price: number;
+  quantity: number;
+  sub_product_type: string;
+  sub_sku: string;
+  sub_name: string;
+  medicine: boolean;
+}
+export interface IBrandsSapo {
+  id: number;
+  tenant_id: number;
+  created_on: Date;
+  modified_on: Date;
+  status: string;
+  name: string;
+  code: string;
+  description: string;
+  parent_id: number;
+  level: number;
+}
+export interface ICategorySapo {
+  id: number;
+  tenant_id: number;
+  created_on: Date;
+  modified_on: Date;
+  status: string;
+  name: string;
+  code: string;
+  description: string;
+  parent_id: number;
+  level: number;
+}
 export interface IInventory {
   location_id: number;
   variant_id: number;

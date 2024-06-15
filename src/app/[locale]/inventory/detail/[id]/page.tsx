@@ -1,6 +1,5 @@
 "use client";
 import { CommonTable } from "@/components/common/table/CommonTable";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQueryParams } from "@/hooks/useQueryParams";
@@ -10,7 +9,7 @@ import {
   useGetInventoryDetailBySapo,
   useGetInventoryTransactionBySapo,
 } from "@/query-keys";
-import { IVariantInventory, Variant } from "@/types/inventories";
+import { CompositeItem, IVariantInventory, Variant } from "@/types/inventories";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import React, { useEffect, useMemo } from "react";
@@ -19,6 +18,7 @@ import { z } from "zod";
 enum INVENTORY_STATUS_PARAMS {
   INVENTORY = "Inventory",
   TRANSACTION = "Transaction",
+  COMPOSITE = "Composite",
 }
 
 const optionsTabs = [
@@ -29,6 +29,10 @@ const optionsTabs = [
   {
     label: "Transaction",
     value: INVENTORY_STATUS_PARAMS.TRANSACTION,
+  },
+  {
+    label: "Composite",
+    value: INVENTORY_STATUS_PARAMS.COMPOSITE,
   },
 ];
 
@@ -66,6 +70,16 @@ const Page = ({ params }: { params: { id: string } }) => {
     selectdVariantIndex !== -1
       ? data?.data?.variants[selectdVariantIndex]
       : ({} as Variant);
+  // const composites =
+  //   data?.data?.product_type === "composite"
+  //     ? (data.data.variants.map((e) => {
+  //         return e.composite_items as unknown as CompositeItem;
+  //       }) as CompositeItem[])
+  //     : [];
+  const composites =
+    data?.data?.product_type === "composite"
+      ? data.data.variants[0].composite_items
+      : [];
 
   const variantId = data?.data.variants[0].id;
 
@@ -86,28 +100,49 @@ const Page = ({ params }: { params: { id: string } }) => {
   const columns = useMemo(() => {
     return [
       {
-        accessorKey: "id",
-        header: () => <div>{"ID"}</div>,
-        cell: ({ row }) => (
-          <div>{format(row.original.issued_at_utc, "dd/MM/yyyy HH:mm")}</div>
-        ),
-        enableSorting: false,
-      },
-      {
-        accessorKey: "account_name",
-        header: () => <div>{"Nhân viên"}</div>,
-        cell: ({ row }) => <div>{row.original.account_name}</div>,
+        accessorKey: "date",
+        header: () => <div>Date</div>,
+        cell: ({ row }) => {
+          const utcDate = row.original.issued_at_utc;
+          //convert to local date time with timezone
+          const localDate = new Date(utcDate);
+          //timezone with local from browser
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          // Format the date to the specified timezone with correct DateTimeFormatOptions
+          const options = {
+            timeZone: timeZone,
+            timeZoneName: "short",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          };
+
+          const formatter = new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            // dd/MM/yyyy HH:mm
+          });
+          const formattedLocalDate = formatter.format(localDate);
+          return <div>{formattedLocalDate}</div>;
+        },
         enableSorting: false,
       },
       {
         accessorKey: "source",
-        header: () => <div>{"Thao tác"}</div>,
-        cell: ({ row }) => <div>{row.original.source}</div>,
+        header: () => <div>Action</div>,
+        cell: ({ row }) => <div>{row.original.log_type_name}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "onhand_adj",
-        header: () => <div>{"Số lượng thay đổi"}</div>,
+        header: () => <div>{"Changes"}</div>,
         cell: ({ row }) => <div>{row.original.onhand_adj}</div>,
         enableSorting: false,
       },
@@ -117,16 +152,11 @@ const Page = ({ params }: { params: { id: string } }) => {
         cell: ({ row }) => <div>{row.original.onhand}</div>,
         enableSorting: false,
       },
+
       {
         accessorKey: "log_root_id",
-        header: () => <div>{"Mã chứng từ"}</div>,
-        cell: ({ row }) => <div>{row.original.log_root_id}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "location_label",
-        header: () => <div>{"Warehouse ID"}</div>,
-        cell: ({ row }) => <div>{row.original.id}</div>,
+        header: () => <div>{"Ref"}</div>,
+        cell: ({ row }) => <div>{row.original.trans_object_code}</div>,
         enableSorting: false,
       },
     ] as ColumnDef<IVariantInventory>[];
@@ -134,12 +164,6 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   const columnsVariantInventory = useMemo(() => {
     return [
-      {
-        accessorKey: "id",
-        header: () => <div>{"Warehouse ID"}</div>,
-        cell: ({ row }) => <div>{row.original.id}</div>,
-        enableSorting: false,
-      },
       {
         accessorKey: "on_hand",
         header: () => <div>{"On hands"}</div>,
@@ -158,37 +182,31 @@ const Page = ({ params }: { params: { id: string } }) => {
         cell: ({ row }) => <div>{row.original.committed || 0}</div>,
         enableSorting: false,
       },
-      {
-        accessorKey: "incoming",
-        header: () => <div>{"Hàng đang về"}</div>,
-        cell: ({ row }) => <div>{row.original.incoming || 0}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "min_value",
-        header: () => <div>{"Hàng đang giao"}</div>,
-        cell: ({ row }) => <div>{row.original.min_value}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "min_value",
-        header: () => <div>{"Tồn tối thiểu"}</div>,
-        cell: ({ row }) => <div>{row.original.min_value || 0}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "max_value",
-        header: () => <div>{"Tồn tối đa"}</div>,
-        cell: ({ row }) => <div>{row.original.max_value || 0}</div>,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "id",
-        header: () => <div>{"Điểm lưu kho"}</div>,
-        cell: ({ row }) => <div>{"---"}</div>,
-        enableSorting: false,
-      },
     ] as ColumnDef<any>[];
+  }, []);
+
+  const columnsComposite = useMemo(() => {
+    return [
+      {
+        accessorKey: "sub_name",
+        header: () => <div>{"Name"}</div>,
+        cell: ({ row }) => <div>{row.original.sub_name}</div>,
+        enableSorting: false,
+      },
+
+      {
+        accessorKey: "sub_sku",
+        header: () => <div>{"SKU"}</div>,
+        cell: ({ row }) => <div>{row.original.sub_sku || 0}</div>,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "quantity",
+        header: () => <div>{"Quantity"}</div>,
+        cell: ({ row }) => <div>{row.original.quantity}</div>,
+        enableSorting: false,
+      },
+    ] as ColumnDef<CompositeItem>[];
   }, []);
 
   const onSelect = (option: string) => {
@@ -198,8 +216,9 @@ const Page = ({ params }: { params: { id: string } }) => {
   return (
     <div className="p-4 flex flex-col gap-2">
       <div className="flex flex-row gap-2">
-        <span>{data?.data?.name || "-"}</span>
-        <Badge>{data?.data?.status || "-"}</Badge>
+        {/* title h1 style */}
+        <h1 className="text-xl font-bold">{data?.data.name}</h1>
+        <p className="text-lg text-gray-400"> {selectedVariant?.sku}</p>
       </div>
       <Card className="w-full">
         <CardContent className="space-y-2 p-4">
@@ -216,12 +235,21 @@ const Page = ({ params }: { params: { id: string } }) => {
                 )}
               >
                 {optionsTabs.map((option, index) => {
+                  // if composite, hide the tab transaction
+                  if (
+                    option.value === INVENTORY_STATUS_PARAMS.TRANSACTION &&
+                    data?.data.product_type === "composite"
+                  ) {
+                    return null;
+                  }
+                  if (
+                    option.value === INVENTORY_STATUS_PARAMS.COMPOSITE &&
+                    data?.data.product_type === "normal"
+                  ) {
+                    return null;
+                  }
                   return (
-                    <TabsTrigger
-                      className="w-full"
-                      key={index}
-                      value={option.value}
-                    >
+                    <TabsTrigger key={index} value={option.value}>
                       {option.label}
                     </TabsTrigger>
                   );
@@ -229,174 +257,103 @@ const Page = ({ params }: { params: { id: string } }) => {
               </TabsList>
             </div>
 
-            {queryParams.status === INVENTORY_STATUS_PARAMS.INVENTORY ? (
+            {queryParams.status === INVENTORY_STATUS_PARAMS.INVENTORY && (
               <CommonTable
                 columns={columnsVariantInventory}
                 data={selectedVariant?.inventories || []}
                 isLoading={false}
               />
-            ) : (
+            )}
+            {queryParams.status === INVENTORY_STATUS_PARAMS.TRANSACTION && (
               <CommonTable
                 columns={columns}
                 data={reports?.data || []}
                 isLoading={isLoadingReports}
-                setPagination={setPagination}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                pageCount={
-                  Math.ceil((reports?.meta?.total || 0) / pageSize) || 1
-                }
               />
             )}
+            {queryParams.status === INVENTORY_STATUS_PARAMS.COMPOSITE &&
+              composites && (
+                <CommonTable
+                  columns={columnsComposite}
+                  data={composites}
+                  onClickRow={(row) => {
+                    console.log(row.original);
+                    //push to detail page
+                    window.location.href = `/inventory/detail/${row.original.sub_product_id}?variantId=${row.original.sub_variant_id}`;
+                  }}
+                  isLoading={false}
+                />
+              )}
           </Tabs>
         </CardContent>
       </Card>
-      <Card className="w-full">
-        <CardContent className="mt-4 space-y-4">
-          <div className="flex flex-row justify-between gap-2">
-            <ul className="grid gap-2">
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Phân loại"} </span>
-                <span className="text-sm">
-                  {data?.data?.product_type || "-"}
-                </span>
-              </li>
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Loại sản phẩm"}</span>
-                <span className="text-sm">{data?.data?.category || "-"}</span>
-              </li>
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Nhãn hiệu"}</span>
-                <span className="text-sm">{data?.data?.brand || "--"}</span>
-              </li>
-            </ul>
-            <ul className="grid gap-2">
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Tags"}</span>
-                <span className="text-sm">{data?.data?.tags || "-"}</span>
-              </li>
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Ngày tạo"}</span>
-                <span className="text-sm">
-                  {data?.data?.created_on
-                    ? format(data?.data.created_on, "dd/MM/yyyy HH:mm")
-                    : "-"}
-                </span>
-              </li>
-              <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">
-                  {"Ngày cập nhật cuối"}
-                </span>
-                <span className="text-sm">
-                  {data?.data?.modified_on
-                    ? format(data?.data.modified_on, "dd/MM/yyyy HH:mm")
-                    : "-"}
-                </span>
-              </li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="w-full flex flex-row gap-2">
-        <div className="flex-[0.4] flex">
-          <Card className="w-full">
-            <CardContent className="p-4">
-              <div className="flex-[0.3] flex flex-col gap-2">
-                {data?.data.variants.map((value, index) => {
-                  const selected =
-                    value.id.toString() === queryParams.variantId ||
-                    (!queryParams.variantId && index === 0);
-                  return (
-                    <div
-                      onClick={() =>
-                        setQueryParams({ variantId: value.id.toString() })
-                      }
-                      className={cn(
-                        "rounded-sm p-2 cursor-pointer bg-muted",
-                        selected && `bg-secondary text-white font-medium`
-                      )}
-                      key={index}
-                    >
-                      <div>{value.opt1 || value.unit}</div>
-                      <div>{`On hands: ${value.inventories[0].on_hand}`}</div>
-                      <div>{`Available: ${value.inventories[0].available}`}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="  flex  gap-2">
+        <Card className="w-full">
+          <CardContent className="mt-4 space-y-4">
+            <div className="flex flex-row justify-between gap-2">
+              <ul className="grid gap-2">
+                <li className="flex items-center justify-between gap-7">
+                  <span className="text-muted-foreground">Type </span>
+                  <span className="text-sm">
+                    {data?.data?.product_type || "-"}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between gap-7">
+                  <span className="text-muted-foreground">{"Shipper"}</span>
+                  <span className="text-sm">{data?.data?.category || "-"}</span>
+                </li>
+              </ul>
+              <ul className="grid gap-2">
+                <li className="flex items-center justify-between gap-7">
+                  <span className="text-muted-foreground">{"Created at"}</span>
+                  <span className="text-sm">
+                    {data?.data?.created_on
+                      ? format(data?.data.created_on, "dd/MM/yyyy HH:mm")
+                      : "-"}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between gap-7">
+                  <span className="text-muted-foreground">
+                    {"Last updated at"}
+                  </span>
+                  <span className="text-sm">
+                    {data?.data?.modified_on
+                      ? format(data?.data.modified_on, "dd/MM/yyyy HH:mm")
+                      : "-"}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="flex-[0.6] flex flex-col gap-2">
+        <div className=" flex w-full gap-2">
           <Card className="w-full">
             <CardContent className="p-4">
               <div className="flex flex-col gap-3">
-                <label className="font-bold">
-                  {"Thông tin chi tiết phiên bản quy đổi"}
-                </label>
+                <label className="font-bold">{"Details"}</label>
                 <div>
                   <ul className="grid gap-2">
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Tên phiên bản quy đổi"}
-                      </span>
+                      <span className="text-muted-foreground">Item name</span>
                       <span className="text-sm">
                         {selectedVariant?.name || "-"}
                       </span>
                     </li>
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">{"Mã SKU"}</span>
+                      <span className="text-muted-foreground">{"SKU"}</span>
                       <span className="text-sm">
                         {selectedVariant?.sku || "-"}
                       </span>
                     </li>
+
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Đơn vị tính"}
-                      </span>
-                      <span className="text-sm">
-                        {selectedVariant?.unit || "--"}
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Mã barcode"}
-                      </span>
+                      <span className="text-muted-foreground">{"Barcode"}</span>
                       <span className="text-sm">
                         {selectedVariant?.barcode || "--"}
                       </span>
                     </li>
-                    <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Số lượng quy đổi"}
-                      </span>
-                      <span className="text-sm">
-                        {selectedVariant?.packsize_quantity || "--"}
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="w-full">
-            <CardContent className="p-4">
-              <div className="flex flex-col gap-3">
-                <label className="font-bold">{"Giá sản phẩm"}</label>
-                <div>
-                  <ul className="grid gap-2">
-                    {selectedVariant?.variant_prices?.map((value, index) => {
-                      return (
-                        <li className="flex items-center justify-between gap-7">
-                          <span className="text-muted-foreground">
-                            {value.name}
-                          </span>
-                          <span className="text-sm">{value.value || "-"}</span>
-                        </li>
-                      );
-                    })}
                   </ul>
                 </div>
               </div>

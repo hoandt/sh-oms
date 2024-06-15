@@ -359,7 +359,7 @@ export function CommonNewToolbar<TData>({
             )}
           </div>
           <Button className="h-8" onClick={onSearch}>
-            Tìm kiếm
+            Search
           </Button>
         </div>
 
