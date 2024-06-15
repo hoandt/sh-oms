@@ -11,9 +11,7 @@ export default async function IndexPage() {
   if (!session) {
     return redirect("/login");
   }
-  const userId = session.userWithRole.id;
-  const subscription = await checkSubcription(userId);
-  console.log(subscription, userId);
+
   return (
     <>
       {/* display me 2 cards, show PACKING and VIEW actions */}

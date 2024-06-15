@@ -45,7 +45,7 @@ const Page = () => {
         enableSorting: false,
       },
       {
-        accessorKey: "transaction",
+        accessorKey: "item",
         header: () => <div className="">{"Item"}</div>,
         cell: ({ row }) => {
           const productName = row.original.product_name || "-";
@@ -55,63 +55,41 @@ const Page = () => {
         enableHiding: false,
       },
       {
-        accessorKey: "user",
+        accessorKey: "sku",
+        header: () => <div className="">{"SKU"}</div>,
+        cell: ({ row }) => {
+          const sku = row.original.sku || "-";
+          return <div>{sku}</div>;
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: "on_hand",
         header: () => <div className="">{"On Hand"}</div>,
         cell: ({ row }) => {
-          const user = row.original.init_stock || "-";
-          return <div>{user}</div>;
+          //reduce total inventory available
+          const onHand = row.original.inventories?.reduce(
+            (acc, cur) => acc + cur.on_hand,
+            0
+          );
+          return <div>{onHand}</div>;
         },
         enableSorting: false,
         enableHiding: false,
       },
       {
-        accessorKey: "user",
-        header: () => <div className="">{"On hands"}</div>,
+        accessorKey: "available",
+        header: () => <div className="">{"Available"}</div>,
         cell: ({ row }) => {
-          const user = row.original.init_stock || "-";
-          return <div>{user}</div>;
+          //reduce total inventory available
+          const available = row.original.inventories?.reduce(
+            (acc, cur) => acc + cur.available,
+            0
+          );
+          return <div>{available}</div>;
         },
         enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "type",
-        header: () => <div className="">{"Ngày khởi tạo"}</div>,
-        cell: ({ row }) => {
-          const created_on = row.original.created_on || "-";
-          return <div>{format(created_on, "dd/MM/yyyy HH:mm")}</div>;
-        },
-        enableSorting: true,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "type",
-        header: () => <div className="">{"Giá bán lẻ"}</div>,
-        cell: ({ row }) => {
-          const created_on = row.original.init_stock || "-";
-          return <div>{created_on}</div>;
-        },
-        enableSorting: true,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "type",
-        header: () => <div className="">{"Giá nhập"}</div>,
-        cell: ({ row }) => {
-          const created_on = row.original.init_stock || "-";
-          return <div>{created_on}</div>;
-        },
-        enableSorting: true,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "type",
-        header: () => <div className="">{"Giá bán buôn"}</div>,
-        cell: ({ row }) => {
-          const created_on = row.original.init_stock || "-";
-          return <div>{created_on}</div>;
-        },
-        enableSorting: true,
         enableHiding: false,
       },
     ] as ColumnDef<IIventoriesSapo>[];

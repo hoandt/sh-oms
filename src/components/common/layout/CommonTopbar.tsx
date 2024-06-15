@@ -10,32 +10,10 @@ import { useSidebarContext } from "@/provider/SidebarProvider";
 import { CircleDashedIcon, CoinsIcon, ConeIcon, FileVideo } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-const TRIAL_LIMIT = 10;
+
 export function CommonTopbar() {
   const { data } = useSession();
   const { setToggleSidebar } = useSidebarContext();
-  const [credits, setCredits] = useState<number | string>("...");
-  const userData = data as any;
-  const organizationId = userData.userWithRole.organization.id;
-  const isTrial = userData.userWithRole.isTrial;
-  // get credts from api /api/reports?subscription=:id
-  useEffect(() => {
-    if (!organizationId) {
-      signOut();
-    }
-
-    fetch("/api/reports?subscription=" + organizationId)
-      .then((res) => res.json())
-      .then((data: any) => {
-        const usage = data.txt as number;
-        //  if trial and usage > TRIAL_LIMIT then signOut
-        if (isTrial && usage > TRIAL_LIMIT) {
-          signOut();
-        }
-        setCredits(usage);
-      });
-  }, []);
 
   return (
     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -70,14 +48,6 @@ export function CommonTopbar() {
         <div className="relative flex flex-1"></div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           {/* display usage limit. For example: 10/2000 credits with style  */}
-          <div className="border gap-1 text-sm rounded shadow-sm text-gray-500 font-semibold px-2 inline-flex justify-center items-center">
-            {isTrial && (
-              <span>
-                <FileVideo className="w-4 text-slate-400" />
-                {credits}/10
-              </span>
-            )}
-          </div>
 
           <Popover>
             <PopoverTrigger asChild className="cursor-pointer">
