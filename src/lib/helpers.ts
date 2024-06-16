@@ -55,3 +55,11 @@ export const capitalizeFirstLetter = (str: string) => {
   const newStr = str.replaceAll("_", " ");
   return newStr.charAt(0).toUpperCase() + newStr.slice(1);
 };
+
+export function formatCurrency(amount: string | number) {
+  // Convert the amount to a string and insert a dot before the last three digits
+  const formattedAmount = amount
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${formattedAmount}`;
+}

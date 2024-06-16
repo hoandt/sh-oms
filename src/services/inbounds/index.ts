@@ -1,5 +1,7 @@
 import { fetchData } from "@/lib/helpers";
+import { IGetInboundBySapo } from "@/query-keys";
 import { DataResponseFromBackend, QueryOptions } from "@/types/common";
+import { ILocation, InboundSapo } from "@/types/inbound";
 import qs from "qs";
 
 function transformData(data: any): any {
@@ -114,4 +116,67 @@ export const updateConfirmInbound = async ({ inbound }: { inbound: any }) => {
 
   const outboundResponses = { data: res.data, meta: res.meta };
   return transformData(outboundResponses);
+};
+
+export const getInboundsBySapo = async ({
+  page,
+  pageSize,
+  keyword,
+  created_on_max,
+  created_on_min,
+}: IGetInboundBySapo) => {
+  const params = {
+    page,
+    pageSize,
+    query: keyword,
+    created_on_max,
+    created_on_min,
+  };
+
+  const queryOptions = qs.stringify(params, {
+    encodeValuesOnly: true,
+    addQueryPrefix: true,
+  });
+
+  const ENDPOINT = `/api/controller/inbounds/getInboundBySapo${queryOptions}`;
+  const res: { purchase_orders: InboundSapo[]; metadata: any } =
+    await fetchData(ENDPOINT, {
+      method: "GET",
+    });
+
+  const responses = { data: res?.purchase_orders, meta: res?.metadata };
+  return responses;
+};
+
+export const getLocationBySapo = async () => {
+  const ENDPOINT = `/api/controller/customers/get-location`;
+  const res: { locations: ILocation[] } = await fetchData(ENDPOINT, {
+    method: "GET",
+  });
+
+  const responses = { data: res?.locations };
+  return responses;
+};
+
+export const getInboundDetailSapo = async ({
+  productId,
+}: {
+  productId: string;
+}) => {
+  const params = {
+    productId,
+  };
+
+  const queryOptions = qs.stringify(params, {
+    encodeValuesOnly: true,
+    addQueryPrefix: true,
+  });
+
+  const ENDPOINT = `/api/controller/inbounds/getInboundDetailBySapo${queryOptions}`;
+  const res: { purchase_order: InboundSapo } = await fetchData(ENDPOINT, {
+    method: "GET",
+  });
+
+  const responses = { data: res?.purchase_order };
+  return responses;
 };

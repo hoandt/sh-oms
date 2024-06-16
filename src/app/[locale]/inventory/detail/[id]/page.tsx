@@ -1,4 +1,5 @@
 "use client";
+import { BackButton } from "@/components/common/custom/BackButton";
 import { CommonTable } from "@/components/common/table/CommonTable";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,8 @@ import {
 import { IVariantInventory, Variant } from "@/types/inventories";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
 
@@ -36,6 +39,7 @@ const LocationIdDefault = 0; /// get all inventory for all location
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const router = useRouter();
   const schema = z.object({
     variantId: z.string().nullish(),
     status: z.string(),
@@ -67,7 +71,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       ? data?.data?.variants[selectdVariantIndex]
       : ({} as Variant);
 
-  const variantId = data?.data.variants[0].id;
+  const variantId = data?.data?.variants[0].id;
 
   useEffect(() => {
     if (data?.data?.variants.length) {
@@ -120,7 +124,13 @@ const Page = ({ params }: { params: { id: string } }) => {
       {
         accessorKey: "log_root_id",
         header: () => <div>{"Mã chứng từ"}</div>,
-        cell: ({ row }) => <div>{row.original.log_root_id}</div>,
+        cell: ({ row }) => (
+          <div className="underline text-primary">
+            <Link href={`/inbound/detail/${row.original.log_root_id}`}>
+              {row.original.log_root_id}
+            </Link>
+          </div>
+        ),
         enableSorting: false,
       },
       {
@@ -160,31 +170,31 @@ const Page = ({ params }: { params: { id: string } }) => {
       },
       {
         accessorKey: "incoming",
-        header: () => <div>{"Hàng đang về"}</div>,
+        header: () => <div>{"Return Item"}</div>,
         cell: ({ row }) => <div>{row.original.incoming || 0}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "min_value",
-        header: () => <div>{"Hàng đang giao"}</div>,
+        header: () => <div>{"Shipping Item"}</div>,
         cell: ({ row }) => <div>{row.original.min_value}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "min_value",
-        header: () => <div>{"Tồn tối thiểu"}</div>,
+        header: () => <div>{"Minimum Stock"}</div>,
         cell: ({ row }) => <div>{row.original.min_value || 0}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "max_value",
-        header: () => <div>{"Tồn tối đa"}</div>,
+        header: () => <div>{"Maximum Stock"}</div>,
         cell: ({ row }) => <div>{row.original.max_value || 0}</div>,
         enableSorting: false,
       },
       {
         accessorKey: "id",
-        header: () => <div>{"Điểm lưu kho"}</div>,
+        header: () => <div>{"Inventory Location"}</div>,
         cell: ({ row }) => <div>{"---"}</div>,
         enableSorting: false,
       },
@@ -197,7 +207,12 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="p-4 flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-2 items-center">
+        <BackButton
+          onClick={() => {
+            router.push("/inventory");
+          }}
+        />
         <span>{data?.data?.name || "-"}</span>
         <Badge>{data?.data?.status || "-"}</Badge>
       </div>
@@ -256,7 +271,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           <div className="flex flex-row justify-between gap-2">
             <ul className="grid gap-2">
               <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Phân loại"} </span>
+                <span className="text-muted-foreground">{"Category"} </span>
                 <span className="text-sm">
                   {data?.data?.product_type || "-"}
                 </span>
@@ -266,7 +281,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <span className="text-sm">{data?.data?.category || "-"}</span>
               </li>
               <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Nhãn hiệu"}</span>
+                <span className="text-muted-foreground">{"Brand"}</span>
                 <span className="text-sm">{data?.data?.brand || "--"}</span>
               </li>
             </ul>
@@ -276,7 +291,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <span className="text-sm">{data?.data?.tags || "-"}</span>
               </li>
               <li className="flex items-center justify-between gap-7">
-                <span className="text-muted-foreground">{"Ngày tạo"}</span>
+                <span className="text-muted-foreground">{"Creation Date"}</span>
                 <span className="text-sm">
                   {data?.data?.created_on
                     ? format(data?.data.created_on, "dd/MM/yyyy HH:mm")
@@ -285,7 +300,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               </li>
               <li className="flex items-center justify-between gap-7">
                 <span className="text-muted-foreground">
-                  {"Ngày cập nhật cuối"}
+                  {"Last Update Date"}
                 </span>
                 <span className="text-sm">
                   {data?.data?.modified_on
@@ -303,7 +318,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           <Card className="w-full">
             <CardContent className="p-4">
               <div className="flex-[0.3] flex flex-col gap-2">
-                {data?.data.variants.map((value, index) => {
+                {data?.data?.variants.map((value, index) => {
                   const selected =
                     value.id.toString() === queryParams.variantId ||
                     (!queryParams.variantId && index === 0);
@@ -333,44 +348,38 @@ const Page = ({ params }: { params: { id: string } }) => {
           <Card className="w-full">
             <CardContent className="p-4">
               <div className="flex flex-col gap-3">
-                <label className="font-bold">
-                  {"Thông tin chi tiết phiên bản quy đổi"}
-                </label>
+                <label className="font-bold">{"Conversion Details"}</label>
                 <div>
                   <ul className="grid gap-2">
                     <li className="flex items-center justify-between gap-7">
                       <span className="text-muted-foreground">
-                        {"Tên phiên bản quy đổi"}
+                        {"Conversion Name"}
                       </span>
                       <span className="text-sm">
                         {selectedVariant?.name || "-"}
                       </span>
                     </li>
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">{"Mã SKU"}</span>
+                      <span className="text-muted-foreground">{"SKU"}</span>
                       <span className="text-sm">
                         {selectedVariant?.sku || "-"}
                       </span>
                     </li>
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Đơn vị tính"}
-                      </span>
+                      <span className="text-muted-foreground">{"Unit"}</span>
                       <span className="text-sm">
                         {selectedVariant?.unit || "--"}
                       </span>
                     </li>
                     <li className="flex items-center justify-between gap-7">
-                      <span className="text-muted-foreground">
-                        {"Mã barcode"}
-                      </span>
+                      <span className="text-muted-foreground">{"Barcode"}</span>
                       <span className="text-sm">
                         {selectedVariant?.barcode || "--"}
                       </span>
                     </li>
                     <li className="flex items-center justify-between gap-7">
                       <span className="text-muted-foreground">
-                        {"Số lượng quy đổi"}
+                        {"Conversion Quantity"}
                       </span>
                       <span className="text-sm">
                         {selectedVariant?.packsize_quantity || "--"}
@@ -384,7 +393,7 @@ const Page = ({ params }: { params: { id: string } }) => {
           <Card className="w-full">
             <CardContent className="p-4">
               <div className="flex flex-col gap-3">
-                <label className="font-bold">{"Giá sản phẩm"}</label>
+                <label className="font-bold">{"Product Price"}</label>
                 <div>
                   <ul className="grid gap-2">
                     {selectedVariant?.variant_prices?.map((value, index) => {

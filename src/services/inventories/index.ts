@@ -7,8 +7,6 @@ import {
   QueryOptions,
 } from "@/types/common";
 import {
-  IBrandsSapo,
-  ICategorySapo,
   IIventoriesSapo,
   IIventorySapo,
   IVariantInventory,
