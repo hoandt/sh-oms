@@ -61,28 +61,8 @@ export const Filter = () => {
     <Form {...form}>
       <div className="flex flex-col gap-4 mt-5">
         <div className="flex flex-col gap-2">
-          <Label>{"Ngày tạo sản phẩm"}</Label>
+          <Label>{"Date Created"}</Label>
           <DatePickerWithRange className="w-full" />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Combobox
-            isLoading={false}
-            label="Loại sản phẩm"
-            placeholder="Loại sản phẩm"
-            name="category_ids"
-            dataOptions={categories as DataOptions[]}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Combobox
-            isLoading={false}
-            label="Nhãn hiệu"
-            placeholder="Nhãn hiệu"
-            name="brand_ids"
-            dataOptions={brands as DataOptions[]}
-          />
         </div>
 
         <div className="flex flex-row gap-2">
@@ -93,7 +73,7 @@ export const Filter = () => {
                 onClick={() => form.handleSubmit(onSubmit)()}
                 type="submit"
               >
-                Lọc
+                Filter
               </Button>
             </SheetClose>
           </SheetFooter>

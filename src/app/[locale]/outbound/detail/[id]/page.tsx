@@ -78,11 +78,18 @@ const Page = ({ params }: { params: { id: string } }) => {
       <div className="flex flex-row gap-2 items-center">
         <BackButton
           onClick={() => {
-            router.push("/inventory");
+            router.push("/outbound");
           }}
         />
-        <span>{data?.data?.code || "-"}</span>
-        <Badge>{data?.data?.status || "-"}</Badge>
+        <h1 className="text-xl font-bold">
+          {data?.data?.code || <span>...</span>}
+        </h1>
+        <p className="text-lg text-gray-400">
+          {" "}
+          {data?.data?.fulfillments &&
+            data?.data?.fulfillments.length &&
+            data?.data?.fulfillments[0].status}
+        </p>
       </div>
       <Card className="w-full">
         <CardContent className="space-y-2 p-4">

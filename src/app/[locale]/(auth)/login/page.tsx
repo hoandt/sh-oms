@@ -47,18 +47,9 @@ export default function Login() {
           </Link>
         </div>
         <h2 className="mt-6 text-xl font-semibold text-gray-900 text-center">
-          Đăng nhập tài khoản
+          Login to your account
         </h2>
-        <p className="mt-2 text-sm text-gray-700 text-center">
-          Chưa có?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-orange-600 hover:underline"
-          >
-            Đăng ký ngay
-          </Link>{" "}
-          dùng thử miễn phí!
-        </p>
+
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <div>
             <label

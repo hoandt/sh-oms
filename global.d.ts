@@ -29,6 +29,9 @@ type UserWithRole = {
   phone: string;
   organization: {
     id: number;
+    taxcode: string;
+    address: string;
+    legalRep: string;
   };
   role: {
     id: number;

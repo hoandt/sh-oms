@@ -11,11 +11,13 @@ const fetchCookies = async () => {
 };
 
 //crete a functionn to fetch data from the api
-export const fetchInventoriesSapo = async (path: string) => {
+export const fetchInventoriesSapo = async (path: string, sellerId: string) => {
+  //default path: ?page=1&pageSize=15&query=&created_on_min=&created_on_max=&brand_ids=
+
   const cookie = await fetchCookies();
 
   const response = await fetch(
-    `https://swifthub2.mysapogo.com/admin/variants/search.json${path}`,
+    `https://swifthub2.mysapogo.com/admin/variants/search.json${path}&category_ids=${sellerId}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -31,7 +33,7 @@ export const fetchInventoriesSapo = async (path: string) => {
 
 export const fetchInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/products/${path}.json`,
     {
@@ -49,7 +51,7 @@ export const fetchInventorySapo = async (path: string) => {
 
 export const fetchReportInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/reports/inventories/variants/${path}`,
     {
@@ -67,7 +69,7 @@ export const fetchReportInventorySapo = async (path: string) => {
 
 export const fetchCaterogyInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/categories/search.json${path}`,
     {
@@ -85,7 +87,7 @@ export const fetchCaterogyInventorySapo = async (path: string) => {
 
 export const fetchBrandsInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/brands/search.json${path}`,
     {
@@ -101,11 +103,13 @@ export const fetchBrandsInventorySapo = async (path: string) => {
   return response.json();
 };
 
-export const fetchInboundsSapo = async (path: string) => {
+export const fetchInboundsSapo = async (path: string, sellerId: string) => {
   const cookie = await fetchCookies();
 
+  //append supplier_ids= sellerId to the path
+
   const response = await fetch(
-    `https://swifthub2.mysapogo.com/admin/purchase_orders.json${path}`,
+    `https://swifthub2.mysapogo.com/admin/purchase_orders.json${path}&supplier_ids=${sellerId}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -155,11 +159,14 @@ export const fetchLocationSapo = async () => {
   return response.json();
 };
 
-export const fetchOutboundsSapo = async (path: string) => {
+export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
   const cookie = await fetchCookies();
 
+  //append tags= sellerId to the path, escape the special characters like space, comma, etc
+  const escapeSellerId = encodeURIComponent(sellerId);
+
   const response = await fetch(
-    `https://swifthub2.mysapogo.com/admin/orders.json${path}`,
+    `https://swifthub2.mysapogo.com/admin/orders.json${path}&tags=${escapeSellerId}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -175,7 +182,7 @@ export const fetchOutboundsSapo = async (path: string) => {
 
 export const fetchOutboundDetailSapo = async (id: string) => {
   const cookie = await fetchCookies();
-  console.log({id})
+  console.log({ id });
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/orders/${id}.json`,
     {
@@ -189,4 +196,3 @@ export const fetchOutboundDetailSapo = async (id: string) => {
   );
   return response.json();
 };
-

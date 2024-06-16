@@ -271,7 +271,7 @@ function mappingFilter(
   if (fromDate && toDate) {
     processedFilters.push({
       key: "date_range",
-      label: "Ngày tạo sản phẩm",
+      label: "Date",
       value: `Từ ${fromDate} đến ${toDate}`,
     });
   }
@@ -367,18 +367,18 @@ export function CommonNewToolbar<TData>({
           {filterComponent && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline">Bộ lọc</Button>
+                <Button variant="outline">Filters</Button>
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
-                  <SheetTitle>Bộ lọc</SheetTitle>
+                  <SheetTitle>Filters</SheetTitle>
                 </SheetHeader>
                 {filterComponent}
               </SheetContent>
             </Sheet>
           )}
 
-          <Sheet>
+          {/* <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline">Bộ lọc đã lưu</Button>
             </SheetTrigger>
@@ -388,7 +388,7 @@ export function CommonNewToolbar<TData>({
               </SheetHeader>
               <SavedFilterSheet />
             </SheetContent>
-          </Sheet>
+          </Sheet> */}
 
           {!!isShowSubComponent && (
             <DropdownMenu>

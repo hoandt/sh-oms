@@ -13,7 +13,6 @@ import {
 import { CompositeItem, IVariantInventory, Variant } from "@/types/inventories";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
@@ -74,12 +73,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     selectdVariantIndex !== -1
       ? data?.data?.variants[selectdVariantIndex]
       : ({} as Variant);
-  // const composites =
-  //   data?.data?.product_type === "composite"
-  //     ? (data.data.variants.map((e) => {
-  //         return e.composite_items as unknown as CompositeItem;
-  //       }) as CompositeItem[])
-  //     : [];
+
   const composites =
     data?.data?.product_type === "composite"
       ? data.data.variants[0].composite_items
@@ -220,7 +214,11 @@ const Page = ({ params }: { params: { id: string } }) => {
   return (
     <div className="p-4 flex flex-col gap-2">
       <div className="flex flex-row gap-2">
-        {/* title h1 style */}
+        <BackButton
+          onClick={() => {
+            router.push("/inventory");
+          }}
+        />
         <h1 className="text-xl font-bold">{data?.data.name}</h1>
         <p className="text-lg text-gray-400"> {selectedVariant?.sku}</p>
       </div>
@@ -281,7 +279,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                   columns={columnsComposite}
                   data={composites}
                   onClickRow={(row) => {
-                    console.log(row.original);
                     //push to detail page
                     window.location.href = `/inventory/detail/${row.original.sub_product_id}?variantId=${row.original.sub_variant_id}`;
                   }}

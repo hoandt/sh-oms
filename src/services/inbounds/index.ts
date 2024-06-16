@@ -159,12 +159,12 @@ export const getLocationBySapo = async () => {
 };
 
 export const getInboundDetailSapo = async ({
-  productId,
+  inboundId,
 }: {
-  productId: string;
+  inboundId: string;
 }) => {
   const params = {
-    productId,
+    inboundId,
   };
 
   const queryOptions = qs.stringify(params, {

@@ -17,21 +17,28 @@ export default async function IndexPage() {
       {/* display me 2 cards, show PACKING and VIEW actions */}
       <div className="flex px-4 w-full py-4 gap-4">
         <Card className="w-full  p-6 hover:bg-slate-50">
-          <a href="/wms-logs" className="   rounded-lg p-4">
+          <a href="/inventory" className="   rounded-lg p-4">
             <div className="flex flex-row items-center">
               <div className="flex-1 text-center">
-                <h5 className="font-bold uppercase text-gray-700">Đóng hàng</h5>
+                <h5 className="font-bold uppercase text-gray-700">Inventory</h5>
               </div>
             </div>
           </a>
         </Card>
         <Card className="w-full  p-6 hover:bg-slate-50">
-          <a href="/history" className="   rounded-lg p-4">
+          <a href="/inbound" className="   rounded-lg p-4">
             <div className="flex flex-row items-center">
               <div className="flex-1 text-center">
-                <h5 className="font-bold uppercase text-gray-700">
-                  Xem lịch sử
-                </h5>
+                <h5 className="font-bold uppercase text-gray-700">Inbound</h5>
+              </div>
+            </div>
+          </a>
+        </Card>
+        <Card className="w-full  p-6 hover:bg-slate-50">
+          <a href="/outbound" className="   rounded-lg p-4">
+            <div className="flex flex-row items-center">
+              <div className="flex-1 text-center">
+                <h5 className="font-bold uppercase text-gray-700">Outbound</h5>
               </div>
             </div>
           </a>

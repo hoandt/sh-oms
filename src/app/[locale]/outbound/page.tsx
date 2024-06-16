@@ -9,7 +9,26 @@ import React, { useEffect, useMemo } from "react";
 import { Filter } from "./components/Filter";
 import { useGetOutboundsBySapo } from "@/query-keys/outbound";
 import { IOutbound } from "@/types/outbound";
-import { Badge } from "@/components/ui/badge";
+
+const STATUS = {
+  finalized: {
+    label: "Processing",
+    color: "blue",
+  },
+  completed: {
+    label: "Completed",
+    color: "green",
+  },
+  cancelled: {
+    label: "Canceled",
+    color: "red",
+  },
+} as {
+  [key: string]: {
+    label: string;
+    color: string;
+  };
+};
 
 const Page = () => {
   const router = useRouter();
@@ -64,19 +83,32 @@ const Page = () => {
         },
       },
       {
-        accessorKey: "on_hand",
+        accessorKey: "status",
         header: () => <div className="">{"Status"}</div>,
         cell: ({ row }) => {
-          const status = row.original.status;
-          return <Badge className="uppercase">{status}</Badge>;
+          const status = row.original.status || "";
+          const label = STATUS[status] && STATUS[status].label;
+          const color = STATUS[status] ? STATUS[status].color : "gray";
+          return (
+            <div>
+              <span className={`bg-${color}-50 text-${color}-600 px-2 rounded`}>
+                {label}
+              </span>
+              <span className="bg-green-50 text-green-600 text-blue-600 bg-blue-50 bg-red-50 bg-blue-50"></span>
+            </div>
+          );
         },
       },
       {
-        accessorKey: "available",
-        header: () => <div className="">{"Payment Status"}</div>,
+        accessorKey: "channel",
+        header: () => <div className="">{"Sales Channel"}</div>,
         cell: ({ row }) => {
-          const paymentStatus = row.original.payment_status;
-          return <Badge className="uppercase">{paymentStatus}</Badge>;
+          const channel = row.original.channel;
+          return (
+            <div className=" ">
+              {channel ? channel.replace("Sàn TMĐT - ", "") : "Other"}
+            </div>
+          );
         },
       },
       {

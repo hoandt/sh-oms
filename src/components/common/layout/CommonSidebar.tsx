@@ -8,10 +8,13 @@ import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowLeftIcon,
   ArrowLeftSquare,
+  ArrowRightIcon,
   ArrowRightSquare,
   BoxIcon,
   BoxSelect,
+  Boxes,
   HandIcon,
   ListOrdered,
   PanelTopInactiveIcon,
@@ -27,17 +30,17 @@ const router = [
     route: [
       {
         name: "Inventory",
-        icon: <PanelTopInactiveIcon />,
+        icon: <Boxes />,
         href: "/inventory",
       },
       {
         name: "Inbound",
-        icon: <BoxSelect />,
+        icon: <ArrowRightIcon />,
         href: "/inbound",
       },
       {
         name: "Outbound",
-        icon: <ListOrdered />,
+        icon: <ArrowLeftIcon />,
         href: "/outbound",
       },
     ],

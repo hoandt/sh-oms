@@ -9,6 +9,8 @@ import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { Filter } from "./components/Filter";
+import { useSession } from "next-auth/react";
+import { Component } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
@@ -22,8 +24,6 @@ const Page = () => {
   const keyword = params.get("q") || "";
   const created_on_max = params.get("created_on_max") || "";
   const created_on_min = params.get("created_on_min") || "";
-  const brand_ids = params.get("brand_ids") || "";
-  const category_ids = params.get("category_ids") || "";
 
   const { data: inventories, isLoading } = useGetInventoriesBySapo({
     page: pageIndex + 1,
@@ -31,8 +31,6 @@ const Page = () => {
     keyword,
     created_on_max,
     created_on_min,
-    brand_ids,
-    category_ids,
   });
 
   const columns = useMemo(() => {
@@ -44,16 +42,29 @@ const Page = () => {
         cell: ({ row }) => <div>{row.getValue("id")}</div>,
         enableSorting: false,
       },
+
       {
         accessorKey: "item",
         header: () => <div className="">{"Item"}</div>,
         cell: ({ row }) => {
+          const isBunble = row.original.composite;
+
           const productName = row.original.product_name || "-";
-          return <div className="flex space-x-2">{productName}</div>;
+          return (
+            <div className="flex gap-1">
+              {productName}{" "}
+              {isBunble && (
+                <span className="border rounded bg-slate-200 text-slate-600 text-sm px-1">
+                  BUNDLED
+                </span>
+              )}
+            </div>
+          );
         },
         enableSorting: false,
         enableHiding: false,
       },
+
       {
         accessorKey: "sku",
         header: () => <div className="">{"SKU"}</div>,
@@ -76,6 +87,7 @@ const Page = () => {
         enableSorting: false,
         enableHiding: false,
       },
+
       {
         accessorKey: "available",
         header: () => <div className="">{"Available"}</div>,

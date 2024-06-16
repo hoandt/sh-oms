@@ -3,8 +3,8 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const { searchParams } = req.nextUrl;
-  const productId = searchParams.get("productId") || '';
+  const inboundId = searchParams.get("inboundId") || "";
 
-  const response = await fetchInboundDetailSapo(productId);
+  const response = await fetchInboundDetailSapo(inboundId);
   return NextResponse.json(response);
 }

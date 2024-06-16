@@ -73,14 +73,14 @@ export function CommonTopbar() {
               </span>
             </PopoverTrigger>
             <PopoverContent className="w-60">
-              <Link
+              {/* <Link
                 href={"/settings"}
                 className="block px-2 py-1 text-sm leading-6 text-gray-900"
                 role="menuitem"
                 id="user-menu-item-0"
               >
                 Cài đặt
-              </Link>
+              </Link> */}
               <a
                 href="#"
                 onClick={() => signOut()}
@@ -88,7 +88,7 @@ export function CommonTopbar() {
                 role="menuitem"
                 id="user-menu-item-1"
               >
-                Thoát
+                Signout
               </a>
             </PopoverContent>
           </Popover>
