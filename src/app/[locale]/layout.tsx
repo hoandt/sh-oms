@@ -23,8 +23,8 @@ const roboto_mono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tracking Order System - SwiftSeller",
-  description: "Hệ thống tracking order của SwiftSeller",
+  title: "SwiftHub - Inventory Portal",
+  description: "SwiftHub OMS",
 };
 type Props = {
   children: ReactNode;
