@@ -11,7 +11,9 @@ import {
   ArrowLeftSquare,
   ArrowRightSquare,
   BoxIcon,
+  BoxSelect,
   HandIcon,
+  ListOrdered,
   PanelTopInactiveIcon,
   RotateCcwIcon,
   SearchIcon,
@@ -21,12 +23,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
   {
-    title: "NAV",
+    title: "",
     route: [
       {
         name: "Inventory",
         icon: <PanelTopInactiveIcon />,
         href: "/inventory",
+      },
+      {
+        name: "Inbound",
+        icon: <BoxSelect />,
+        href: "/inbound",
+      },
+      {
+        name: "Outbound",
+        icon: <ListOrdered />,
+        href: "/outbound",
       },
     ],
   },

@@ -1,14 +1,15 @@
 "use client";
 import { CommonTable } from "@/components/common/table/CommonTable";
 import { Card, CardContent } from "@/components/ui/card";
-import { PAGE_SIZE_TABLE } from "@/lib/helpers";
-import { useGetInventoriesBySapo } from "@/query-keys";
-import { IIventoriesSapo } from "@/types/inventories";
+import { PAGE_SIZE_TABLE, formatCurrency } from "@/lib/helpers";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { Filter } from "./components/Filter";
+import { useGetOutboundsBySapo } from "@/query-keys/outbound";
+import { IOutbound } from "@/types/outbound";
+import { Badge } from "@/components/ui/badge";
 
 const Page = () => {
   const router = useRouter();
@@ -22,17 +23,13 @@ const Page = () => {
   const keyword = params.get("q") || "";
   const created_on_max = params.get("created_on_max") || "";
   const created_on_min = params.get("created_on_min") || "";
-  const brand_ids = params.get("brand_ids") || "";
-  const category_ids = params.get("category_ids") || "";
 
-  const { data: inventories, isLoading } = useGetInventoriesBySapo({
+  const { data: outbounds, isLoading } = useGetOutboundsBySapo({
     page: pageIndex + 1,
     pageSize,
     keyword,
     created_on_max,
     created_on_min,
-    brand_ids,
-    category_ids,
   });
 
   const columns = useMemo(() => {
@@ -41,56 +38,56 @@ const Page = () => {
         accessorKey: "id",
         width: 60,
         header: () => <div>{"ID"}</div>,
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
-        enableSorting: false,
+        cell: ({ row }) => {
+          const code = row.original.code || "-";
+          return <div className="flex space-x-2">{code}</div>;
+        },
       },
       {
         accessorKey: "item",
-        header: () => <div className="">{"Item"}</div>,
+        header: () => <div className="">{"Created On"}</div>,
         cell: ({ row }) => {
-          const productName = row.original.product_name || "-";
-          return <div className="flex space-x-2">{productName}</div>;
+          const createdOn = row.original.created_on || "-";
+          return (
+            <div className="flex space-x-2">
+              {format(createdOn, "dd/MM/yyyy HH:mm")}
+            </div>
+          );
         },
-        enableSorting: false,
-        enableHiding: false,
       },
       {
         accessorKey: "sku",
-        header: () => <div className="">{"SKU"}</div>,
+        header: () => <div className="">{"Customer"}</div>,
         cell: ({ row }) => {
-          const sku = row.original.sku || "-";
-          return <div>{sku}</div>;
+          const name = row.original.customer_data.name || "-";
+          return <div>{name}</div>;
         },
       },
       {
         accessorKey: "on_hand",
-        header: () => <div className="">{"On Hand"}</div>,
+        header: () => <div className="">{"Status"}</div>,
         cell: ({ row }) => {
-          //reduce total inventory available
-          const onHand = row.original.inventories?.reduce(
-            (acc, cur) => acc + cur.on_hand,
-            0
-          );
-          return <div>{onHand}</div>;
+          const status = row.original.status;
+          return <Badge className="uppercase">{status}</Badge>;
         },
-        enableSorting: false,
-        enableHiding: false,
       },
       {
         accessorKey: "available",
-        header: () => <div className="">{"Available"}</div>,
+        header: () => <div className="">{"Payment Status"}</div>,
         cell: ({ row }) => {
-          //reduce total inventory available
-          const available = row.original.inventories?.reduce(
-            (acc, cur) => acc + cur.available,
-            0
-          );
-          return <div>{available}</div>;
+          const paymentStatus = row.original.payment_status;
+          return <Badge className="uppercase">{paymentStatus}</Badge>;
         },
-        enableSorting: false,
-        enableHiding: false,
       },
-    ] as ColumnDef<IIventoriesSapo>[];
+      {
+        accessorKey: "available",
+        header: () => <div className="">{"Total"}</div>,
+        cell: ({ row }) => {
+          const total = row.original.total;
+          return <div>{formatCurrency(total)}</div>;
+        },
+      },
+    ] as ColumnDef<IOutbound>[];
   }, []);
 
   return (
@@ -101,17 +98,15 @@ const Page = () => {
             extraActionTable={[]}
             filterComponent={<Filter />}
             onClickRow={(e) => {
-              router.push(`/inventory/detail/${e.original.product_id}`);
+              router.push(`/outbound/detail/${e.original.id}`);
             }}
-            data={(inventories?.data as any[]) || []}
+            data={(outbounds?.data as any[]) || []}
             columns={columns}
             isLoading={isLoading}
             setPagination={setPagination}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            pageCount={
-              Math.ceil((inventories?.meta?.total || 0) / pageSize) || 1
-            }
+            pageCount={Math.ceil((outbounds?.meta?.total || 0) / pageSize) || 1}
           />
         </CardContent>
       </Card>

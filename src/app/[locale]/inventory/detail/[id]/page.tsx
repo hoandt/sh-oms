@@ -1,4 +1,5 @@
 "use client";
+import { BackButton } from "@/components/common/custom/BackButton";
 import { CommonTable } from "@/components/common/table/CommonTable";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +13,8 @@ import {
 import { CompositeItem, IVariantInventory, Variant } from "@/types/inventories";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { format } from "date-fns";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
 
@@ -40,6 +43,7 @@ const LocationIdDefault = 0; /// get all inventory for all location
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { id } = params;
+  const router = useRouter();
   const schema = z.object({
     variantId: z.string().nullish(),
     status: z.string(),
@@ -81,7 +85,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       ? data.data.variants[0].composite_items
       : [];
 
-  const variantId = data?.data.variants[0].id;
+  const variantId = data?.data?.variants[0].id;
 
   useEffect(() => {
     if (data?.data?.variants.length) {

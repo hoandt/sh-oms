@@ -1,0 +1,217 @@
+export interface IOutbound {
+  id: number;
+  tenant_id: number;
+  location_id: number;
+  code: string;
+  created_on: Date;
+  modified_on: Date;
+  issued_on: Date;
+  ship_on: null;
+  ship_on_min: null;
+  ship_on_max: null;
+  account_id: number;
+  assignee_id: number;
+  customer_id: number;
+  customer_data: CustomerData;
+  contact_id: null;
+  billing_address: Address;
+  shipping_address: Address;
+  email: null;
+  phone_number: string;
+  reference_number: string;
+  price_list_id: number;
+  tax_treatment: string;
+  status: string;
+  print_status: boolean;
+  packed_status: string;
+  fulfillment_status: string;
+  received_status: string;
+  payment_status: string;
+  return_status: string;
+  source_id: number;
+  total: number;
+  order_discount_rate: number;
+  order_discount_value: number;
+  order_discount_amount: number;
+  discount_reason: null;
+  total_discount: number;
+  total_tax: number;
+  note: string;
+  tags: string[];
+  delivery_fee: null;
+  discount_items: DiscountItem[];
+  order_line_items: OrderLineItem[];
+  prepayments: any[];
+  fulfillments: any[];
+  order_returns: any[];
+  business_version: number;
+  expected_payment_method_id: null;
+  expected_delivery_type: null;
+  expected_delivery_provider_id: null;
+  process_status_id: null;
+  reason_cancel_id: null;
+  finalized_on: Date;
+  finished_on: null;
+  completed_on: null;
+  channel: string;
+  cancelled_on: null;
+  promotion_redemptions: any[];
+  create_invoice: boolean;
+  reference_url: string;
+  from_order_return_id: null;
+  order_return_exchange: null;
+  total_order_exchange_amount: null;
+  allow_no_refund_order_exchange_amount: boolean;
+  order_coupon_code: null;
+  interconnection_status: null;
+  einvoice_status: string;
+}
+
+export interface Address {
+  id: number;
+  label: null;
+  first_name: null;
+  last_name: null;
+  full_name: string;
+  address1: string;
+  address2: null;
+  email: null;
+  phone_number: null | string;
+  country: string;
+  city: string;
+  district: string;
+  ward: string;
+  zip_code: null | string;
+  full_address?: null;
+  created_on?: Date;
+  modified_on?: Date;
+  status?: string;
+}
+
+export interface CustomerData {
+  id: number;
+  tenant_id: number;
+  default_location_id: null;
+  created_on: Date;
+  modified_on: Date;
+  code: string;
+  name: string;
+  dob: null;
+  sex: null;
+  description: null;
+  email: null;
+  fax: null;
+  phone_number: null;
+  tax_number: null;
+  website: null;
+  customer_group_id: number;
+  group_name: string;
+  assignee_id: number;
+  default_payment_term_id: null;
+  default_payment_method_id: null;
+  default_tax_type_id: null;
+  default_discount_rate: null;
+  default_price_list_id: null;
+  tags: string[];
+  addresses: Address[];
+  contacts: any[];
+  notes: any[];
+  customer_group: CustomerGroup;
+  status: string;
+  is_default: boolean;
+  debt: number;
+  apply_incentives: null;
+  total_expense: null;
+  loyalty_customer: null;
+  sale_order: null;
+  social_customers: any[];
+}
+
+export interface CustomerGroup {
+  id: number;
+  tenant_id: number;
+  created_on: Date;
+  modified_on: Date;
+  name: string;
+  name_translate: string;
+  status: string;
+  is_default: boolean;
+  default_payment_term_id: null;
+  default_payment_method_id: null;
+  default_tax_type_id: null;
+  default_discount_rate: null;
+  default_price_list_id: null;
+  note: null;
+  code: string;
+}
+
+export interface DiscountItem {
+  source: string;
+  rate: number;
+  value: number;
+  amount: number;
+  reason: string;
+  promotion_redemption_id: null;
+  promotion_condition_item_id: null;
+}
+
+export interface OrderLineItem {
+  id: number;
+  created_on: Date;
+  modified_on: Date;
+  variant_id: number;
+  product_id: number;
+  product_name: string;
+  variant_name: string;
+  tax_type_id: null;
+  tax_included: boolean;
+  tax_rate_override: number;
+  tax_rate: number;
+  tax_amount: number;
+  discount_rate: number;
+  discount_value: number;
+  discount_reason: null;
+  discount_amount: number;
+  note: null;
+  price: number;
+  quantity: number;
+  is_freeform: boolean;
+  is_composite: boolean;
+  is_packsize: boolean;
+  pack_size_quantity: null;
+  pack_size_root_id: null;
+  line_amount: number;
+  discount_items: DiscountItem[];
+  composite_item_domains: CompositeItemDomain[];
+  height_text_term_compo: number;
+  sku: string;
+  barcode: string;
+  unit: null;
+  variant_options: string;
+  serials: null;
+  lots_dates: any[];
+  product_type: string;
+  lots_number_code1: null;
+  lots_number_code2: null;
+  lots_number_code3: null;
+  lots_number_code4: null;
+  line_promotion_type: null;
+  warranty: null;
+  distributed_discount_amount: number;
+}
+
+export interface CompositeItemDomain {
+  order_id: number;
+  order_line_item_id: number;
+  tenant_id: number;
+  product_id: number;
+  variant_id: number;
+  quantity: number;
+  price: null;
+  original_quantity: number;
+  product_type: string;
+  created_on: Date;
+  modified_on: Date;
+  variant_name: null;
+  warranty: null;
+}
