@@ -7,13 +7,17 @@ export const getOutboundsBySapo = async ({
   page,
   pageSize,
   keyword,
-  created_on_max, created_on_min
+  saleChannel,
+  created_on_max,
+  created_on_min,
 }: IGetInboundBySapo) => {
   const params = {
     page,
     pageSize,
     query: keyword,
-    created_on_max, created_on_min
+    saleChannel: saleChannel,
+    created_on_max,
+    created_on_min,
   };
 
   const queryOptions = qs.stringify(params, {
@@ -22,10 +26,12 @@ export const getOutboundsBySapo = async ({
   });
 
   const ENDPOINT = `/api/controller/outbounds/getSapoOutbound${queryOptions}`;
-  const res: { orders: IOutbound[]; metadata: any } =
-    await fetchData(ENDPOINT, {
+  const res: { orders: IOutbound[]; metadata: any } = await fetchData(
+    ENDPOINT,
+    {
       method: "GET",
-    });
+    }
+  );
 
   const responses = { data: res?.orders, meta: res?.metadata };
   return responses;

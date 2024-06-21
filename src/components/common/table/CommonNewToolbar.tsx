@@ -142,71 +142,7 @@ const SavedFilterComponent = () => {
     return setOpen(false);
   }
 
-  return (
-    <Form {...form}>
-      <Popover open={open} onOpenChange={(e) => setOpen(e)}>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Lưu Lọc</Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 flex flex-col gap-5">
-          <div className="flex flex-col">
-            <RadioGroup
-              onValueChange={(value: TypeFilter) => {
-                setType(value);
-              }}
-              value={type}
-              className="flex flex-col gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value={TypeFilter["NEW"]} />
-                <Label>Lưu bộ lọc mới</Label>
-              </div>
-
-              {type == TypeFilter["NEW"] && (
-                <div className="w-full items-center gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Nhập Tên bộ lọc mới"
-                            className="col-span-2 h-9 w-full"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value={TypeFilter["EXIST"]} />
-                <Label>Lưu vào bộ lọc đã có</Label>
-              </div>
-              {type == TypeFilter["EXIST"] && (
-                <div className="w-full items-center gap-4">
-                  <Combobox
-                    isLoading={false}
-                    placeholder="Chọn tên bộ lọc"
-                    name="selectedFilterId"
-                    dataOptions={dataOptionsFilter}
-                  />
-                </div>
-              )}
-            </RadioGroup>
-          </div>
-
-          <div className="flex justify-end flex-row gap-2">
-            <Button variant={"outline"}>{"Thoát"}</Button>
-            <Button onClick={form.handleSubmit(onSubmit)}>{"Lưu"}</Button>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </Form>
-  );
+  return <></>;
 };
 
 const formatDate = (dateString: string) => {

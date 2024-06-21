@@ -162,11 +162,56 @@ export const fetchLocationSapo = async () => {
 export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
   const cookie = await fetchCookies();
 
-  //append tags= sellerId to the path, escape the special characters like space, comma, etc
-  const escapeSellerId = encodeURIComponent(sellerId);
+  const saleChannel = path.split("&")[3].split("=")[1];
+
+  const marketplaces = [
+    "tiktok",
+    "shopee",
+    "lazada",
+    "tiki",
+    "sendo",
+    "shopify",
+    "all",
+    "motherswork",
+  ];
+
+  const sellers = sellerId.split(",");
+
+  const filteredSellers = sellers.filter((seller) => {
+    return marketplaces.some((marketplace) => {
+      const prefix =
+        marketplace.charAt(0).toUpperCase() +
+        marketplace.slice(1).toLowerCase();
+      return (
+        seller.toLowerCase().startsWith(marketplace) ||
+        seller.startsWith(prefix)
+      );
+    });
+  });
+
+  //filter saleChannel in filteredSellers
+
+  const filteredSaleChannel = filteredSellers.filter((seller) => {
+    return seller.toLowerCase().startsWith(saleChannel);
+  });
+
+  const prefixSaleChannel = filteredSaleChannel.map((seller) => {
+    return seller.split("_")[0].toLowerCase();
+  });
+
+  let tags = "";
+
+  if (prefixSaleChannel.length > 0) {
+    tags = filteredSaleChannel.join(",");
+  } else {
+    tags = sellerId;
+  }
+
+  //url encode tags
+  tags = encodeURIComponent(tags);
 
   const response = await fetch(
-    `https://swifthub2.mysapogo.com/admin/orders.json${path}&tags=${escapeSellerId}`,
+    `https://swifthub2.mysapogo.com/admin/orders.json${path}&tags=${tags}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
@@ -182,7 +227,7 @@ export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
 
 export const fetchOutboundDetailSapo = async (id: string) => {
   const cookie = await fetchCookies();
-  console.log({ id });
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/orders/${id}.json`,
     {

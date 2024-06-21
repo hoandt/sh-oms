@@ -10,8 +10,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const urlPath = req.nextUrl.search;
   const path = urlPath.replace("?endpoint=", "");
 
-
-
   let response = await fetchData<BackendDataResponse>(
     `${BACKEND_ENDPOINT}${path}`,
     {
@@ -20,6 +18,5 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
   );
 
-  console.log({ response: `${BACKEND_ENDPOINT}${path}` });
   return NextResponse.json(standardizeBackendResponse(response));
 }

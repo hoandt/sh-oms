@@ -50,7 +50,6 @@ export const getWards = async ({ options }: { options: string }) => {
 export const getCustomer = async ({ options }: { options: string }) => {
   try {
     const ENDPOINT = `${BACKEND_URL}/${SUB_DOMAIN}${options}`;
-    console.log({ ENDPOINT });
 
     const res: DataResponseFromBackend = await axios.get(ENDPOINT, {
       headers: adminHeadersList,

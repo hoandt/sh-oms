@@ -46,6 +46,7 @@ export interface IGetInboundBySapo {
   keyword?: string;
   page?: number;
   pageSize?: number;
+  saleChannel?: string;
   created_on_max?: string;
   created_on_min?: string;
 }

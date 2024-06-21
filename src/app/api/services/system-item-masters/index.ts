@@ -11,7 +11,6 @@ export const getSystemItemMaster = async ({
   options: QueryOptions;
 }) => {
   try {
-    console.log({ options });
     const queryOptions = qs.stringify(options, {
       encodeValuesOnly: true,
       addQueryPrefix: true,

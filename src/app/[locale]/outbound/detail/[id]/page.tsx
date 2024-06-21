@@ -11,6 +11,7 @@ import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
+import Composite from "../../components/Composite";
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { id } = params;
@@ -36,10 +37,24 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   const columns = useMemo(() => {
     return [
+      // qty
       {
-        accessorKey: "account_name",
-        header: () => <div>{"Item Name"}</div>,
-        cell: ({ row }) => <div>{row.original.product_name}</div>,
+        accessorKey: "sku",
+        header: () => <div>{"SKU"}</div>,
+        cell: ({ row }) => {
+          const compositeItems = row.original.composite_item_domains;
+          //if
+
+          return (
+            <div
+              className={
+                compositeItems.length > 0 ? "text-blue-900 font-black" : ""
+              }
+            >
+              {row.original.sku}
+            </div>
+          );
+        },
         enableSorting: false,
       },
       {
@@ -49,27 +64,48 @@ const Page = ({ params }: { params: { id: string } }) => {
         enableSorting: false,
       },
       {
-        accessorKey: "source",
-        header: () => <div>{"Price"}</div>,
-        cell: ({ row }) => <div>{formatCurrency(row.original.price)}</div>,
-        enableSorting: false,
-      },
-      {
         accessorKey: "onhand_adj",
-        header: () => <div>{"Discount"}</div>,
+        header: () => <div> </div>,
         cell: ({ row }) => (
-          <div>{formatCurrency(row.original.discount_value)}</div>
+          //  is composite item, display, else none
+          <div>
+            {row.original.composite_item_domains.length > 0 && (
+              <Composite
+                compositeDomains={row.original.composite_item_domains}
+              />
+            )}
+          </div>
         ),
         enableSorting: false,
       },
       {
-        accessorKey: "onhand_adj",
-        header: () => <div>{"Total Price"}</div>,
-        cell: ({ row }) => (
-          <div>{formatCurrency(row.original.line_amount)}</div>
-        ),
+        accessorKey: "account_name",
+        header: () => <div>{"Item Name"}</div>,
+        cell: ({ row }) => {
+          const compositeItems = row.original.composite_item_domains;
+          return (
+            <div>
+              <div>{row.original.product_name}</div>
+            </div>
+          );
+        },
         enableSorting: false,
       },
+      // {
+      //   accessorKey: "source",
+      //   header: () => <div>{"Price"}</div>,
+      //   cell: ({ row }) => <div>{formatCurrency(row.original.price)}</div>,
+      //   enableSorting: false,
+      // },
+
+      // {
+      //   accessorKey: "onhand_adj",
+      //   header: () => <div>{"Discount"}</div>,
+      //   cell: ({ row }) => (
+      //     <div>{formatCurrency(row.original.discount_value)}</div>
+      //   ),
+      //   enableSorting: false,
+      // },
     ] as ColumnDef<OrderLineItem>[];
   }, []);
 
@@ -78,7 +114,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       <div className="flex flex-row gap-2 items-center">
         <BackButton
           onClick={() => {
-            router.push("/outbound");
+            router.back();
           }}
         />
         <h1 className="text-xl font-bold">
@@ -101,13 +137,13 @@ const Page = ({ params }: { params: { id: string } }) => {
 
           <div>
             <ul className="grid gap-2 justify-end">
-              <li className="flex items-center justify-between gap-7 w-[200px]">
+              {/* <li className="flex items-center justify-between gap-7 w-[200px]">
                 <span className="text-muted-foreground">{"Quantity"}</span>
                 <div className="flex items-center justify-between gap-5">
                   <span className="text-sm">{totalQuantity}</span>
                 </div>
-              </li>
-              <li className="flex items-center justify-between gap-7 w-[200px]">
+              </li> */}
+              {/* <li className="flex items-center justify-between gap-7 w-[200px]">
                 <span className="text-muted-foreground">{"Discount"}</span>
                 <span className="text-sm">
                   {data?.data?.fulfillments[0]?.discount_value || "0"}
@@ -118,13 +154,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <span className="text-sm">
                   {data?.data?.fulfillments[0]?.ship || "0"}
                 </span>
-              </li>
-              <li className="flex items-center justify-between gap-7 w-[200px]">
+              </li> */}
+              {/* <li className="flex items-center justify-between gap-7 w-[200px]">
                 <span className="text-muted-foreground">{"Total Price"}</span>
                 <span className="text-sm">
                   {data?.data?.fulfillments[0]?.total || "0"}
                 </span>
-              </li>
+              </li> */}
             </ul>
           </div>
         </CardContent>

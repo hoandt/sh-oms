@@ -1,10 +1,14 @@
 import { outboundQueryKeys } from "./key";
 import { getSystemInventoriesSapo } from "@/services/inventories";
-import { getOutboundDetailSapo, getOutboundsBySapo } from "@/services/outbounds";
+import {
+  getOutboundDetailSapo,
+  getOutboundsBySapo,
+} from "@/services/outbounds";
 import { useQuery } from "@tanstack/react-query";
 
 export interface IGetOutboundSapo {
   keyword?: string;
+  saleChannel?: string;
   page?: number;
   pageSize?: number;
   created_on_max?: string;
@@ -13,6 +17,7 @@ export interface IGetOutboundSapo {
 
 export const useGetOutboundsBySapo = ({
   keyword,
+  saleChannel,
   page,
   pageSize,
   created_on_max,
@@ -22,6 +27,7 @@ export const useGetOutboundsBySapo = ({
     queryKey: outboundQueryKeys.getOutboundSapo({
       page,
       keyword,
+      saleChannel,
       created_on_max,
       created_on_min,
     }),
@@ -30,8 +36,9 @@ export const useGetOutboundsBySapo = ({
         page,
         pageSize,
         keyword,
+        saleChannel,
         created_on_max,
-        created_on_min
+        created_on_min,
       }),
   });
   return query;

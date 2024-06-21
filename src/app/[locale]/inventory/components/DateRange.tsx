@@ -59,7 +59,6 @@ export function DatePickerWithRange({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(value) => {
-              console.log({ value });
               form.setValue("created_on_max", value?.to?.toISOString());
               form.setValue("created_on_min", value?.from?.toISOString());
               setDate(value);
