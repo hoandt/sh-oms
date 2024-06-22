@@ -3,9 +3,9 @@ export interface IOutbound {
   tenant_id: number;
   location_id: number;
   code: string;
-  created_on: Date;
-  modified_on: Date;
-  issued_on: Date;
+  created_on: string;
+  modified_on: string;
+  issued_on: string;
   ship_on: null;
   ship_on_min: null;
   ship_on_max: null;
@@ -42,7 +42,7 @@ export interface IOutbound {
   discount_items: DiscountItem[];
   order_line_items: OrderLineItem[];
   prepayments: any[];
-  fulfillments: any[];
+  fulfillments: FulfillmentsSapo[];
   order_returns: any[];
   business_version: number;
   expected_payment_method_id: null;
@@ -50,7 +50,7 @@ export interface IOutbound {
   expected_delivery_provider_id: null;
   process_status_id: null;
   reason_cancel_id: null;
-  finalized_on: Date;
+  finalized_on: string;
   finished_on: null;
   completed_on: null;
   channel: string;
@@ -67,6 +67,53 @@ export interface IOutbound {
   einvoice_status: string;
 }
 
+export interface FulfillmentsSapo {
+  id: number;
+  tenant_id: number;
+  stock_location_id: number;
+  code: string;
+  order_id: number;
+  account_id: number;
+  assignee_id: number;
+  partner_id: number;
+  billing_address: Address;
+  shipping_address: Address;
+  delivery_type: string;
+  tax_treatment: string;
+  discount_rate: number;
+  discount_value: number;
+  discount_amount: number;
+  total: number;
+  total_tax: number;
+  total_discount: number;
+  notes: null;
+  packed_on: string;
+  received_on: null;
+  shipped_on: string;
+  cancel_date: string;
+  cancel_account_id: number;
+  created_on: string;
+  modified_on: string;
+  status: string;
+  print_status: boolean;
+  composite_fulfillment_status: string;
+  payment_status: string;
+  status_before_cancellation: string;
+  stock_out_account_id: number;
+  receive_account_id: null;
+  receive_cancellation_account_id: number;
+  receive_cancellation_on: string;
+
+  payments: any[];
+  total_quantity: number;
+  reason_cancel_id: null;
+  pushing_status: string;
+  bill_of_lading_on: string;
+  packed_processing_account_id: null;
+  bill_of_lading_account_id: null;
+  late_pickup_date: null;
+  late_delivery_date: null;
+}
 export interface Address {
   id: number;
   label: null;
@@ -83,8 +130,8 @@ export interface Address {
   ward: string;
   zip_code: null | string;
   full_address?: null;
-  created_on?: Date;
-  modified_on?: Date;
+  created_on?: string;
+  modified_on?: string;
   status?: string;
 }
 
@@ -92,8 +139,8 @@ export interface CustomerData {
   id: number;
   tenant_id: number;
   default_location_id: null;
-  created_on: Date;
-  modified_on: Date;
+  created_on: string;
+  modified_on: string;
   code: string;
   name: string;
   dob: null;
@@ -130,8 +177,8 @@ export interface CustomerData {
 export interface CustomerGroup {
   id: number;
   tenant_id: number;
-  created_on: Date;
-  modified_on: Date;
+  created_on: string;
+  modified_on: string;
   name: string;
   name_translate: string;
   status: string;
@@ -157,8 +204,8 @@ export interface DiscountItem {
 
 export interface OrderLineItem {
   id: number;
-  created_on: Date;
-  modified_on: Date;
+  created_on: string;
+  modified_on: string;
   variant_id: number;
   product_id: number;
   product_name: string;
@@ -210,8 +257,8 @@ export interface CompositeItemDomain {
   price: null;
   original_quantity: number;
   product_type: string;
-  created_on: Date;
-  modified_on: Date;
+  created_on: string;
+  modified_on: string;
   variant_name: null;
   warranty: null;
 }

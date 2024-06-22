@@ -1,5 +1,4 @@
 import { outboundQueryKeys } from "./key";
-import { getSystemInventoriesSapo } from "@/services/inventories";
 import {
   getOutboundDetailSapo,
   getOutboundsBySapo,

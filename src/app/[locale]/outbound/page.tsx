@@ -190,8 +190,9 @@ const Page = () => {
             <div>
               <span
                 className="bg-green-50
+                bg-blue-500
               bg-indigo-500
-               text-green-600  bg-blue-50 bg-red-50 bg-blue-50 bg-orange-500 bg-sky-500 bg-blue-50 text-sky-600 bg-green-500"
+               text-green-600  bg-blue-50 bg-red-50 bg-blue-50 bg-orange-500 bg-sky-500 bg-sky-50 bg-blue-50 text-sky-600 bg-green-500"
               ></span>
 
               <span className={`bg-${color}-50 text-${color}-600 px-2 rounded`}>
