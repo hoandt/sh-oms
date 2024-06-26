@@ -1,35 +1,55 @@
 import { getVariantInventoryDetailSapo } from "@/services";
 import { Variant } from "@/types/inventories";
 import { formatDate } from "date-fns";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 
-const LotInventory = ({ variant }: { variant: Variant }) => {
+const LotInventory = () => {
+  //extract url get
+  const params = useSearchParams();
+
   const [isLoading, setIsLoading] = React.useState(true);
   const [variantInventory, setVariantInventory] = React.useState<
     LotVariantInventory[]
   >([]);
   useEffect(() => {
-    const fetchVariantInventory = async () => {
+    const fetchVariantInventory = async (productId: string) => {
       const res = await getVariantInventoryDetailSapo({
-        productId: `${variant.id}`,
+        productId,
       });
 
       setVariantInventory(res.data);
       setIsLoading(false);
     };
-    fetchVariantInventory();
-  }, []);
+
+    params.get("variantId")
+      ? fetchVariantInventory(params.get("variantId") as string)
+      : setIsLoading(false);
+  }, [params.get("variantId")]);
 
   return (
-    <div className="w-full bg-slate-100 rounded space-y-2 py-2">
+    <div className="  ">
       {isLoading && <div>Loading Inventory...</div>}
-      {variantInventory.map((lot) => (
-        <div key={lot.id} className="flex space-x-2 px-2 border-b">
-          <div className="font-bold">{lot.lots_number}</div>
-          <div>{formatDate(lot.manufacture_date, "MM/yyyy")}</div>
-          <div>{lot.available}</div>
-        </div>
-      ))}
+      {variantInventory && variantInventory.length > 0 && (
+        <table className="mt-2 py-2 bg-white">
+          <thead>
+            <tr className="rounded-t bg-slate-200 py-2 text-sm text-slate-500">
+              <th className="font-bold px-2">Lot Number</th>
+              <th className="font-bold px-2">MFG Date</th>
+              <th className="font-bold px-2">Available</th>
+            </tr>
+          </thead>
+          {variantInventory.map((lot) => (
+            <tr key={lot.id} className="my-1 py-2">
+              <td className="font-bold px-2">{lot.lots_number}</td>
+              <td className="px-2">
+                {formatDate(lot.manufacture_date, "MM/yyyy")}
+              </td>
+              <td className="px-2">{lot.available}</td>
+            </tr>
+          ))}
+        </table>
+      )}
     </div>
   );
 };

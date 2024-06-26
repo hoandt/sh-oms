@@ -144,7 +144,12 @@ export const getInboundsBySapo = async ({
       method: "GET",
     });
 
-  const responses = { data: res?.purchase_orders, meta: res?.metadata };
+  const responses = {
+    data: res?.purchase_orders.filter(
+      (po) => !po.tags.includes("portal_canceled")
+    ),
+    meta: res?.metadata,
+  };
   return responses;
 };
 

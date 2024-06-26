@@ -81,6 +81,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       ? data.data.variants[0].composite_items
       : [];
 
+  const lots_date = data?.data?.product_type === "lots_date";
   const variantId = data?.data?.variants[0].id;
 
   useEffect(() => {
@@ -169,16 +170,10 @@ const Page = ({ params }: { params: { id: string } }) => {
         header: () => <div>{"On hands"}</div>,
         cell: ({ row }) => (
           <div className="flex">
-            {selectedVariant &&
-              selectedVariant.product_type === "lots_date" && (
-                <ChevronDown />
-              )}{" "}
+            {lots_date && <ChevronDown />}{" "}
             <div className="w-full">
               {row.original.on_hand}
-              {selectedVariant &&
-                selectedVariant.product_type === "lots_date" && (
-                  <LotInventory variant={selectedVariant} />
-                )}
+              {lots_date && <LotInventory />}
             </div>
           </div>
         ),
