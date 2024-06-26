@@ -49,12 +49,13 @@ const MARKETPLACE = {
     label: "Tiktok",
     color: "indigo",
   },
-  sendo: {
-    label: "Sendo",
-    color: "yellow",
-  },
+
   other: {
-    label: "Retail",
+    label: "Other",
+    color: "slate",
+  },
+  wholesale: {
+    label: "Wholesale",
     color: "green",
   },
 } as {
@@ -145,6 +146,9 @@ const Page = () => {
                   className={`inline-block w-4 bg-${MARKETPLACE[marketplace].color}-500  px-3 rounded`}
                 ></span>
                 <span className={` `}>{MARKETPLACE[marketplace].label}</span>
+                {marketplace === "other" && (
+                  <span className={`text-sm`}>{row.original.tags.flat()}</span>
+                )}
               </div>
             );
           }
@@ -192,6 +196,7 @@ const Page = () => {
                 className="bg-green-50
                 bg-blue-500
               bg-indigo-500
+              bg-slate-500 bg-slate-50
                text-green-600  bg-blue-50 bg-red-50 bg-blue-50 bg-orange-500 bg-sky-500 bg-sky-50 bg-blue-50 text-sky-600 bg-green-500"
               ></span>
 

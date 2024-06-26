@@ -190,6 +190,7 @@ export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
     "shopify",
     "all",
     "motherswork",
+    "wholesales",
   ];
 
   const sellers = sellerId.split(",");
