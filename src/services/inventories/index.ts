@@ -123,6 +123,29 @@ export const getSystemInventoryDetailSapo = async ({
   return responses;
 };
 
+export const getVariantInventoryDetailSapo = async ({
+  productId,
+}: {
+  productId: string;
+}) => {
+  const params = {
+    productId,
+  };
+
+  const queryOptions = qs.stringify(params, {
+    encodeValuesOnly: true,
+    addQueryPrefix: true,
+  });
+
+  const ENDPOINT = `/api/controller/inventories/getLotInventoryDetail?params=${queryOptions}`;
+  const res: { lots_dates: any } = await fetchData(ENDPOINT, {
+    method: "GET",
+  });
+
+  const responses = { data: res?.lots_dates };
+  return responses;
+};
+
 export const getInventoryTransactionBySapo = async ({
   page,
   pageSize,

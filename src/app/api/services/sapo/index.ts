@@ -48,6 +48,23 @@ export const fetchInventorySapo = async (path: string) => {
 
   return response.json();
 };
+export const fetchVariantInventorySapo = async (path: string) => {
+  const cookie = await fetchCookies();
+
+  const response = await fetch(
+    `https://swifthub2.mysapogo.com/admin/lots_dates.json?variant_id=${path}&query=&limit=20&page=1`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        cookie,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+
+  return await response.json();
+};
 
 export const fetchReportInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();

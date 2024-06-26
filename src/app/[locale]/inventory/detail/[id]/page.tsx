@@ -16,6 +16,8 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
+import LotInventory from "../../components/LotInventory";
+import { ChevronDown } from "lucide-react";
 
 enum INVENTORY_STATUS_PARAMS {
   INVENTORY = "Inventory",
@@ -165,9 +167,24 @@ const Page = ({ params }: { params: { id: string } }) => {
       {
         accessorKey: "on_hand",
         header: () => <div>{"On hands"}</div>,
-        cell: ({ row }) => <div>{row.original.on_hand}</div>,
+        cell: ({ row }) => (
+          <div className="flex">
+            {selectedVariant &&
+              selectedVariant.product_type === "lots_date" && (
+                <ChevronDown />
+              )}{" "}
+            <div className="w-full">
+              {row.original.on_hand}
+              {selectedVariant &&
+                selectedVariant.product_type === "lots_date" && (
+                  <LotInventory variant={selectedVariant} />
+                )}
+            </div>
+          </div>
+        ),
         enableSorting: false,
       },
+
       {
         accessorKey: "available",
         header: () => <div>{"Available"}</div>,
