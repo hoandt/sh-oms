@@ -51,7 +51,7 @@ const Page = () => {
     created_on_min,
   });
 
-  const { data: locations } = useGetLocationBySapo();
+  // const { data: locations } = useGetLocationBySapo();
 
   const columns = useMemo(() => {
     return [
@@ -128,30 +128,6 @@ const Page = () => {
               {STATUS[status] && STATUS[status].label}
             </span>
           );
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "available",
-        header: () => <div className="">{"Location Code"}</div>,
-        cell: ({ row }) => {
-          //reduce total inventory available
-          const available = locations?.data.find(
-            (e) => e.id.toString() === row.original.location_id.toString()
-          );
-          return <div>{available?.label}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-
-      {
-        accessorKey: "available",
-        header: () => <div className="">{"Price"}</div>,
-        cell: ({ row }) => {
-          const available = row.original.total_price;
-          return <div>{formatCurrency(available)}</div>;
         },
         enableSorting: false,
         enableHiding: false,

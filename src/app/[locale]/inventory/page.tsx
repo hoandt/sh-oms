@@ -9,8 +9,6 @@ import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { Filter } from "./components/Filter";
-import { useSession } from "next-auth/react";
-import { Component } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();

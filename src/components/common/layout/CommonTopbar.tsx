@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Popover,
@@ -48,7 +49,13 @@ export function CommonTopbar() {
         <div className="relative flex flex-1"></div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           {/* display usage limit. For example: 10/2000 credits with style  */}
-
+          <Button
+            size={"sm"}
+            variant={"outline"}
+            className="hover:bg-slate-100 hover:text-slate-500 py-1"
+          >
+            Refresh
+          </Button>
           <Popover>
             <PopoverTrigger asChild className="cursor-pointer">
               <span className="hidden lg:flex lg:items-center">

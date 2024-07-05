@@ -100,6 +100,10 @@ const Page = () => {
 
       const currentUser = session.userWithRole as any as UserWithRole;
       const tags = currentUser.organization.address;
+      //validate tags is not empty
+      if (!tags) {
+        return;
+      }
       //explode tags by comma
       const tagsArray = tags.split(",");
       let uniqueTags = ["all"] as string[];
