@@ -45,7 +45,7 @@ type SapoOrderForm = {
   promotion_redemptions: any[]; // Assuming promotions can vary
   operation_system: string;
 };
-export const SapoOrderForm = z.object({
+const SapoOrderForm = z.object({
   status: z.string(),
   customer_id: z.number(),
   shipping_address: z.string().nullable(),
@@ -172,5 +172,3 @@ const OrderForm = () => {
 };
 
 export default OrderForm;
-
-const sampleLine = [{ "287435767": { quantity: "3" } }];
