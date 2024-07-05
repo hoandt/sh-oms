@@ -53,6 +53,7 @@ export function CommonTopbar() {
             size={"sm"}
             variant={"outline"}
             className="hover:bg-slate-100 hover:text-slate-500 py-1"
+            onClick={() => signOut()}
           >
             Refresh
           </Button>
