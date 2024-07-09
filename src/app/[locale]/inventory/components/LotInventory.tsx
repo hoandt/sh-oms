@@ -30,7 +30,8 @@ const LotInventory = () => {
   return (
     <div className="  ">
       {isLoading && <div>Loading Inventory...</div>}
-      {variantInventory && variantInventory.length > 0 && (
+      {/* @Hoan fix variantInventory.length > 0   */}
+      {variantInventory && variantInventory.length === 0 && (
         <table className="mt-2 py-2 bg-white">
           <thead>
             <tr className="rounded-t bg-slate-200 py-2 text-sm text-slate-500">
