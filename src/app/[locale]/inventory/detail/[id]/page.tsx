@@ -63,6 +63,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       pageIndex: 0,
       pageSize: PAGE_SIZE_TABLE,
     });
+
   const { data } = useGetInventoryDetailBySapo({
     id,
   });
@@ -147,13 +148,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         cell: ({ row }) => <div>{row.original.onhand_adj}</div>,
         enableSorting: false,
       },
-      // {
-      //   accessorKey: "onhand",
-      //   header: () => <div>{"On hands"}</div>,
-      //   cell: ({ row }) => <div>{row.original.onhand}</div>,
-      //   enableSorting: false,
-      // },
-
       {
         accessorKey: "log_root_id",
         header: () => <div>{"Ref"}</div>,
@@ -165,21 +159,6 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   const columnsVariantInventory = useMemo(() => {
     return [
-      // {
-      //   accessorKey: "on_hand",
-      //   header: () => <div>{"On hands"}</div>,
-      //   cell: ({ row }) => (
-      //     <div className="flex">
-      //       {/* {lots_date && <ChevronDown />}{" "} */}
-      //       <div className="w-full">
-      //         {row.original.on_hand}
-      //         {/* {lots_date && <LotInventory />} */}
-      //       </div>
-      //     </div>
-      //   ),
-      //   enableSorting: false,
-      // },
-
       {
         accessorKey: "available",
         header: () => <div>{"Available"}</div>,
@@ -283,6 +262,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 columns={columns}
                 data={reports?.data || []}
                 isLoading={isLoadingReports}
+                setPagination={setPagination}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                pageCount={
+                  Math.ceil((reports?.meta.total || 0) / pageSize) || 1
+                }
               />
             )}
             {queryParams.status === INVENTORY_STATUS_PARAMS.COMPOSITE &&
