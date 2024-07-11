@@ -191,6 +191,7 @@ export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
     "all",
     "motherswork",
     "wholesales",
+    "offline",
   ];
 
   const sellers = sellerId.split(",");
