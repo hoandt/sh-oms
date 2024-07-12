@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { addDays, addHours, format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -64,13 +64,13 @@ export function DatePickerWithRange({
 
                 form.setValue(
                   "created_on_max",
-                  formatDateTimeWithoutMilliseconds(today)
+                  formatDateTimeWithoutMilliseconds(addDays(today, 1))
                 );
                 form.setValue(
                   "created_on_min",
-                  formatDateTimeWithoutMilliseconds(addDays(today, -1))
+                  formatDateTimeWithoutMilliseconds(today)
                 );
-                setDate({ from: today, to: today });
+                setDate({ from: today, to: addDays(today, 1) });
               }}
             >
               Today
@@ -84,13 +84,13 @@ export function DatePickerWithRange({
                 yesterday.setHours(0, 0, 0, 0);
                 form.setValue(
                   "created_on_max",
-                  formatDateTimeWithoutMilliseconds(yesterday)
+                  formatDateTimeWithoutMilliseconds(addHours(yesterday, 23))
                 );
                 form.setValue(
                   "created_on_min",
-                  formatDateTimeWithoutMilliseconds(addDays(yesterday, -1))
+                  formatDateTimeWithoutMilliseconds(yesterday)
                 );
-                setDate({ from: yesterday, to: yesterday });
+                setDate({ from: yesterday, to: addHours(yesterday, 23) });
               }}
             >
               Yesterday
