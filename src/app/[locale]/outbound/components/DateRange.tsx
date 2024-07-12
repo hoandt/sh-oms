@@ -59,8 +59,17 @@ export function DatePickerWithRange({
               size="sm"
               onClick={() => {
                 const today = new Date();
-                form.setValue("created_on_max", format(today, "yyyy-MM-dd"));
-                form.setValue("created_on_min", format(today, "yyyy-MM-dd"));
+                //set today 00:00:00
+                today.setHours(0, 0, 0, 0);
+
+                form.setValue(
+                  "created_on_max",
+                  formatDateTimeWithoutMilliseconds(today)
+                );
+                form.setValue(
+                  "created_on_min",
+                  formatDateTimeWithoutMilliseconds(addDays(today, -1))
+                );
                 setDate({ from: today, to: today });
               }}
             >
@@ -71,13 +80,15 @@ export function DatePickerWithRange({
               variant={"outline"}
               onClick={() => {
                 const yesterday = addDays(new Date(), -1);
+                //set yesterday 00:00:00
+                yesterday.setHours(0, 0, 0, 0);
                 form.setValue(
                   "created_on_max",
-                  format(yesterday, "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(yesterday)
                 );
                 form.setValue(
                   "created_on_min",
-                  format(yesterday, "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(addDays(yesterday, -1))
                 );
                 setDate({ from: yesterday, to: yesterday });
               }}
@@ -94,11 +105,11 @@ export function DatePickerWithRange({
                 );
                 form.setValue(
                   "created_on_max",
-                  format(new Date(), "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(new Date())
                 );
                 form.setValue(
                   "created_on_min",
-                  format(startOfWeek, "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(startOfWeek)
                 );
                 setDate({ from: startOfWeek, to: new Date() });
               }}
@@ -113,11 +124,11 @@ export function DatePickerWithRange({
                 startOfMonth.setDate(1);
                 form.setValue(
                   "created_on_max",
-                  format(new Date(), "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(new Date())
                 );
                 form.setValue(
                   "created_on_min",
-                  format(startOfMonth, "yyyy-MM-dd")
+                  formatDateTimeWithoutMilliseconds(startOfMonth)
                 );
                 setDate({ from: startOfMonth, to: new Date() });
               }}
@@ -149,5 +160,6 @@ export function DatePickerWithRange({
   );
 }
 function formatDateTimeWithoutMilliseconds(dateTime: Date) {
+  //return empty string if dateTime is undefined
   return dateTime.toISOString().replace(/\.\d{3}Z$/, "Z");
 }

@@ -103,7 +103,7 @@ export const getFeeTracking = async ({ options }: { options: any }) => {
   return res;
 };
 
-export const getCustomers = async ({ code, page = 1, pageSize = 15 }: any) => {
+export const getCustomers = async ({ code, page = 1, pageSize = 25 }: any) => {
   const params: QueryOptions = {
     filters: {
       code: {

@@ -5,7 +5,7 @@ import qs from "qs";
 export const getSystemItemMaster = async ({
   code,
   page = 1,
-  pageSize = 15,
+  pageSize = 25,
 }: any) => {
   const params: QueryOptions = {
     filters: {

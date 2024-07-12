@@ -1,7 +1,7 @@
 import { DataResponseFromBackend } from "@/types/common";
 import { SystemInventory } from "@/types/todo";
 
-export const PAGE_SIZE_TABLE = 15;
+export const PAGE_SIZE_TABLE = 50;
 
 export async function fetchData<T>(
   url: string,

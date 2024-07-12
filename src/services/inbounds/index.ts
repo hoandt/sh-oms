@@ -21,7 +21,7 @@ export const getOperateInbounds = async ({
   code,
   status,
   page = 1,
-  pageSize = 15,
+  pageSize = 25,
 }: any) => {
   const endpoint = "/oms-inbounds";
 

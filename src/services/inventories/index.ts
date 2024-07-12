@@ -32,7 +32,7 @@ export const getSystemInventories = async ({
   code,
   status,
   page = 1,
-  pageSize = 15,
+  pageSize = 25,
 }: any) => {
   const endpoint = "/system-inventories";
 
@@ -66,7 +66,7 @@ export type IResponse = {
 
 export const getSystemInventoriesSapo = async ({
   page = 1,
-  pageSize = 15,
+  pageSize = 25,
   keyword,
   created_on_min,
   created_on_max,

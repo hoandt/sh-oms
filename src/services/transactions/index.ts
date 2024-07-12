@@ -16,7 +16,7 @@ function transformData(data: any): any {
   return data;
 }
 
-export const getTransactions = async ({ id, page = 1, pageSize = 15 }: any) => {
+export const getTransactions = async ({ id, page = 1, pageSize = 25 }: any) => {
   const endpoint = "/system-transactions";
 
   const params: QueryOptions = {

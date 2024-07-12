@@ -121,13 +121,29 @@ const Page = () => {
   }, []);
 
   const handleSalesChannel = (tag: string) => {
+    //get
     //check if the tag is all
     if (tag === "all") {
-      //redirect to the same page
-      router.push("/outbound");
+      //redirect to the same page, keep the saleChannel, created_on_max, created_on_min if they are not empty
+      if (created_on_max && created_on_min) {
+        router.push(
+          `/outbound?saleChannel=${tag}&created_on_max=${created_on_max}&created_on_min=${created_on_min}`
+        );
+      } else {
+        //redirect to the same page
+        router.push(`/outbound?saleChannel=${tag}`);
+      }
     } else {
-      //redirect to the same page with the tag
-      router.push(`/outbound?saleChannel=${tag}`);
+      //redirect to the same page with the tag, saleChannel, created_on_max, created_on_min if they are not empty
+      if (created_on_max && created_on_min) {
+        router.push(
+          `/outbound?saleChannel=${tag}&created_on_max=${created_on_max}&created_on_min=${created_on_min}`
+        );
+      }
+      //redirect to the same page
+      else {
+        router.push(`/outbound?saleChannel=${tag}`);
+      }
     }
   };
 
@@ -168,8 +184,20 @@ const Page = () => {
         },
       },
       {
-        accessorKey: "item",
+        accessorKey: "packed_at",
         header: () => <div className="">{"Created On"}</div>,
+        cell: ({ row }) => {
+          const createdOn = row.original.issued_on || "-";
+          return (
+            <div className="flex space-x-2">
+              {format(createdOn, "dd/MM/yyyy HH:mm")}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "created_on",
+        header: () => <div className="">{"Processed On"}</div>,
         cell: ({ row }) => {
           const createdOn = row.original.created_on || "-";
           return (
@@ -226,7 +254,7 @@ const Page = () => {
   return (
     <div className="p-4">
       {/* display all tags*/}
-      {outbounds && outbounds?.data?.length > 0 && (
+      {outbounds && outbounds?.data?.length >= 0 && (
         <div className="flex justify-between items-center">
           <div className="flex space-x-1 px-2">
             {
