@@ -1,8 +1,6 @@
-import { Combobox } from "@/components/common/custom/Combobox";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { SheetClose, SheetFooter } from "@/components/ui/sheet";
-import { DataOptions } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "qs";
@@ -10,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DatePickerWithRange } from "./DateRange";
 import { Label } from "@/components/ui/label";
-import { useGetBrandsBySapo, useGetCategoryBySapo } from "@/query-keys";
 
 export const formFilterInboundSchema = z.object({
   created_on_max: z.coerce.string().nullish(),
@@ -32,20 +29,6 @@ export const Filter = () => {
       category_ids: searchParams.get("category_ids") || undefined,
       brand_ids: searchParams.get("brand_ids") || undefined,
     },
-  });
-
-  const { data: brands } = useGetBrandsBySapo({
-    page: 1,
-    pageSize: 99,
-    query: "",
-    status: "active",
-  });
-
-  const { data: categories } = useGetCategoryBySapo({
-    page: 1,
-    pageSize: 99,
-    query: "",
-    status: "active",
   });
 
   function onSubmit(values: z.infer<typeof formFilterInboundSchema>) {
