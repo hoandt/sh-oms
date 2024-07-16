@@ -150,7 +150,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       },
       {
         accessorKey: "available",
-        header: () => <div>{"Changes"}</div>,
+        header: () => <div>{"On hand"}</div>,
         cell: ({ row }) => <div>{row.original.onhand}</div>,
         enableSorting: false,
       },
