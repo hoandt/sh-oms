@@ -149,6 +149,12 @@ const Page = ({ params }: { params: { id: string } }) => {
         enableSorting: false,
       },
       {
+        accessorKey: "available",
+        header: () => <div>{"Changes"}</div>,
+        cell: ({ row }) => <div>{row.original.onhand}</div>,
+        enableSorting: false,
+      },
+      {
         accessorKey: "log_root_id",
         header: () => <div>{"Ref"}</div>,
         cell: ({ row }) => <div>{row.original.trans_object_code}</div>,
