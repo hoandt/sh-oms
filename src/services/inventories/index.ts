@@ -183,6 +183,7 @@ export const getInventoryTransactionBySapo = async ({
     "190924_Ulike_W",
     "IAN00009",
     "IAN00010",
+    "IAN00011",
   ];
 
   const responses = {

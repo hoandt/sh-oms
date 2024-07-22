@@ -148,12 +148,12 @@ const Page = ({ params }: { params: { id: string } }) => {
         cell: ({ row }) => <div>{row.original.onhand_adj}</div>,
         enableSorting: false,
       },
-      // {
-      //   accessorKey: "available",
-      //   header: () => <div>{"On hand"}</div>,
-      //   cell: ({ row }) => <div>{row.original.onhand}</div>,
-      //   enableSorting: false,
-      // },
+      {
+        accessorKey: "available",
+        header: () => <div>{"On hand"}</div>,
+        cell: ({ row }) => <div>{row.original.onhand}</div>,
+        enableSorting: false,
+      },
       {
         accessorKey: "log_root_id",
         header: () => <div>{"Ref"}</div>,
