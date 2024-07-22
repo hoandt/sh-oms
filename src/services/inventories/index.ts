@@ -174,7 +174,7 @@ export const getInventoryTransactionBySapo = async ({
     await fetchData(ENDPOINT, {
       method: "GET",
     });
-
+  // @Hoan exclude for ULIKE
   const excludedCodes = [
     "200724_Confirm_Inventory",
     "170724_Ulike",
