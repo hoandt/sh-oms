@@ -175,7 +175,22 @@ export const getInventoryTransactionBySapo = async ({
       method: "GET",
     });
 
-  const responses = { data: res?.variant_inventories, meta: res?.metadata };
+  const excludedCodes = [
+    "200724_Confirm_Inventory",
+    "170724_Ulike",
+    "170724_Ulike_2",
+    "170724_Ulike_3",
+    "190924_Ulike_W",
+    "IAN00009",
+    "IAN00010",
+  ];
+
+  const responses = {
+    data: res?.variant_inventories.filter(
+      (e) => !excludedCodes.includes(e.trans_object_code)
+    ),
+    meta: res?.metadata,
+  };
   return responses;
 };
 
