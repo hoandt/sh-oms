@@ -7,7 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 
 const WIDTH = 800;
 const HEIGHT = 600;
-const MAX_SIZE = 200 * 1024 * 1024; // 200MB
+const MAX_SIZE = 300 * 1024 * 1024; // 200MB
 const CanvasVideoRecorder = ({
   action,
   handleStream,

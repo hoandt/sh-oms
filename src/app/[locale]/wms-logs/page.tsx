@@ -392,7 +392,7 @@ const Page = () => {
             <DialogHeader>
               {currentUser && (
                 <Timer
-                  handleTimeOut={handleRecordComplete}
+                  handleTimeOut={() => handleRecordComplete()}
                   isTrial={currentUser?.isTrial}
                 />
               )}

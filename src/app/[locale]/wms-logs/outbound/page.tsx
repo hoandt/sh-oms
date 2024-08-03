@@ -411,7 +411,7 @@ const Page = () => {
                 <DialogTitle>Recording {cameraAction.trackingCode}</DialogTitle>
                 {currentUser && (
                   <Timer
-                    handleTimeOut={handleRecordComplete}
+                    handleTimeOut={() => handleRecordComplete()}
                     isTrial={currentUser?.isTrial}
                   />
                 )}
