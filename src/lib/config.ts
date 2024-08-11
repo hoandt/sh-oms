@@ -7,8 +7,8 @@ export const API_ADMIN_ENDPOINT = {
 
 export const defaultImage = "/assets/images/image-placeholder.png";
 export const DURATION_TOAST = 1500;
-
 export const BACKEND_URL = process.env.BACKEND_URL;
+export const SH_BACKEND_URL = process.env.SH_BACKEND_URL;
 export const FRONTEND_URL = process.env.FRONTEND_URL;
 export const NEXT_SUPER_TOKEN = process.env.NEXT_SUPER_TOKEN;
 
@@ -21,10 +21,18 @@ export const MASTER_CUSTOMER_WAREHOUSE =
 export const EXT_API = process.env.NEXT_EXT_API || "http://localhost:3001";
 
 export const BACKEND_ENDPOINT = `${BACKEND_URL}/api`;
+export const SH_BACKEND_ENDPOINT = `${SH_BACKEND_URL}/api`;
+export const SH_SUPER_TOKEN = process.env.SH_SUPER_TOKEN;
 
 export let adminHeadersList = {
   Accept: "*/*",
   Authorization: "Bearer " + NEXT_SUPER_TOKEN,
+  "Content-Type": "application/json",
+};
+
+export let swifthubAdminHeadersList = {
+  Accept: "*/*",
+  Authorization: "Bearer " + SH_SUPER_TOKEN,
   "Content-Type": "application/json",
 };
 

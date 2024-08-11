@@ -28,11 +28,7 @@ const router = [
         icon: <ArrowRightSquare />,
         href: "/wms-logs/inbound",
       },
-      {
-        name: "Inventory",
-        icon: <PanelTopInactiveIcon />,
-        href: "/wms-logs/inventory",
-      },
+
       {
         name: "Packing",
         icon: <BoxIcon />,

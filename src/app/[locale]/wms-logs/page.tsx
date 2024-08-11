@@ -4,7 +4,12 @@ import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { createLogs, deleteLogs, updateLogs } from "@/services";
-import { WMSLog } from "@/types/todo";
+import {
+  FulfillmentOrder,
+  HaravanLineItem,
+  SHOrder,
+  WMSLog,
+} from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
 // import { signOut } from "next-auth/react";
@@ -35,12 +40,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { toInteger } from "lodash";
+import { set, toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 
 import { VideoUploadResponse } from "@api.video/video-uploader";
 import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
 import Timer from "./components/Timer";
+import { getSHOrders } from "@/services/sh-orders";
+import ScanLineItems from "./components/ScanLineItems";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -54,6 +61,7 @@ const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
+  const [SHOrder, setSHOrder] = useState<SHOrder>();
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
   const [video, setVideo] = useState<VideoUploadResponse>();
   const session = useSession() as any;
@@ -176,6 +184,10 @@ const Page = () => {
       type: "packing",
       status: "done",
       user: 1,
+    });
+    getSHOrders({ trackingNumber: code }).then((data) => {
+      //set line items
+      setSHOrder(data.data[0]);
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
@@ -388,39 +400,51 @@ const Page = () => {
           <DialogContent
             onPointerDownOutside={(e) => e.preventDefault()}
             hideCloseButton
+            className="min-w-[520px] h-full p-2"
           >
-            <DialogHeader>
+            <DialogHeader className="m-0 p-0">
               {currentUser && (
                 <Timer
                   handleTimeOut={() => handleRecordComplete()}
                   isTrial={currentUser?.isTrial}
                 />
               )}
-              <DialogDescription className="py-4">
+              <DialogDescription className="py-4 px-1">
                 <div>Quá trình hoàn hàng đang được thực hiện</div>
+                {/* display line items */}
+
+                {SHOrder && (
+                  <ScanLineItems
+                    shOrder={SHOrder}
+                    handleComplete={handleRecordComplete}
+                  />
+                )}
+
                 {/* timer */}
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <div>
               <div className="w-full flex justify-between">
-                <Button
-                  ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
-                  disabled={
-                    log.length > 0 &&
-                    (log[0].attributes as any).transaction !==
-                      cameraAction.trackingCode
-                  }
-                  onClick={() => handleRecordComplete()}
-                >
-                  {"Hoàn thành"}
-                </Button>
+                {!SHOrder && (
+                  <Button
+                    ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
+                    disabled={
+                      log.length > 0 &&
+                      (log[0].attributes as any).transaction !==
+                        cameraAction.trackingCode
+                    }
+                    onClick={() => handleRecordComplete()}
+                  >
+                    {"Hoàn thành"}
+                  </Button>
+                )}
                 <DialogClose tabIndex={-1}>
                   <div className="bg-slate-50 border rounded shadow px-4 py-3 text-sm text-red-500 cursor-pointer inline-flex justify-center items-center">
                     Cancel
                   </div>
                 </DialogClose>
               </div>
-            </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       )}

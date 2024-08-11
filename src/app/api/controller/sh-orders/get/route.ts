@@ -1,5 +1,4 @@
-import auth from "@/auth";
-import { adminHeadersList, BACKEND_ENDPOINT } from "@/lib/config";
+import { SH_BACKEND_ENDPOINT, swifthubAdminHeadersList } from "@/lib/config";
 import { fetchData, standardizeBackendResponse } from "@/lib/helpers";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
@@ -11,13 +10,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const path = urlPath.replace("?endpoint=", "");
 
   let response = await fetchData<BackendDataResponse>(
-    `${BACKEND_ENDPOINT}${path}`,
+    `${SH_BACKEND_ENDPOINT}${path}`,
     {
       method: "GET",
-      headers: adminHeadersList,
+      headers: swifthubAdminHeadersList,
     }
   );
 
-  console.log({ response: `${BACKEND_ENDPOINT}${path}` });
   return NextResponse.json(standardizeBackendResponse(response));
 }

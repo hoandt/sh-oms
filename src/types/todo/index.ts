@@ -699,6 +699,17 @@ export interface WMSLog {
     };
   };
 }
+export interface SHOrder {
+  id: number | string;
+  attributes: {
+    orderNumber: string;
+    trackingNumber: string;
+    fulfillment_status: string;
+    cancelled_status: string;
+    cancelled_at: string;
+    fulfillments: FulfillmentOrder;
+  };
+}
 
 export interface SystemItemCategory {
   name?: string;
@@ -1322,3 +1333,19 @@ export interface WmsLog {
   user?: number;
   status?: string;
 }
+
+export type FulfillmentOrder = {
+  line_items: HaravanLineItem[];
+};
+
+export type HaravanLineItem = {
+  quantity: number;
+  sku: string;
+  barcode: string;
+  name: string;
+  image: {
+    src: {
+      src: string;
+    };
+  };
+};
