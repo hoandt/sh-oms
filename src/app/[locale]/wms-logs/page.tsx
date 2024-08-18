@@ -185,9 +185,12 @@ const Page = () => {
       status: "done",
       user: 1,
     });
+    setSHOrder(undefined);
     getSHOrders({ trackingNumber: code }).then((data) => {
-      //set line items
-      setSHOrder(data.data[0]);
+      //set line items if order is found
+      if (data.data.length) {
+        setSHOrder(data.data[0]);
+      }
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
@@ -393,7 +396,7 @@ const Page = () => {
           defaultOpen
           onOpenChange={() => {
             setCameraAction({ ...cameraAction, action: "idle" });
-            mutateDeleteTransaction.mutate(toInteger(log[0].id));
+            log.length && mutateDeleteTransaction.mutate(toInteger(log[0].id));
             setIsBarcodeFocused((prev) => !prev);
           }}
         >
@@ -410,7 +413,7 @@ const Page = () => {
                 />
               )}
               <DialogDescription className="py-4 px-1">
-                <div>Quá trình hoàn hàng đang được thực hiện</div>
+                <div>Quá trình đóng hàng đang được thực hiện</div>
                 {/* display line items */}
 
                 {SHOrder && (

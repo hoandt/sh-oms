@@ -88,7 +88,10 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
 
   // Display item lines table
   const renderItemLines = () => (
-    <div>
+    <div
+      // overflow y scroll, fade out when overflow
+      className="overflow-y-auto max-h-96 bg-slate-100 rounded-sm relative"
+    >
       <table className="min-w-full bg-white border border-gray-200 rounded-sm  ">
         <thead>
           <tr className="bg-gray-100 border-b">
@@ -100,7 +103,7 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
             </th>
 
             <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Quantity
+              Qty
             </th>
             <th className="p-1 text-left text-sm font-medium text-gray-600">
               Scanned
@@ -129,7 +132,6 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
                   {itemLine.image.src.src ? (
                     <img
                       src={itemLine.image.src.src}
-                      alt={itemLine.name}
                       className="w-24 h-24 object-cover rounded"
                     />
                   ) : (
@@ -138,11 +140,10 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
                     </div>
                   )}
                 </td>
-                <td className="p-3 text-xs text-gray-700 ">
-                  {itemLine.name}
+                <td className="p-3 text-xs text-gray-700 text-ellipsis ">
+                  {`${itemLine.name.substring(0, 50)}...`}
                   <br></br>
-                  {itemLine.sku}
-                  <br></br> {itemLine.barcode}
+                  {itemLine.sku} | {itemLine.barcode}
                 </td>
 
                 <td className="p-3 text-sm text-gray-500">
@@ -157,12 +158,27 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
           })}
         </tbody>
       </table>
+      {/* fixed div fade to white to indicate the end of the div overflow, fixed on scroll */}
+      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-b from-slate-100 to-white"></div>
     </div>
   );
+  // if shOrder.attributes.cancelled_status is true, show cancelled, else show packing
+
+  if (shOrder.attributes.cancelled_status) {
+    return (
+      <div className="mx-auto">
+        <div className="mb-3">
+          <div className="text-red-500 bg-red-100 p-4 rounded">
+            This order has been cancelled.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-2 max-w-3xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-3">
         {shOrder.attributes.cancelled_status ? (
           <div className="text-red-500 bg-red-100">Cancelled</div>
         ) : (
@@ -175,14 +191,14 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
           onChange={(e) => setBarcodeInput(e.target.value)}
           onKeyDown={handleKeyDown}
           ref={inputRef}
-          className="border mt-2 p-2 rounded-sm w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border mt-1 p-2 rounded-sm w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <div className="mt-2">
           Bấm <span className="bg-white border rounded shadow px-1">F4</span> để
           focus.
         </div>
       </div>
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && <div className="text-red-500 mt-1">{error}</div>}
       {renderItemLines()}
       <button
         onClick={() => handleComplete()}
