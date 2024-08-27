@@ -24,7 +24,7 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
     organization,
     page: 1,
     pageSize: 1,
-    code: "SPXVN043831696958",
+    code: shOrder.attributes.trackingNumber,
   });
 
   //if logs has data, setError to the error message
@@ -33,9 +33,9 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
       if (logs.data.length > 0) {
         setIsOrderScanned(true);
         setError(
-          `This ${shOrder.attributes.trackingNumber} (${
+          `Đơn ${shOrder.attributes.trackingNumber} (${
             shOrder.attributes.orderNumber
-          }) is already packed at ${
+          }) đã được đóng gói ${
             // to Vietnam locale
             new Date(logs.data[0].attributes.createdAt).toLocaleString(
               "vi-VN",
@@ -213,32 +213,48 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
 
   return (
     <div className="p-2 max-w-3xl mx-auto">
-      <div className="mb-3">
-        {shOrder.attributes.cancelled_status ? (
-          <div className="text-red-500 bg-red-100">Cancelled</div>
-        ) : (
-          <div className="text-blue-500 bg-blue-100">Packing</div>
-        )}
-        <input
-          type="text"
-          placeholder="Enter barcode"
-          value={barcodeInput}
-          onChange={(e) => setBarcodeInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          ref={inputRef}
-          className="border mt-1 p-2 rounded-sm w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="mt-2">
-          Bấm <span className="bg-white border rounded shadow px-1">F4</span> để
-          focus.
+      {!isOrderScanned && (
+        <div className="mb-3">
+          {shOrder.attributes.cancelled_status ? (
+            <div className="text-red-500 bg-red-100">Cancelled</div>
+          ) : (
+            <div className="text-blue-500 bg-blue-100">Packing</div>
+          )}
+          <input
+            type="text"
+            placeholder="Enter barcode"
+            value={barcodeInput}
+            onChange={(e) => setBarcodeInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            ref={inputRef}
+            className="border mt-1 p-2 rounded-sm w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="mt-2">
+            Bấm <span className="bg-white border rounded shadow px-1">F4</span>{" "}
+            để focus.
+          </div>
         </div>
-      </div>
+      )}
       {error && <div className="text-red-500 mt-1">{error}</div>}
+      {isOrderScanned && (
+        <div className="text-red-500 bg-red-100 p-4 rounded">
+          <button
+            onClick={() => {
+              setIsOrderScanned(false);
+              setError(null);
+            }}
+            className="bg-blue-500 text-white p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Repack
+          </button>
+        </div>
+      )}
 
-      {renderItemLines}
+      {/* display {renderItemLines} if no error and confirm repack */}
+      {!error && !isOrderScanned && renderItemLines}
       <button
         onClick={() => handleComplete()}
-        disabled={!isCompleted}
+        disabled={!isCompleted || isLoading || isOrderScanned}
         className={`my-2 bg-green-500 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
           isCompleted ? "" : "opacity-50 cursor-not-allowed"
         }`}
