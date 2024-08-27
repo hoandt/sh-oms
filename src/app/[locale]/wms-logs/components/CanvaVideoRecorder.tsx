@@ -7,7 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 
 const WIDTH = 800;
 const HEIGHT = 600;
-const MAX_SIZE = 300 * 1024 * 1024; // 200MB
+
 const CanvasVideoRecorder = ({
   action,
   handleStream,
@@ -44,12 +44,12 @@ const CanvasVideoRecorder = ({
             width: {
               min: 480,
               ideal: WIDTH,
-              max: 1920,
+              max: 720,
             },
             height: {
               min: 480,
               ideal: HEIGHT,
-              max: 1080,
+              max: 720,
             },
           },
         };
@@ -118,6 +118,8 @@ const CanvasVideoRecorder = ({
     };
 
     recorder.start();
+    // Update the video size every 1 second
+
     setMediaRecorder(recorder);
   };
 
@@ -132,157 +134,123 @@ const CanvasVideoRecorder = ({
       mediaRecorder.stop();
     }
   };
-  const drawTextOnCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !videoRef.current) {
-      return;
-    }
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      return;
-    }
 
-    // Cache repeated values
-    const videoWidth = videoRef.current.videoWidth;
-    const videoHeight = videoRef.current.videoHeight;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw video frame
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-    // Set text styles
-    ctx.font = "bold 40px Monospace";
-    ctx.textAlign = "left";
-    ctx.lineWidth = 2;
-
-    // Draw tracking code
-    ctx.fillStyle = "#EEE";
-    ctx.strokeStyle = "black";
-    ctx.strokeText(`${action.trackingCode}`, 21, 51); // Adjust position as needed
-    ctx.fillText(`${action.trackingCode}`, 20, 50); // Adjust position as needed
-
-    // Draw current date and time
-    const currentTime = new Date().toLocaleString("en-US", {
-      hour: "numeric",
-      hour12: false,
-      minute: "numeric",
-      second: "numeric",
-    });
-    const currentDate = new Date().toLocaleString("vi-VN", {
-      month: "2-digit",
-      day: "numeric",
-      year: "numeric",
-    });
-    ctx.strokeText(`${currentDate}`, 21, 101); // Top right
-    ctx.fillText(`${currentDate}`, 20, 100); // Top right
-
-    // calculate currentDate width and adjust position for currentTime
-    const currentDateWidth = ctx.measureText(currentDate).width;
-    ctx.strokeText(`${currentTime}`, 21 + currentDateWidth + 20, 101); // Top right
-    ctx.fillText(`${currentTime}`, 20 + currentDateWidth + 20, 100); // Top right
-
-    // calculate canvas height and adjust position for username
-    const canvasHeight = canvas.height;
-    ctx.strokeText(`${currentUser.username}`, 21, canvasHeight - 51); // Bottom left
-    ctx.fillText(`${currentUser.username}`, 20, canvasHeight - 50); // Bottom left
-
-    // Draw trial text if applicable
-    if (currentUser.isTrial) {
-      ctx.font = "bold 48px Arial";
-      ctx.fillStyle = "yellow";
-      ctx.fillText(`Tài khoản dùng thử`, videoWidth / 2, videoHeight / 2); // Center
-    }
-  };
-
-  const handleProgressiveUpload = (blob: Blob) => {
-    const formData = new FormData();
+  const handleProgressiveUpload = async (blob: Blob) => {
     const file = new File([blob], `${action.trackingCode}.webm`, {
       type: "video/webm",
     });
-    formData.append("file", file);
+
+    // Maximum allowed file size (e.g., 300MB)
+    const MAX_SIZE = 300 * 1024 * 1024;
+
+    // Timeout duration (e.g., 30 seconds)
+    const TIMEOUT_DURATION = 60000 * 5;
+
+    //file size in Mb
+
+    // Check if the file size exceeds the maximum allowed size
+    if (file.size > MAX_SIZE) {
+      const fileSizeInMB = (file.size / 1024 / 1024).toFixed(2);
+
+      //confirm download
+      alert(
+        `File quá lớn để upload lên cloud (${fileSizeInMB}MB > ${(
+          MAX_SIZE /
+          1024 /
+          1024
+        ).toFixed(
+          2
+        )}MB). Xin lưu về máy để sau này sử dụng (tối thiểu 30 ngày).`
+      );
+
+      // Download the file locally if it's too large
+      downloadFileLocally(file);
+      // Notify the user that the upload is complete
+      handleUploadingProgress(false, action.trackingCode, {
+        videoId: action.trackingCode,
+        assets: {
+          mp4: "LOCAL",
+        },
+      });
+      return;
+    }
+
+    // Create a FormData object to send the file in the request
+    const formData = new FormData();
     const uniqueUploadId = generateUniqueUploadId();
-    const chunkSize = MAX_SIZE;
-    const totalChunks = Math.ceil(file.size / chunkSize);
-    let currentChunk = 0;
-    const uploadChunk = async (start: number, end: number) => {
-      //return if file is null
-      if (!file) {
-        return;
+    formData.append("file", file);
+    formData.append(
+      "filename",
+      slugify(file.name, {
+        locale: "vi",
+      })
+    );
+    formData.append("organization", `${currentUser.organization.id}`);
+    formData.append("isTrial", `${currentUser.isTrial}`);
+    formData.append("uniqueId", uniqueUploadId);
+    formData.append("mimeType", file.type);
+
+    // Create a timeout promise that rejects after TIMEOUT_DURATION
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Upload timeout")), TIMEOUT_DURATION)
+    );
+
+    try {
+      // Notify the user that the upload is in progress
+      handleUploadingProgress(true, action.trackingCode);
+
+      // Make the HTTP request to upload the file with a timeout
+      const response = (await Promise.race([
+        fetch(`${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/upload`, {
+          method: "POST",
+          body: formData,
+        }),
+        timeoutPromise,
+      ])) as Response;
+
+      console.log(response);
+      // Handle the response from the server
+      if (!response.ok) {
+        throw new Error("File upload failed.");
       }
-      //max 100mb size
-      if (file.size > MAX_SIZE) {
-        console.error("File is too large. Max size is 200MB.");
-        toast({
-          title: "File is too large",
-          description: "Max size is 200MB.",
-          variant: "destructive",
-        });
 
-        return;
-      }
+      const fetchResponse = await response.json();
 
-      const formData = new FormData();
-      formData.append("file", file.slice(start, end));
-      formData.append(
-        "filename",
-        slugify(file.name, {
-          locale: "vi",
-        })
-      );
-      formData.append("organization", `${currentUser.organization.id}`);
-      formData.append("isTrial", `${currentUser.isTrial}`);
-      formData.append("uniqueId", uniqueUploadId);
+      // Notify the user that the upload is complete
+      handleUploadingProgress(false, action.trackingCode, {
+        videoId: action.trackingCode,
+        assets: {
+          mp4: fetchResponse.data.assets.mp4,
+        },
+      });
+      console.info("File upload complete.");
+    } catch (error) {
+      // Log the error and alert the user
+      console.error("Error uploading file:", error);
+      toast({
+        title: "Upload Failed",
+        description:
+          "There was an issue uploading the video. Please try again or download the file.",
+        variant: "destructive",
+      });
 
-      // MIME type
-      formData.append("mimeType", file.type);
-      console.log(
-        `Uploading chunk for uniqueUploadId: ${uniqueUploadId}; start: ${start}, end: ${
-          end - 1
-        }`
-      );
-
-      try {
-        handleUploadingProgress(true, action.trackingCode);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/upload`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Chunk upload failed.");
-        }
-
-        currentChunk++;
-
-        if (currentChunk < totalChunks) {
-          const nextStart = currentChunk * chunkSize;
-          const nextEnd = Math.min(nextStart + chunkSize, file.size);
-          uploadChunk(nextStart, nextEnd);
-        } else {
-          const fetchResponse = await response.json();
-          console.log(fetchResponse.data);
-          handleUploadingProgress(false, action.trackingCode, {
-            videoId: action.trackingCode,
-            assets: {
-              mp4: fetchResponse.data.assets.mp4,
-            },
-          });
-          console.info("File upload complete.");
-        }
-      } catch (error) {
-        console.error("Error uploading chunk:", error);
-      }
-    };
-
-    const start = 0;
-    const end = Math.min(chunkSize, file.size);
-    uploadChunk(start, end);
+      // Download the file locally if an error occurs
+      downloadFileLocally(file);
+    }
   };
+
+  // Helper function to download the file locally
+  const downloadFileLocally = (file: Blob) => {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    document.body.appendChild(a);
+    a.href = url;
+    a.download = `${action.trackingCode}.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  };
+
   return (
     <div>
       <div>
@@ -364,4 +332,12 @@ const generateUniqueUploadId = () => {
   const offsetTimezone = new Date().getTimezoneOffset() * 60 * -1;
   const timestamp = Math.floor(Date.now() / 1000);
   return `uqid-${timestamp + offsetTimezone}`;
+};
+
+const updateVideoSize = (blob: Blob) => {
+  const sizeInMB = (blob.size / 1024 / 1024).toFixed(2);
+  const sizeElement = document.getElementById("videoSize"); // Ensure you have an element with this ID
+  if (sizeElement) {
+    sizeElement.textContent = `Video Size: ${sizeInMB} MB`;
+  }
 };

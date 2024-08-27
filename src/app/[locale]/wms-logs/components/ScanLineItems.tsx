@@ -1,17 +1,53 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { SHOrder } from "@/types/todo";
+import { useGetLogs } from "@/query-keys/logs/query";
 
 interface ScanProps {
   shOrder: SHOrder;
   handleComplete: () => void;
+  organization: number;
 }
 
-function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
+function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
   const [barcodeInput, setBarcodeInput] = useState("");
   const [scannedItems, setScannedItems] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isOrderScanned, setIsOrderScanned] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    data: logs,
+    isLoading,
+    refetch,
+  } = useGetLogs({
+    organization,
+    page: 1,
+    pageSize: 1,
+    code: "SPXVN043831696958",
+  });
+
+  //if logs has data, setError to the error message
+  useEffect(() => {
+    if (logs) {
+      if (logs.data.length > 0) {
+        setIsOrderScanned(true);
+        setError(
+          `This ${shOrder.attributes.trackingNumber} (${
+            shOrder.attributes.orderNumber
+          }) is already packed at ${
+            // to Vietnam locale
+            new Date(logs.data[0].attributes.createdAt).toLocaleString(
+              "vi-VN",
+              {
+                timeZone: "Asia/Ho_Chi_Minh",
+              }
+            )
+          }`
+        );
+      }
+    }
+  }, [logs]);
 
   // Function to handle barcode scanning
   const handleScan = () => {
@@ -87,81 +123,80 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
   const isItemCompleted = (item: any) => item.scannedCount >= item.quantity;
 
   // Display item lines table
-  const renderItemLines = () => (
-    <div
-      // overflow y scroll, fade out when overflow
-      className="overflow-y-auto max-h-96 bg-slate-100 rounded-sm relative"
-    >
-      <table className="min-w-full bg-white border border-gray-200 rounded-sm  ">
-        <thead>
-          <tr className="bg-gray-100 border-b">
-            <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Image
-            </th>
-            <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Name
-            </th>
+  const renderItemLines = useMemo(() => {
+    return (
+      <div className="overflow-y-auto max-h-96 bg-slate-100 rounded-sm relative">
+        <table className="min-w-full bg-white border border-gray-200 rounded-sm">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              <th className="p-1 text-left text-sm font-medium text-gray-600">
+                Image
+              </th>
+              <th className="p-1 text-left text-sm font-medium text-gray-600">
+                Name
+              </th>
+              <th className="p-1 text-left text-sm font-medium text-gray-600">
+                Qty
+              </th>
+              <th className="p-1 text-left text-sm font-medium text-gray-600">
+                Scanned
+              </th>
+              <th className="p-1 text-left text-sm font-medium text-gray-600">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {shOrder.attributes.fulfillments.line_items.map((itemLine) => {
+              const scannedItem = scannedItems.find(
+                (item) => item.sku === itemLine.sku
+              );
+              const scannedCount = scannedItem ? scannedItem.scannedCount : 0;
+              const isCompleted = isItemCompleted({
+                ...itemLine,
+                scannedCount,
+              });
 
-            <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Qty
-            </th>
-            <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Scanned
-            </th>
-            <th className="p-1 text-left text-sm font-medium text-gray-600">
-              Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {shOrder.attributes.fulfillments.line_items.map((itemLine) => {
-            const scannedItem = scannedItems.find(
-              (item) => item.sku === itemLine.sku
-            );
-            const scannedCount = scannedItem ? scannedItem.scannedCount : 0;
-            const isCompleted = isItemCompleted({ ...itemLine, scannedCount });
-
-            return (
-              <tr
-                key={itemLine.sku}
-                className={`border-b ${
-                  isCompleted ? "bg-green-50" : "bg-white"
-                }`}
-              >
-                <td className="p-1">
-                  {itemLine.image.src.src ? (
-                    <img
-                      src={itemLine.image.src.src}
-                      className="w-24 h-24 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gray-200 flex items-center justify-center text-gray-500 rounded">
-                      No Image
-                    </div>
-                  )}
-                </td>
-                <td className="p-3 text-xs text-gray-700 text-ellipsis ">
-                  {`${itemLine.name.substring(0, 50)}...`}
-                  <br></br>
-                  {itemLine.sku} | {itemLine.barcode}
-                </td>
-
-                <td className="p-3 text-sm text-gray-500">
-                  {itemLine.quantity}
-                </td>
-                <td className="p-3 text-sm text-gray-700">{scannedCount}</td>
-                <td className="p-3 text-sm font-medium text-gray-500">
-                  {isCompleted ? "Completed" : "Pending"}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {/* fixed div fade to white to indicate the end of the div overflow, fixed on scroll */}
-      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-b from-slate-100 to-white"></div>
-    </div>
-  );
+              return (
+                <tr
+                  key={itemLine.sku}
+                  className={`border-b ${
+                    isCompleted ? "bg-green-50" : "bg-white"
+                  }`}
+                >
+                  <td className="p-1">
+                    {itemLine.image.src.src ? (
+                      <img
+                        src={itemLine.image.src.src}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 bg-gray-200 flex items-center justify-center text-gray-500 rounded">
+                        No Image
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3 text-xs text-gray-700 text-ellipsis">
+                    {`${itemLine.name.substring(0, 50)}...`}
+                    <br />
+                    {itemLine.sku} | {itemLine.barcode}
+                  </td>
+                  <td className="p-3 text-sm text-gray-500">
+                    {itemLine.quantity}
+                  </td>
+                  <td className="p-3 text-sm text-gray-700">{scannedCount}</td>
+                  <td className="p-3 text-sm font-medium text-gray-500">
+                    {isCompleted ? "Completed" : "Pending"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="absolute bottom-0 w-full h-4 bg-gradient-to-b from-slate-100 to-white"></div>
+      </div>
+    );
+  }, [shOrder, scannedItems]);
   // if shOrder.attributes.cancelled_status is true, show cancelled, else show packing
 
   if (shOrder.attributes.cancelled_status) {
@@ -199,7 +234,8 @@ function ScanBarcode({ shOrder, handleComplete }: ScanProps) {
         </div>
       </div>
       {error && <div className="text-red-500 mt-1">{error}</div>}
-      {renderItemLines()}
+
+      {renderItemLines}
       <button
         onClick={() => handleComplete()}
         disabled={!isCompleted}

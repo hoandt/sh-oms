@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useSidebarContext } from "@/provider/SidebarProvider";
-import { CircleDashedIcon, CoinsIcon, ConeIcon, FileVideo } from "lucide-react";
+import { FileVideo, PlayCircleIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -69,6 +69,18 @@ export function CommonTopbar() {
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
         <div className="relative flex flex-1"></div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
+          {/* https://www.youtube.com/watch?v=zmuFK87XQy0 */}
+          {/* Youtube click action */}
+          <div
+            className="cursor-pointer flex bg-blue-100 text-blue-800 gap-2 text-sm px-2 py-1 rounded-sm  align-middle"
+            onClick={() =>
+              window.open("https://www.youtube.com/watch?v=zmuFK87XQy0")
+            }
+          >
+            <PlayCircleIcon className="w-4 text-gray-500" />
+            hướng dẫn gửi khiếu nại
+          </div>
+
           {/* display usage limit. For example: 10/2000 credits with style  */}
           <div className="border gap-1 text-sm rounded shadow-sm text-gray-500 font-semibold px-2 inline-flex justify-center items-center">
             {isTrial && (
@@ -78,7 +90,6 @@ export function CommonTopbar() {
               </span>
             )}
           </div>
-
           <Popover>
             <PopoverTrigger asChild className="cursor-pointer">
               <span className="hidden lg:flex lg:items-center">
@@ -127,3 +138,11 @@ export function CommonTopbar() {
     </div>
   );
 }
+
+const updateVideoSize = (blob: Blob) => {
+  const sizeInMB = (blob.size / 1024 / 1024).toFixed(2);
+  const sizeElement = document.getElementById("videoSize"); // Ensure you have an element with this ID
+  if (sizeElement) {
+    sizeElement.textContent = `Video Size: ${sizeInMB} MB`;
+  }
+};

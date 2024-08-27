@@ -52,8 +52,6 @@ const page = () => {
     status,
   });
 
-  console.log({ status });
-
   const [isLoadingURL, setIsLoading] = React.useState(false);
 
   const handleDownload = async (log: WMSLog) => {

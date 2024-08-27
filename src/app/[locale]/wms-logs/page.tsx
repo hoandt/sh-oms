@@ -4,15 +4,10 @@ import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { createLogs, deleteLogs, updateLogs } from "@/services";
-import {
-  FulfillmentOrder,
-  HaravanLineItem,
-  SHOrder,
-  WMSLog,
-} from "@/types/todo";
+import { SHOrder, WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
-// import { signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 import {
   AlertDialog,
@@ -25,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCheckIcon, PlayCircle, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -35,9 +30,7 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { set, toInteger } from "lodash";
@@ -129,6 +122,16 @@ const Page = () => {
       });
       setLog((prev) => [newData, ...prev]);
     },
+    onError(error) {
+      //alert
+      toast({
+        duration: DURATION_TOAST,
+        title: "Lỗi",
+        description: "Không thể thêm giao dịch",
+        variant: "destructive",
+      });
+      signOut();
+    },
   });
 
   const handleUploadingProgress = (
@@ -183,7 +186,7 @@ const Page = () => {
       transaction: code,
       type: "packing",
       status: "done",
-      user: 1,
+      user: `${currentUser?.id}`,
     });
     setSHOrder(undefined);
     getSHOrders({ trackingNumber: code }).then((data) => {
@@ -416,9 +419,10 @@ const Page = () => {
                 <div>Quá trình đóng hàng đang được thực hiện</div>
                 {/* display line items */}
 
-                {SHOrder && (
+                {SHOrder && currentUser && (
                   <ScanLineItems
                     shOrder={SHOrder}
+                    organization={currentUser.organization.id}
                     handleComplete={handleRecordComplete}
                   />
                 )}
