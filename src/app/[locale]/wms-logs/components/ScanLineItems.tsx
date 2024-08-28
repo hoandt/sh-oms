@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { SHOrder } from "@/types/todo";
 import { useGetLogs } from "@/query-keys/logs/query";
+import { getLogs } from "@/services";
 
 interface ScanProps {
   shOrder: SHOrder;
@@ -16,38 +17,30 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
   const [isOrderScanned, setIsOrderScanned] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    data: logs,
-    isLoading,
-    refetch,
-  } = useGetLogs({
-    organization,
-    page: 1,
-    pageSize: 1,
-    code: shOrder.attributes.trackingNumber,
-  });
+  const [logs, setLogs] = useState<any>(null);
 
   //if logs has data, setError to the error message
   useEffect(() => {
-    if (logs) {
-      if (logs.data.length > 0) {
-        setIsOrderScanned(true);
-        setError(
-          `Đơn ${shOrder.attributes.trackingNumber} (${
-            shOrder.attributes.orderNumber
-          }) đã được đóng gói ${
-            // to Vietnam locale
-            new Date(logs.data[0].attributes.createdAt).toLocaleString(
-              "vi-VN",
-              {
-                timeZone: "Asia/Ho_Chi_Minh",
-              }
-            )
-          }`
-        );
-      }
-    }
-  }, [logs]);
+    getLogs({
+      organization: organization,
+      transaction: shOrder.attributes.trackingNumber,
+      status: undefined,
+      page: 1,
+      pageSize: 1,
+    }).then((data) => {
+      setIsOrderScanned(true);
+      setError(
+        `Đơn ${shOrder.attributes.trackingNumber} (${
+          shOrder.attributes.orderNumber
+        }) đã được đóng gói ${
+          // to Vietnam locale
+          new Date(data.data[0].attributes.createdAt).toLocaleString("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh",
+          })
+        }`
+      );
+    });
+  }, []);
 
   // Function to handle barcode scanning
   const handleScan = () => {
@@ -251,10 +244,10 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
       )}
 
       {/* display {renderItemLines} if no error and confirm repack */}
-      {!error && !isOrderScanned && renderItemLines}
+      {!isOrderScanned && renderItemLines}
       <button
         onClick={() => handleComplete()}
-        disabled={!isCompleted || isLoading || isOrderScanned}
+        disabled={!isCompleted || isOrderScanned}
         className={`my-2 bg-green-500 text-white p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
           isCompleted ? "" : "opacity-50 cursor-not-allowed"
         }`}
