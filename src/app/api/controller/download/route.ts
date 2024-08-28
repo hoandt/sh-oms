@@ -37,6 +37,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       disputed: true,
       originalUrl: logData.attributes.videoUrl,
     },
+    status: "downloaded",
   });
 
   return NextResponse.json({ url: log.data.videoUrl });
