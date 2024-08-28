@@ -171,6 +171,7 @@ const CanvasVideoRecorder = ({
         assets: {
           mp4: "LOCAL",
         },
+        description: "error",
       });
       return;
     }
@@ -222,9 +223,17 @@ const CanvasVideoRecorder = ({
         assets: {
           mp4: fetchResponse.data.assets.mp4,
         },
+        description: "packed",
       });
       console.info("File upload complete.");
     } catch (error) {
+      handleUploadingProgress(false, action.trackingCode, {
+        videoId: action.trackingCode,
+        assets: {
+          mp4: "LOCAL",
+        },
+        description: "error",
+      });
       // Log the error and alert the user
       console.error("Error uploading file:", error);
       toast({

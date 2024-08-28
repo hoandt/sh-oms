@@ -68,8 +68,16 @@ const Page = () => {
     isSaveToLocal: true,
   });
   const mutateUpdateLog = useMutation({
-    mutationFn: ({ id, videoUrl }: { id: number; videoUrl: string }) => {
-      return updateLogs({ id, videoUrl });
+    mutationFn: ({
+      id,
+      videoUrl,
+      status,
+    }: {
+      id: number;
+      videoUrl: string;
+      status: string;
+    }) => {
+      return updateLogs({ id, videoUrl, status });
     },
     onSuccess: (data: any) => {
       // Handle success if needed
@@ -84,6 +92,7 @@ const Page = () => {
       mutateUpdateLog.mutate({
         id: toInteger(uploadedLog?.id),
         videoUrl: video.assets?.mp4 || "",
+        status: video.description || "packed",
       });
     }
     // warning user alert if the video is not uploaded and user try to close the tab or navigate away
@@ -150,6 +159,7 @@ const Page = () => {
               ...l,
               isUploading: uploading,
               videoUrl: video?.assets?.mp4,
+              status: video?.description,
             };
           }
           return l;
@@ -185,7 +195,7 @@ const Page = () => {
       organization: currentUser?.organization.id,
       transaction: code,
       type: "packing",
-      status: "done",
+      status: "packing",
       user: `${currentUser?.id}`,
     });
     setSHOrder(undefined);

@@ -140,11 +140,14 @@ const page = () => {
   const columns = useMemo(() => {
     return [
       {
-        accessorKey: "id",
-        width: 60,
-        header: () => <div>{"ID"}</div>,
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        accessorKey: "user",
+        header: () => <div className="">{"Packer ID"}</div>,
+        cell: ({ row }) => {
+          const user = row.original.attributes.user;
+          return <div>{user}</div>;
+        },
         enableSorting: false,
+        enableHiding: false,
       },
       {
         accessorKey: "transaction",
@@ -163,16 +166,6 @@ const page = () => {
         cell: ({ row }) => {
           const date = row.original.attributes.createdAt;
           return <div>{format(date, "HH:mm dd/MM/yyyy")}</div>;
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "user",
-        header: () => <div className="">{"Station"}</div>,
-        cell: ({ row }) => {
-          const user = row.original.attributes.user;
-          return <div>{user}</div>;
         },
         enableSorting: false,
         enableHiding: false,

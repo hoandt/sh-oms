@@ -31,10 +31,12 @@ export const getLogs = async ({ options }: { options: QueryOptions }) => {
 export const updateLogs = async ({
   id,
   videoUrl,
+  status,
   history,
 }: {
   id: number;
   videoUrl: string;
+  status: string;
   history?: WMSLogHistory;
 }) => {
   try {
@@ -46,6 +48,7 @@ export const updateLogs = async ({
         data: {
           videoUrl,
           history,
+          status,
         },
       },
       {

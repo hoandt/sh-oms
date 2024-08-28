@@ -22,6 +22,7 @@ export const getLogs = async ({
   status,
   page = 1,
   pageSize = 15,
+  type,
 }: any) => {
   const endpoint = "/wms-logs";
 
@@ -38,6 +39,11 @@ export const getLogs = async ({
             id: {
               $eq: organization,
             },
+          },
+        },
+        {
+          status: {
+            $eq: type || undefined,
           },
         },
         {
@@ -99,10 +105,11 @@ export const deleteLogs = async ({ id }: any) => {
   return res;
 };
 
-export const updateLogs = async ({ id, videoUrl }: any) => {
+export const updateLogs = async ({ id, videoUrl, status }: any) => {
   const body = {
     id,
     videoUrl,
+    status,
   };
 
   const ENDPOINT = `/api/controller/logs/update`;

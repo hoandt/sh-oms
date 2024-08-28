@@ -3,7 +3,11 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const logData = (await req.json()) as { id: number; videoUrl: string };
+    const logData = (await req.json()) as {
+      id: number;
+      videoUrl: string;
+      status: string;
+    };
 
     const response = await updateLogs(logData);
 

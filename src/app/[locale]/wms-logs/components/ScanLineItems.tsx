@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { SHOrder } from "@/types/todo";
-import { useGetLogs } from "@/query-keys/logs/query";
 import { getLogs } from "@/services";
 
 interface ScanProps {
@@ -17,24 +16,28 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
   const [isOrderScanned, setIsOrderScanned] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [logs, setLogs] = useState<any>(null);
-
   //if logs has data, setError to the error message
   useEffect(() => {
+    if (isOrderScanned) return;
+
     getLogs({
-      organization: organization,
-      transaction: shOrder.attributes.trackingNumber,
+      organization,
+      code: shOrder.attributes.trackingNumber,
       status: undefined,
       page: 1,
-      pageSize: 1,
+      pageSize: 5,
+      type: "packed",
     }).then((data) => {
+      if (data.data.length === 0) return;
       setIsOrderScanned(true);
       setError(
         `Đơn ${shOrder.attributes.trackingNumber} (${
           shOrder.attributes.orderNumber
         }) đã được đóng gói ${
           // to Vietnam locale
-          new Date(data.data[0].attributes.createdAt).toLocaleString("vi-VN", {
+          new Date(
+            data?.data[data.data.length - 1].attributes.createdAt
+          ).toLocaleString("vi-VN", {
             timeZone: "Asia/Ho_Chi_Minh",
           })
         }`
