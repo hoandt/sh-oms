@@ -14,6 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           disputed: true,
           originalUrl: cloudinaryReq.url,
         },
+        status: "packed",
       });
     }
   } catch (error) {
