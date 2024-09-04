@@ -10,6 +10,7 @@ const QrCodeGenerator = () => {
   const [align, setAlign] = useState<string>("left");
   const [verticalAlign, setVerticalAlign] = useState<string>("top");
   const [cellMargin, setCellMargin] = useState<number>(0);
+  const [CellPadding, setCellPadding] = useState<number>(0);
   const [borderStyle, setBorderStyle] = useState<string>("dotted");
   const [borderThickness, setBorderThickness] = useState<number>(1);
   const [fixedWidth, setFixedWidth] = useState<number>(0);
@@ -38,6 +39,7 @@ const QrCodeGenerator = () => {
         align,
         verticalAlign,
         cellMargin,
+        CellPadding,
         borderStyle,
         borderThickness,
         fixedWidth,
@@ -59,6 +61,7 @@ const QrCodeGenerator = () => {
     setAlign("left");
     setVerticalAlign("top");
     setCellMargin(0);
+    setCellPadding(0);
     setBorderStyle("dotted");
     setBorderThickness(1);
     setFixedWidth(0);
@@ -79,6 +82,7 @@ const QrCodeGenerator = () => {
       setAlign(settings.align);
       setVerticalAlign(settings.verticalAlign);
       setCellMargin(settings.cellMargin);
+      setCellPadding(settings.cellPadding);
       setBorderStyle(settings.borderStyle);
       setBorderThickness(settings.borderThickness);
       setFixedWidth(settings.fixedWidth);
@@ -152,6 +156,11 @@ const QrCodeGenerator = () => {
                   label: "Cell Margin",
                   value: cellMargin,
                   setter: setCellMargin,
+                },
+                {
+                  label: "Cell Padding",
+                  value: CellPadding,
+                  setter: setCellPadding,
                 },
 
                 {
@@ -301,6 +310,7 @@ const QrCodeGenerator = () => {
                   alignItems: verticalAlign,
                   width: fixedWidth > 0 ? `${fixedWidth}px` : "auto",
                   height: fixedHeight > 0 ? `${fixedHeight}px` : "auto",
+                  padding: `${CellPadding}px`,
                 }}
               >
                 <div className="flex flex-col">
