@@ -13,6 +13,7 @@ import {
   BoxIcon,
   HandIcon,
   PanelTopInactiveIcon,
+  Printer,
   RotateCcwIcon,
   SearchIcon,
   SettingsIcon,
@@ -50,6 +51,11 @@ const router = [
         icon: <SearchIcon />,
         href: "/history",
       },
+      {
+        name: "Print",
+        icon: <Printer />,
+        href: "/print",
+      },
     ],
   },
   {
@@ -80,12 +86,12 @@ export function CommonSidebar() {
         exit={{ width: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          "fixed hidden lg:inset-y-0 lg:left-0 z-50 sm:block lg:w-18  overflow-y-auto bg-gray-900 lg:pb-4 pb-20 rounded-b-md",
-          toggleSidebar && "block w-18 "
+          "fixed  hidden lg:inset-y-0 lg:left-0 z-50 sm:block lg:w-18  overflow-y-auto bg-gray-900 lg:pb-4 pb-20 rounded-b-md",
+          toggleSidebar && "block w-18 print:hidden"
         )}
       >
         <div
-          className="flex h-16 shrink-0 items-center justify-center"
+          className="flex h-16 shrink-0 items-center justify-center print:hidden"
           onClick={handleExpand}
         >
           <img
@@ -94,7 +100,7 @@ export function CommonSidebar() {
             alt="SwiftHub"
           />
         </div>
-        <nav className="mt-8">
+        <nav className="mt-8 print:hidden">
           <ul role="list" className="flex flex-col items-center gap-2 p-3">
             {router.map((value, index) => {
               return (
