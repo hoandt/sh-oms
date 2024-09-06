@@ -4,6 +4,7 @@ import { CameraActionPayload } from "../page";
 import { Switch } from "@/components/ui/switch";
 import slugify from "slugify";
 import { toast } from "@/components/ui/use-toast";
+import { signOut, useSession } from "next-auth/react";
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -29,10 +30,26 @@ const CanvasVideoRecorder = ({
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
+  const [token, setToken] = useState<string | null>(null);
 
+  //get user session
+  const { data: session } = useSession() as any;
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
 
   useEffect(() => {
+    //check current user currentUser.blocked === true, sign out
+
+    if (currentUser.blocked) {
+      //sign out
+      // router.push("/sign-in");
+      signOut();
+    } else {
+      //get token
+      if (session) {
+        setToken(session.jwt);
+      }
+    }
+
     const startCamera = async () => {
       try {
         const constraints: MediaStreamConstraints = {
@@ -177,6 +194,12 @@ const CanvasVideoRecorder = ({
     }
 
     // Create a FormData object to send the file in the request
+
+    if (!token) {
+      throw new Error("Token is null");
+    }
+    //if current user is trial, only download the file
+
     const formData = new FormData();
     const uniqueUploadId = generateUniqueUploadId();
     formData.append("file", file);
@@ -186,6 +209,7 @@ const CanvasVideoRecorder = ({
         locale: "vi",
       })
     );
+    formData.append("token", `${token}.${currentUser.organization.id}`);
     formData.append("organization", `${currentUser.organization.id}`);
     formData.append("isTrial", `${currentUser.isTrial}`);
     formData.append("uniqueId", uniqueUploadId);
@@ -200,7 +224,6 @@ const CanvasVideoRecorder = ({
       // Notify the user that the upload is in progress
       handleUploadingProgress(true, action.trackingCode);
 
-      // Make the HTTP request to upload the file with a timeout
       const response = (await Promise.race([
         fetch(`${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/upload`, {
           method: "POST",
