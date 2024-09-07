@@ -19,7 +19,14 @@ export const useGetLogs = ({
 }: IGetLogs) => {
   const query = useQuery({
     queryKey: logQueryKeys.getLogs({ pageParam: page, code, status }),
-    queryFn: () => getLogs({ organization, code, page, pageSize, status }),
+    queryFn: () =>
+      getLogs({
+        organization: `${organization}`,
+        code,
+        page,
+        pageSize,
+        status,
+      }),
   });
   return query;
 };
