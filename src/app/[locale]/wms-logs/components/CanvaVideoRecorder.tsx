@@ -37,16 +37,20 @@ const CanvasVideoRecorder = ({
   const canvasRef = useRef<HTMLCanvasElement>(null); // Specify HTMLCanvasElement type
 
   useEffect(() => {
-    //check current user currentUser.blocked === true, sign out
+    //decode session.jwt to get user info
+    const jwt = session?.jwt;
+    const exp = jwt ? JSON.parse(atob(jwt.split(".")[1])).exp : 0;
+    //token expired if 15 days remaining
+    if (exp - Date.now() / 1000 < 864000) {
+      signOut();
+    }
 
     if (currentUser.blocked) {
-      //sign out
-      // router.push("/sign-in");
       signOut();
     } else {
       //get token
       if (session) {
-        setToken(session.jwt);
+        setToken(jwt);
       }
     }
 
