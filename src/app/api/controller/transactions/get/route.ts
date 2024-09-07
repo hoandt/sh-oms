@@ -18,6 +18,5 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
   );
 
-  console.log({ response: `${BACKEND_ENDPOINT}${path}` });
   return NextResponse.json(standardizeBackendResponse(response));
 }

@@ -7,8 +7,36 @@ export const getSHOrders = async ({
   trackingNumber,
   page = 1,
   pageSize = 15,
+  platform = "haravan",
 }: any) => {
-  const endpoint = "/haravan-orders";
+  //switch platform
+  let endpoint = "";
+  switch (platform) {
+    case "haravan":
+      endpoint = "/haravan-orders";
+      break;
+    case "shopify":
+      endpoint = "/shopify-orders";
+      break;
+    case "shopee":
+      endpoint = "/shopee-orders";
+      break;
+    case "tiki":
+      endpoint = "/tiki-orders";
+      break;
+    case "lazada":
+      endpoint = "/lazada-orders";
+      break;
+    case "sendo":
+      endpoint = "/sendo-orders";
+      break;
+    case "shopee":
+      endpoint = "/shopee-orders";
+      break;
+    default:
+      endpoint = "/haravan-orders";
+      break;
+  }
 
   const params: QueryOptions = {
     filters: {

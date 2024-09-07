@@ -23,7 +23,14 @@ export const getLogs = async ({
   page = 1,
   pageSize = 15,
   type,
-}: any) => {
+}: {
+  organization: string;
+  code?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+  type?: string;
+}) => {
   const endpoint = "/wms-logs";
 
   const params: QueryOptions = {

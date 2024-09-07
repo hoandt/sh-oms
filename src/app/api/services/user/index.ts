@@ -145,7 +145,6 @@ export const deleteUser = async ({ id }: { id: number }) => {
         console.log(">>>", axiosError.response.data);
       } else if (axiosError.request) {
         // The request was made but no response was received
-        console.log("axiosError.request");
       } else {
         // Something happened in setting up the request that triggered an Error
         console.log("Error", "axiosError.message");

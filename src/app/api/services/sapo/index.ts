@@ -14,7 +14,6 @@ const fetchCookies = async () => {
 export const fetchInventoriesSapo = async (path: string) => {
   const cookie = await fetchCookies();
 
-  console.log({first: `https://swifthub2.mysapogo.com/admin/variants/search.json${path}`})
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/variants/search.json${path}`,
     {
@@ -32,7 +31,7 @@ export const fetchInventoriesSapo = async (path: string) => {
 
 export const fetchInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/products/${path}.json`,
     {
@@ -50,7 +49,7 @@ export const fetchInventorySapo = async (path: string) => {
 
 export const fetchReportInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
-  
+
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/reports/inventories/variants/${path}`,
     {

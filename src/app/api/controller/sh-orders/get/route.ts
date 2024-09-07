@@ -1,8 +1,5 @@
 import { SH_BACKEND_ENDPOINT, swifthubAdminHeadersList } from "@/lib/config";
 import { fetchData, standardizeBackendResponse } from "@/lib/helpers";
-import { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {

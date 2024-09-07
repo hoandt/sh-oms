@@ -3,7 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import { createLogs, deleteLogs, updateLogs } from "@/services";
+import {
+  createLogs,
+  deleteLogs,
+  getLogs,
+  getTransactions,
+  updateLogs,
+} from "@/services";
 import { SHOrder, WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -41,6 +47,7 @@ import CanvasVideoRecorder from "./components/CanvaVideoRecorder";
 import Timer from "./components/Timer";
 import { getSHOrders } from "@/services/sh-orders";
 import ScanLineItems from "./components/ScanLineItems";
+import TransactionTable from "./components/TransactionTable";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -55,6 +62,7 @@ const Page = () => {
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
   const [SHOrder, setSHOrder] = useState<SHOrder>();
+  const [transactions, setTransactions] = useState<WMSLog[]>([]);
   const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
   const [video, setVideo] = useState<VideoUploadResponse>();
   const session = useSession() as any;
@@ -188,6 +196,7 @@ const Page = () => {
   const handleRecordComplete = () => {
     setCameraAction({ ...cameraAction, action: "stop" });
     setIsBarcodeFocused((prev) => !prev);
+    setTransactions([]);
   };
 
   const handleScan = (code: string) => {
@@ -203,6 +212,14 @@ const Page = () => {
       //set line items if order is found
       if (data.data.length) {
         setSHOrder(data.data[0]);
+      }
+    });
+    getLogs({
+      organization: currentUser!.organization.id.toString(),
+      code: code,
+    }).then((data) => {
+      if (data.data.length) {
+        setTransactions(data.data);
       }
     });
     setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
@@ -411,6 +428,7 @@ const Page = () => {
             setCameraAction({ ...cameraAction, action: "idle" });
             log.length && mutateDeleteTransaction.mutate(toInteger(log[0].id));
             setIsBarcodeFocused((prev) => !prev);
+            setTransactions([]);
           }}
         >
           <DialogContent
@@ -435,6 +453,10 @@ const Page = () => {
                     organization={currentUser.organization.id}
                     handleComplete={handleRecordComplete}
                   />
+                )}
+
+                {!SHOrder && transactions.length > 0 && (
+                  <TransactionTable transactions={transactions} />
                 )}
 
                 {/* timer */}
