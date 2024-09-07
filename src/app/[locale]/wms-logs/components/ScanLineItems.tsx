@@ -21,7 +21,7 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
     if (isOrderScanned) return;
 
     getLogs({
-      organization,
+      organization: organization.toString(),
       code: shOrder.attributes.trackingNumber,
       status: undefined,
       page: 1,
