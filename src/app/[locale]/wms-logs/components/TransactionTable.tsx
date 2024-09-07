@@ -13,7 +13,7 @@ const TransactionTable = ({ transactions }: { transactions: WMSLog[] }) => {
   return (
     <div className="min h-[400px] overflow-y-auto py-2">
       {/* Conditionally render the confirm button if transactions length > 1 */}
-      {transactions.length > 1 && !confirmed && (
+      {transactions.length > 0 && !confirmed && (
         <div className="flex justify-center align-middle items-center py-4">
           <div className="bg-red-50 text-red-500 px-4 ">
             Đã có {transactions.length} giao dịch đã được thực hiện trước đó.
