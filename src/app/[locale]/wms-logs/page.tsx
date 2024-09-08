@@ -3,13 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import BarcodeScanForm from "./components/BarcodeScanner";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import {
-  createLogs,
-  deleteLogs,
-  getLogs,
-  getTransactions,
-  updateLogs,
-} from "@/services";
+import { createLogs, deleteLogs, getLogs, updateLogs } from "@/services";
 import { SHOrder, WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -39,7 +33,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { set, toInteger } from "lodash";
+import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
 
 import { VideoUploadResponse } from "@api.video/video-uploader";
@@ -91,6 +85,7 @@ const Page = () => {
       // Handle success if needed
     },
   });
+
   useEffect(() => {
     if (video && video.assets?.mp4) {
       // find the log with the same tracking code and update the video url

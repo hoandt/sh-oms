@@ -11,6 +11,7 @@ import {
   ArrowLeftSquare,
   ArrowRightSquare,
   BoxIcon,
+  FileText,
   HandIcon,
   PanelTopInactiveIcon,
   Printer,
@@ -35,15 +36,16 @@ const router = [
         icon: <BoxIcon />,
         href: "/wms-logs",
       },
-      {
-        name: "Outbound",
-        icon: <ArrowLeftSquare />,
-        href: "/wms-logs/outbound",
-      },
+
       {
         name: "Return",
         icon: <RotateCcwIcon />,
         href: "/wms-logs/returns",
+      },
+      {
+        name: "Outbound",
+        icon: <FileText />,
+        href: "/wms-logs/outbound",
       },
 
       {

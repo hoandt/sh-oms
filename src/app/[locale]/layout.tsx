@@ -1,3 +1,4 @@
+import VersionManager from "@/components/common/custom/VersionManager";
 import { cn } from "../../lib/utils";
 import "../../styles/globals.css";
 import { CommonLayout } from "@/components/common/layout/CommonLayout";
@@ -48,6 +49,7 @@ export default function LocaleLayout({ children, params: { locale } }: Props) {
               <SidebarProvider>
                 <CommonLayout>
                   {children}
+                  <VersionManager />
                   <Toaster />
                 </CommonLayout>
               </SidebarProvider>

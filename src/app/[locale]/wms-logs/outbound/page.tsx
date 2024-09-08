@@ -2,11 +2,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import { createLogs, deleteLogs, updateLogs } from "@/services";
+import { createLogs, deleteLogs, getLogs, updateLogs } from "@/services";
 import { WMSLog } from "@/types/todo";
 import { format } from "date-fns";
 import Link from "next/link";
-// import { signOut } from "next-auth/react";
 
 import {
   AlertDialog,
@@ -23,50 +22,22 @@ import { Trash2Icon } from "lucide-react";
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toInteger } from "lodash";
 import { cn } from "@/lib/utils";
-import Timer from "./../components/Timer";
-import { VideoUploadResponse } from "@api.video/video-uploader";
-import CanvasVideoRecorder from "../components/CanvaVideoRecorder";
+
 import BarcodeScanForm from "../components/BarcodeScanner";
-import SelectCameraDevice from "../components/Webcam";
+import PostsList from "@/components/common/custom/PostList";
 
-type CameraAction = "start" | "stop" | "idle";
-export type CameraActionPayload = {
-  deviceId: string;
-  action: CameraAction;
-  trackingCode: string;
-  log: VideosLog[];
-  isSaveToLocal: boolean;
-};
 const Page = () => {
-  const [scanActive, setScanActive] = useState<boolean>(false);
-  const [disableHandleDialog, setDisableHandleDialog] = useState(true);
-
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
-  const finishRecordBtn = useRef<HTMLButtonElement | undefined>();
-  const [video, setVideo] = useState<VideoUploadResponse>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const session = useSession() as any;
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
   const [log, setLog] = useState<VideosLog[]>([]);
-  const [cameraAction, setCameraAction] = useState<CameraActionPayload>({
-    deviceId: "",
-    action: "idle",
-    trackingCode: "",
-    log,
-    isSaveToLocal: true,
-  });
+  const [transactions, setTransactions] = useState<WMSLog[]>([]);
+
   const mutateUpdateLog = useMutation({
     mutationFn: ({ id, videoUrl }: { id: number; videoUrl: string }) => {
       return updateLogs({ id, videoUrl });
@@ -75,51 +46,16 @@ const Page = () => {
       // Handle success if needed
     },
   });
-  useEffect(() => {
-    if (video && video.assets?.mp4) {
-      // find the log with the same tracking code and update the video url
-      const uploadedLog = log.find(
-        (l) => (l.attributes as any).transaction === video.videoId
-      );
-      mutateUpdateLog.mutate({
-        id: toInteger(uploadedLog?.id),
-        videoUrl: video.assets?.mp4 || "",
-      });
-    }
-    // warning user alert if the video is not uploaded and user try to close the tab or navigate away
-    if (video && !video.assets?.mp4) {
-      window.onbeforeunload = function () {
-        return "Bạn có chắc chắn muốn rời khỏi trang này?";
-      };
-    }
-  }, [video]);
 
   useEffect(() => {
+    //focus on barcode scanner input
+    setIsBarcodeFocused(true);
     if (session.data) {
       const user = session.data.userWithRole as UserWithRole;
 
       setCurrentUser(user);
     }
   }, [session]);
-  useEffect(() => {
-    cameraAction.action === "start" && finishRecordBtn.current?.focus();
-
-    if (cameraAction.action === "start") {
-      // Set a timer to enable the button after 5 seconds
-      const timerId = setTimeout(() => {
-        setDisableHandleDialog(false);
-      }, 2500);
-
-      // Return a cleanup function to clear the timer when the component unmounts or when the dependencies change
-      return () => {
-        clearTimeout(timerId);
-      };
-    }
-  }, [cameraAction.action]);
-
-  useEffect(() => {
-    setIsBarcodeFocused(true);
-  }, [cameraAction]);
 
   const mutateTransaction = useMutation({
     mutationFn: (logs: any) => {
@@ -127,36 +63,10 @@ const Page = () => {
     },
     onSuccess(data, __, _) {
       const newData = (data.data as any).data as VideosLog;
-      setCameraAction({
-        ...cameraAction,
-        log: [newData, ...log],
-      });
+
       setLog((prev) => [newData, ...prev]);
     },
   });
-
-  const handleUploadingProgress = (
-    uploading: boolean,
-    trackingCode: string,
-    video?: VideoUploadResponse
-  ) => {
-    video && setVideo(video);
-    setLog((prev) =>
-      // filter out log with video url
-      prev
-        .filter((l) => !l.videoUrl)
-        .map((l) => {
-          if ((l.attributes as any).transaction === trackingCode) {
-            return {
-              ...l,
-              isUploading: uploading,
-              videoUrl: video?.assets?.mp4,
-            };
-          }
-          return l;
-        })
-    );
-  };
 
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
@@ -176,85 +86,49 @@ const Page = () => {
       setLog(newData);
     },
   });
-  const handleRecordComplete = () => {
-    if (disableHandleDialog) {
-      return;
-    } else {
-      setCameraAction({ ...cameraAction, action: "stop" });
-      setIsBarcodeFocused((prev) => !prev);
-    }
-  };
 
   const handleScan = (code: string) => {
-    mutateTransaction.mutate({
-      organization: currentUser?.organization.id,
-      transaction: code,
-      type: "outbound",
-      status: "handover",
-      user: 1,
+    // Fetch existing logs by organization and code
+    getLogs({
+      organization: currentUser!.organization.id.toString(),
+      code: code,
+      status: "outbound",
+    }).then((data) => {
+      if (data.data.length > 0) {
+        // If transaction exists, set transactions and open the dialog
+        setTransactions(data.data);
+        setIsDialogOpen(true);
+      } else {
+        // If no existing transaction, create a new one
+        mutateTransaction.mutate({
+          organization: currentUser?.organization.id,
+          transaction: code,
+          type: "outbound",
+          status: "handover",
+          user: `${currentUser?.id}`,
+        });
+      }
     });
-    setCameraAction({ ...cameraAction, trackingCode: code, action: "start" });
   };
 
   return (
     <div className="-mt-32 ">
-      {/*  */}
-
       {/* Add padding-top equivalent to the height of your sticky header */}
       <div className="grid grid-cols-6">
-        {/* Sidebar */}
-        <div className="bg-slate-200 h-screen col-span-6 sm:col-span-2 pt-32">
-          <div className="p-4">
-            {scanActive && (
+        {/* Main Content */}
+
+        <div className="sm:col-span-4 pt-32">
+          <div className="p-4 ">
+            <h1 className="text-2xl text-slate-600 flex font-bold ">
+              Bàn giao
+            </h1>
+            <div className="my-2">
               <BarcodeScanForm
                 handleScan={handleScan}
                 isFocused={isBarcodeFocused}
                 isLoading={mutateTransaction.isPending}
               />
-            )}
-
-            {cameraAction.deviceId && (
-              <>
-                <div className="rounded shadow my-2">
-                  {currentUser && (
-                    <CanvasVideoRecorder
-                      action={cameraAction}
-                      handleStream={(status: boolean) => {
-                        setScanActive(status);
-                      }}
-                      currentUser={currentUser}
-                      handleUploadingProgress={(
-                        isUploading: boolean,
-                        trackingCode: string,
-                        video?: VideoUploadResponse
-                      ) =>
-                        handleUploadingProgress(
-                          isUploading,
-                          trackingCode,
-                          video
-                        )
-                      }
-                    />
-                  )}
-                </div>
-              </>
-            )}
-            <SelectCameraDevice
-              handleSelect={(device: string) => {
-                setCameraAction({ ...cameraAction, deviceId: device });
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Main Content */}
-
-        <div className="col-span-6 sm:col-span-4 pt-32">
-          <div className="p-4 ">
-            <h1 className="text-2xl text-slate-600 flex font-bold ">
-              Bàn giao
-            </h1>
-
+            </div>
             {/* make a button inline */}
             {/* View all transaction button  */}
             <div className="flex justify-between mb-2 w-full">
@@ -265,20 +139,7 @@ const Page = () => {
                 </span>
               </h2>
             </div>
-            {log.filter((l) => l.isUploading).length ? (
-              <p
-                // status section
-                className="text-slate-500  text-sm "
-              >
-                Đang xử lý tải lên server:{" "}
-                <span className="  p-1  w-2 rounded bg-green-100 text-green-600 ">
-                  {" "}
-                  {log.filter((l) => l.isUploading).length}
-                </span>
-              </p>
-            ) : (
-              ""
-            )}
+
             {/* Display a simple table show recent log, if log is empty, display placeholder message */}
             {log.length > 0 ? (
               <table className="w-full bg-white rounded border px-2">
@@ -287,9 +148,7 @@ const Page = () => {
                     <th className="text-left px-2 py-3">STT</th>
                     <th className="text-left px-2 py-3">Mã đơn</th>
                     <th className="text-left px-2 py-3">Nhân viên</th>
-                    <th className="text-left px-2 py-3">Thời gian</th>
-                    <th className="text-left px-2 py-3">Status</th>
-                    <th className="text-left px-2 py-3">Hành động</th>
+                    <th className="text-left px-2 py-3">Thời gian bàn giao</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -319,24 +178,12 @@ const Page = () => {
                           {currentUser?.lastName} {currentUser?.firstName}
                         </td>
                         <td className="px-3 py-2">
-                          {format(new Date(), "dd/MM/yyyy")}
-                        </td>
-                        <td className="px-3 py-2">
-                          {l.videoUrl ? (
-                            // view video with link
-                            <a target="_blank">Đã upload</a>
-                          ) : l.isUploading ? (
-                            <div className="flex items-center gap-2">
-                              <span className="text-orange-500  animate-pulse">
-                                đang tải lên
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400  ">
-                              uploading...
-                            </span>
+                          {format(
+                            new Date(l.attributes.createdAt),
+                            "dd/MM/yyyy HH:mm:ss"
                           )}
                         </td>
+
                         <td className="px-3 py-2">
                           <AlertDialog>
                             <AlertDialogTrigger>
@@ -380,7 +227,7 @@ const Page = () => {
               </div>
             )}
             {/* if log.length > 5 display fade to indcated more */}
-            {log.length > 5 && (
+            {log.length > 15 && (
               <div
                 className="flex justify-center items-center
               -mt-2
@@ -391,59 +238,66 @@ const Page = () => {
             )}
           </div>
         </div>
-      </div>
+        <div className="sm:col-span-2 py-32 bg-slate-50 px-2 flex-1 h-screen">
+          <PostsList />
+          {transactions.length > 0 && (
+            //  display popup to show transaction detail
+            <AlertDialog open={isDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{"Đơn hàng đã bàn giao"}</AlertDialogTitle>
+                </AlertDialogHeader>
+                <AlertDialogDescription>
+                  {transactions.map((t) => (
+                    <div key={t.id} className="flex items-center gap-2 w-full">
+                      {/* display txn, datetime, user and delete */}
+                      <div className="flex-1 flex gap-1">
+                        <p className="text-gray-800">
+                          {t.attributes.transaction} <br />
+                          <span className="text-gray-500">
+                            Station: {t.attributes.user}
+                          </span>
+                        </p>
 
-      {cameraAction.action === "start" && (
-        <Dialog
-          defaultOpen
-          onOpenChange={() => {
-            setCameraAction({ ...cameraAction, action: "idle" });
-            mutateDeleteTransaction.mutate(toInteger(log[0].id));
-            setIsBarcodeFocused((prev) => !prev);
-          }}
-        >
-          <DialogContent
-            onPointerDownOutside={(e: any) => e.preventDefault()}
-            hideCloseButton
-          >
-            <div>
-              <DialogHeader>
-                <DialogTitle>Recording {cameraAction.trackingCode}</DialogTitle>
-                {currentUser && (
-                  <Timer
-                    handleTimeOut={() => handleRecordComplete()}
-                    isTrial={currentUser?.isTrial}
-                  />
-                )}
-                <DialogDescription className="py-4">
-                  <div>Quá trình bàn giao đang được thực hiện</div>
-                  {/* timer */}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <div className="w-full flex justify-between">
-                  <Button
-                    ref={finishRecordBtn as React.Ref<HTMLButtonElement>}
-                    disabled={
-                      log.length > 0 &&
-                      (log[0].attributes as any).transaction !==
-                        cameraAction.trackingCode
-                    }
-                    onClick={() => handleRecordComplete()}
-                  >
-                    {"Hoàn thành"}
-                  </Button>
-                  <DialogClose className="" tabIndex={-1}>
-                    <div className="bg-slate-50 border rounded shadow px-4 py-3 text-sm text-red-500 cursor-pointer inline-flex justify-center items-center">
-                      Cancel
+                        <p className="text-gray-800">
+                          {" "}
+                          vào lúc:{" "}
+                          {format(
+                            new Date(t.attributes.createdAt),
+                            "dd/MM/yyyy HH:mm:ss"
+                          )}
+                        </p>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          mutateDeleteTransaction.mutate(toInteger(t.id));
+                          setIsBarcodeFocused((prev) => !prev);
+                          setIsDialogOpen((prev) => !prev);
+                        }}
+                      >
+                        <Trash2Icon className="w-5 " />
+                      </Button>
                     </div>
-                  </DialogClose>
-                </div>
-              </DialogFooter>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+                  ))}
+                </AlertDialogDescription>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setIsDialogOpen((prev) => !prev);
+                      setIsBarcodeFocused((prev) => !prev);
+                    }}
+                  >
+                    {"Hủy"}
+                  </AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
