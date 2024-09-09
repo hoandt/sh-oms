@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import PrintPDF from "./components/PrintFrame";
 
 const QrCodeGenerator = () => {
   // State for input values

@@ -439,6 +439,32 @@ const Page = () => {
                 />
               )}
               <DialogDescription className="py-4 px-1">
+                {!SHOrder && transactions.length === 0 && (
+                  // display instruction, image logo
+                  <div className="flex flex-col items-center justify-center bg-black px-4 py-2">
+                    <div className="text-white text-sm text-center font-bold py-1">
+                      {/* image with border  */}
+                      <div className="px-2 rounded text-center  pb-2">
+                        <a href="https://www.tiktok.com/@swifthub.net">
+                          <img
+                            src="https://swifthub.net/wp-content/uploads/2024/09/Screenshot-2024-09-10-at-02.23.56.png"
+                            alt="scan barcode"
+                            className="text-center w-32 mx-auto "
+                          />
+                        </a>
+                        Cập nhật:{" "}
+                        <a href="https://www.tiktok.com/@swifthub.net">
+                          Xác nhận hàng hóa và số lượng với barcode (Inbox)
+                        </a>
+                        <img
+                          src="https://swifthub.net/wp-content/uploads/2024/09/noi-dung.jpg"
+                          alt="scan barcode"
+                          className="rounded-lg   mx-auto "
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div>Quá trình đóng hàng đang được thực hiện</div>
                 {/* display line items */}
 
