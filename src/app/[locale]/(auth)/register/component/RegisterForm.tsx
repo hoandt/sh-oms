@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import { Input } from "@/components/ui/input";
 import {
@@ -40,9 +41,15 @@ export const registerSchema = z.object({
   referralCode: z.string().optional(),
   phone: z.string(),
   email: z.string(),
+  captcha: z.string(),
 });
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const handleCaptcha = (token: string) => {
+    setCaptchaToken(token);
+    form.setValue("captcha", token);
+  };
   const session = useSession();
   // If session exists, redirect to home
   if (session && session.data) {
@@ -60,6 +67,7 @@ export default function RegisterForm() {
       referralCode: "",
       phone: "",
       email: "",
+      captcha: "",
     },
   });
   const { toast } = useToast();
@@ -72,6 +80,15 @@ export default function RegisterForm() {
   }, [referral]);
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    if (!captchaToken) {
+      toast({
+        title: "Error",
+        description: "Please complete the CAPTCHA.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     // check if password and confirm password match
@@ -84,41 +101,37 @@ export default function RegisterForm() {
       return;
     }
 
-    try {
-      const res = await fetch("/api/controller/authentication/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+    const res = await fetch("/api/controller/authentication/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
 
-      if (!res.ok) {
-        throw new Error("Registration failed.");
-      }
+    const data = await res.json();
 
-      const data = await res.json();
-
-      // redirect to login page
-      window.confirm("Đăng ký thành công. Bạn có muốn đăng nhập ngay?");
-      window.location.href = "/login";
-
+    if (data) {
       toast({
         title: "Success",
-        description: "Registration successful",
-        variant: "default",
-        type: "foreground",
+        description: "Account created successfully.",
       });
-    } catch (error) {
+      //reset form
+      form.reset();
+      //redirect to login
+      if (window) {
+        window.location.href = "/login";
+      }
+    } else {
       toast({
         title: "Failed",
-        description: "SĐT hoặc email đã tồn tại. Vui lòng thử lại.",
+        description: "Registration failed. Please try again.",
         variant: "destructive",
         type: "foreground",
       });
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -134,7 +147,11 @@ export default function RegisterForm() {
                 <FormItem>
                   <FormLabel>Tên</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nguyen ABC" {...field} />
+                    <Input
+                      placeholder="Nguyen ABC"
+                      {...field}
+                      autoComplete="false"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,7 +164,11 @@ export default function RegisterForm() {
                 <FormItem>
                   <FormLabel>Số điện thoại</FormLabel>
                   <FormControl>
-                    <Input placeholder="Phone" {...field} />
+                    <Input
+                      placeholder="Phone"
+                      {...field}
+                      autoComplete="false"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -164,6 +185,7 @@ export default function RegisterForm() {
                   <Input
                     placeholder="vd: fashionShop123, Mỹ phẩm ABC"
                     {...field}
+                    autoComplete="false"
                   />
                 </FormControl>
                 <FormMessage />
@@ -181,6 +203,7 @@ export default function RegisterForm() {
                   <Input
                     type="email"
                     placeholder="Email"
+                    autoComplete="false"
                     {...field}
                     // onchange set username
                     onChange={(e) => {
@@ -243,6 +266,10 @@ export default function RegisterForm() {
               )}
             />
           )}
+          <ReCAPTCHA
+            sitekey="6LcIIUAqAAAAABUYj6ME4Db_7ttDoL701wNvuHoU"
+            onChange={handleCaptcha as any}
+          />
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && (
               <LoaderIcon size={16} className="animate-spin mr-2" />

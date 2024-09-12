@@ -41,23 +41,11 @@ export default function Login() {
   return (
     <div className="flex justify-center items-center h-screen lg:-ml-60">
       <div className="w-full max-w-md p-8 bg-white rounded shadow-lg">
-        <div className="w-full   bg-white rounded shadow-lg">
-          {/* red annoucemnt that the server is upgrading... Đang nâng cấp server trong ngày 12/09/2024. Chúng tôi sẽ thông báo khi hoàn thành */}
-
-          <p className="bg-yellow-50 text-yellow-700 font-bold p-4">
-            Kính gửi quý khách hàng, <br /> <br />
-            Vào ngày 12/09/2024, chúng tôi sẽ tiến hành nâng cấp hệ thống máy
-            chủ, dự kiến sẽ hoàn tất trước 21:00:00. <br /> Chúng tôi sẽ thông
-            báo ngay khi việc nâng cấp hoàn tất sớm hơn dự kiến.
-            <br /> <br />
-            Chúng tôi xin chân thành cảm ơn sự thông cảm và xin lỗi vì sự bất
-            tiện này.
-          </p>
-        </div>
+        <div className="w-full   bg-white rounded shadow-lg"></div>
         <div className="text-center  ">
-          {/* <Link href="/" aria-label="Home">
+          <Link href="/" aria-label="Home">
             <Logo />
-          </Link> */}
+          </Link>
         </div>
         <h2 className="mt-6 text-xl font-semibold text-gray-900 text-center">
           Đăng nhập tài khoản
