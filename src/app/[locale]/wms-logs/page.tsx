@@ -42,6 +42,8 @@ import Timer from "./components/Timer";
 import { getSHOrders } from "@/services/sh-orders";
 import ScanLineItems from "./components/ScanLineItems";
 import TransactionTable from "./components/TransactionTable";
+import PickingBarcodeScanner from "../picking/components/PickingBarcodeScanner";
+import PackingInstruction from "./components/PackingInstruction";
 
 type CameraAction = "start" | "stop" | "idle";
 export type CameraActionPayload = {
@@ -53,6 +55,7 @@ export type CameraActionPayload = {
 };
 const Page = () => {
   const [scanActive, setScanActive] = useState<boolean>(false);
+  const [barcode, setBarcode] = useState<string>("");
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
   const { toast } = useToast();
   const [SHOrder, setSHOrder] = useState<SHOrder>();
@@ -203,6 +206,7 @@ const Page = () => {
       user: `${currentUser?.id}`,
     });
     setSHOrder(undefined);
+    setBarcode(code);
     getSHOrders({ trackingNumber: code }).then((data) => {
       //set line items if order is found
       if (data.data.length) {
@@ -479,6 +483,8 @@ const Page = () => {
                 {!SHOrder && transactions.length > 0 && (
                   <TransactionTable transactions={transactions} />
                 )}
+
+                {barcode && <PackingInstruction barcode={barcode} />}
 
                 {/* timer */}
               </DialogDescription>
