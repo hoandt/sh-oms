@@ -61,7 +61,7 @@ const CanvasVideoRecorder = ({
           video: {
             aspectRatio: WIDTH / HEIGHT,
             deviceId: { exact: action.deviceId },
-            frameRate: { max: 20 },
+            frameRate: { max: 14 },
             width: {
               min: 480,
               ideal: WIDTH,
@@ -236,7 +236,6 @@ const CanvasVideoRecorder = ({
         timeoutPromise,
       ])) as Response;
 
-      console.log(response);
       // Handle the response from the server
       if (!response.ok) {
         throw new Error("File upload failed.");

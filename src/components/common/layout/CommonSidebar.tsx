@@ -18,6 +18,7 @@ import {
   RotateCcwIcon,
   SearchIcon,
   SettingsIcon,
+  ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -57,6 +58,11 @@ const router = [
         name: "Print",
         icon: <Printer />,
         href: "/print",
+      },
+      {
+        name: "Picking (Sapo)",
+        icon: <ShoppingBag />,
+        href: "/picking",
       },
     ],
   },

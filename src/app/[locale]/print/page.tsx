@@ -7,6 +7,7 @@ const QrCodeGenerator = () => {
   // State for input values
   const [content, setContent] = useState<string>("hello\nworld");
   const [columns, setColumns] = useState<number>(2);
+  const [fontSize, setFontSize] = useState<number>(12);
   const [rows, setRows] = useState<number>(64);
   const [align, setAlign] = useState<string>("left");
   const [verticalAlign, setVerticalAlign] = useState<string>("top");
@@ -185,6 +186,8 @@ const QrCodeGenerator = () => {
                   value: borderThickness,
                   setter: setBorderThickness,
                 },
+                // font size
+                { label: "Font Size", value: fontSize, setter: setFontSize },
               ].map(({ label, value, setter }, index) => (
                 <div key={index}>
                   <label className="block mb-2 font-semibold">{label}</label>
@@ -314,10 +317,19 @@ const QrCodeGenerator = () => {
                   padding: `${CellPadding}px`,
                 }}
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col justify-center items-center">
                   <QRCodeSVG value={value} width={rows} height={rows} />
 
-                  <p className="font-mono text-center">{value}</p>
+                  <p
+                    className="text-left"
+                    style={{
+                      fontSize: `${fontSize}px`,
+                      margin: "0",
+                      padding: "0",
+                    }}
+                  >
+                    {value}
+                  </p>
                 </div>
               </div>
             ))}

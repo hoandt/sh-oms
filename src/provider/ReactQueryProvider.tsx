@@ -1,10 +1,10 @@
 "use client";
 
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,10 +16,22 @@ const queryClient = new QueryClient({
 
 export const ReactQueryProvider = ({ children }: { children: ReactNode }) => {
   const CACHE_KEY = "QUERY_CACHE";
-  const persister = createSyncStoragePersister({
-    key: CACHE_KEY,
-    storage: window.localStorage,
-  });
+  const [persister, setPersister] = useState<any>(null);
+
+  useEffect(() => {
+    // Ensure localStorage is only accessed on the client-side
+    if (typeof window !== "undefined") {
+      setPersister(
+        createSyncStoragePersister({
+          key: CACHE_KEY,
+          storage: window.localStorage,
+        })
+      );
+    }
+  }, []);
+
+  // Only render PersistQueryClientProvider when persister is available
+  if (!persister) return null;
 
   return (
     <PersistQueryClientProvider
