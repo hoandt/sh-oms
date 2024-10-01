@@ -182,7 +182,26 @@ const page = () => {
         enableSorting: true,
         enableHiding: false,
       },
+      {
+        accessorKey: "videoURL",
+        header: () => <div className="">{"Preview"}</div>,
+        cell: ({ row }) => {
+          const videoURL = row.original.attributes.videoUrl;
+          return videoURL ? (
+            //  display Camera icon
 
+            <PlayCircle
+              onClick={() => {
+                setIsOpen(true);
+                handleVideoUrl(row.original);
+              }}
+              className="h-6 w-6 text-slate-600 cursor-pointer"
+            />
+          ) : (
+            "-"
+          );
+        },
+      },
       {
         accessorKey: "actions",
         header: () => <div className="">{"Download"}</div>,
