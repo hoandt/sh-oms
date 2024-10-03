@@ -364,9 +364,12 @@ const page = () => {
           <DialogHeader></DialogHeader>
           <DialogContent className="w-[480px]">
             <VideoPlayer
-              src={currentVideo
-                .replace("uploads", "downloads")
-                .replace(".webm", ".mp4")}
+              src={
+                "https://tracking.swifthub.net" +
+                currentVideo
+                  .replace("uploads", "downloads")
+                  .replace(".webm", "")
+              }
             />
             {/* open video in a new tab */}
           </DialogContent>
