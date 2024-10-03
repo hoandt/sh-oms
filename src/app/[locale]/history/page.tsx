@@ -53,7 +53,19 @@ const page = () => {
   });
 
   const [isLoadingURL, setIsLoading] = React.useState(false);
-
+  //use effect esc set is loading to false
+  useEffect(() => {
+    //detect ESC key
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsLoading(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
   const handleDownload = async (
     log: WMSLog,
     type: "download" | "preview" = "download"
@@ -71,11 +83,9 @@ const page = () => {
           },
         });
 
-        console.log(cloudinaryUrl.json());
         //sleep for 2 seconds
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await new Promise((resolve) => setTimeout(resolve, 35000));
         const updatedLogs = refetch();
-        console.log((await updatedLogs).data);
 
         setIsLoading(false);
       } catch (error) {
@@ -356,7 +366,8 @@ const page = () => {
       {isLoadingURL && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-50 flex items-center justify-center  text-white gap-2">
           <Loader2Icon className="h-8 w-8 animate-spin" />
-          <p>Đang xử lý...</p>
+          <p>Đang xử lý, xin đợi trong 30s - 60s...</p>
+          {/* output video url */}
         </div>
       )}
 
