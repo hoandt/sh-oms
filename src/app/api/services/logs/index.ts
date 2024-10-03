@@ -62,10 +62,7 @@ export const updateLogs = async ({
   }
 };
 
-type WMSLogHistory = {
-  disputed: boolean;
-  originalUrl: string;
-};
+type WMSLogHistory = {};
 
 export const postLogs = async ({ logs }: { logs: any }) => {
   try {

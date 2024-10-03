@@ -54,11 +54,47 @@ const page = () => {
 
   const [isLoadingURL, setIsLoading] = React.useState(false);
 
-  const handleDownload = async (log: WMSLog) => {
+  const handleDownload = async (
+    log: WMSLog,
+    type: "download" | "preview" = "download"
+  ) => {
+    //type preview
+    if (type === "preview") {
+      setIsLoading(true);
+      try {
+        log.attributes.action = "preview";
+        const cloudinaryUrl = await fetch("/api/controller/download", {
+          method: "POST",
+          body: JSON.stringify(log),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(cloudinaryUrl.json());
+        //sleep for 2 seconds
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        const updatedLogs = refetch();
+        console.log((await updatedLogs).data);
+
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        console.log("error", error);
+      }
+    }
+
+    //type download
+
     // check log history
     let videoUrl = "";
-    if (log.attributes.history && log.attributes.history.disputed) {
-      videoUrl = log.attributes.videoUrl;
+    if (
+      log.attributes.history &&
+      log.attributes.history.find((v) => v.status === "success")
+    ) {
+      videoUrl =
+        log.attributes.history.find((v) => v.status === "success")?.message ||
+        "";
       const a = document.createElement("a");
       a.href = videoUrl;
       a.target = "_blank";
@@ -70,47 +106,26 @@ const page = () => {
     } else {
       setIsLoading(true);
       try {
-        const controller = new AbortController();
-        const signal = controller.signal;
-        // Set a timeout of 5 minutes (300,000 milliseconds)
-        const timeoutId = setTimeout(() => {
-          controller.abort(); // Abort the fetch request after 5 minutes
-          setIsLoading(false); // Update isLoading state
-          console.log("Request timed out"); // Log a timeout message
-        }, 300000);
+        log.attributes.action = "download";
         const cloudinaryUrl = await fetch("/api/controller/download", {
           method: "POST",
           body: JSON.stringify(log),
           headers: {
             "Content-Type": "application/json",
           },
-          signal: signal, // Pass the AbortController's signal to the fetch request
         });
-        clearTimeout(timeoutId); // Clear the timeout if the request completes before timeout
+        //sleep for 2 seconds
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        const updateLogs = refetch();
+        console.log((await updateLogs).data);
 
-        const data = await cloudinaryUrl.json();
+        setIsLoading(false);
+        toast({
+          duration: DURATION_TOAST,
+          title: "Video đang được xử lý",
 
-        if (data.url) {
-          videoUrl = data.url;
-          setIsLoading(false);
-          const a = document.createElement("a");
-          a.href = videoUrl;
-          a.target = "_blank";
-          a.download = `video-${log.attributes.transaction}.mp4`;
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
-          toast({
-            duration: DURATION_TOAST,
-            title: "Không tải được video",
-            description: `Video của giao dịch ${log.attributes.transaction} bị lỗi! `,
-            variant: "destructive",
-          });
-        }
+          description: `Video của giao dịch ${log.attributes.transaction} đang được xử lý, vui lòng chờ trong giây lát!`,
+        });
       } catch (error) {
         setIsLoading(false);
         console.log("error", error);
@@ -119,7 +134,21 @@ const page = () => {
   };
 
   const handleVideoUrl = async (log: WMSLog) => {
-    setCurrentVideo(log.attributes.videoUrl);
+    //check log history for success
+    if (
+      log.attributes.history &&
+      log.attributes.history.find((v) => v.status === "success")
+    ) {
+      console.log(
+        log.attributes.history.find((v) => v.status === "success")?.message ||
+          ""
+      );
+      setCurrentVideo(
+        log.attributes.history.find((v) => v.status === "success")?.message ||
+          ""
+      );
+      return;
+    }
   };
   const mutateDeleteTransaction = useMutation({
     mutationFn: (id: number) => {
@@ -182,13 +211,41 @@ const page = () => {
         enableSorting: true,
         enableHiding: false,
       },
+      {
+        accessorKey: "videoURL",
+        header: () => <div className="">{"Preview"}</div>,
+        cell: ({ row }) => {
+          const videoUrl = row.original.attributes.history?.find(
+            (v) => v.status === "success"
+          )?.message;
 
+          return videoUrl ? (
+            //  display Camera icon
+
+            <PlayCircle
+              onClick={() => {
+                setIsOpen(true);
+                handleVideoUrl(row.original);
+              }}
+              className="h-6 w-6 text-slate-600 cursor-pointer"
+            />
+          ) : (
+            <PlayCircle
+              onClick={() => {
+                handleDownload(row.original, "preview");
+              }}
+              className="h-6 w-6 text-orange-600 cursor-pointer"
+            />
+          );
+        },
+      },
       {
         accessorKey: "actions",
         header: () => <div className="">{"Download"}</div>,
         cell: ({ row }) => {
-          const videoURL = row.original.attributes.videoUrl;
-          const isDisputed = row.original.attributes.history?.disputed;
+          const videoURL = row.original.attributes.history?.find(
+            (v) => v.status === "success"
+          );
           return videoURL ? (
             //  display Download icon
             <div className="flex">
@@ -203,7 +260,7 @@ const page = () => {
                 <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
                 {isLoadingURL ? "Processing..." : "Download"}
               </Button>
-              {isDisputed && (
+              {videoURL && (
                 <Button
                   variant={"link"}
                   size={"sm"}

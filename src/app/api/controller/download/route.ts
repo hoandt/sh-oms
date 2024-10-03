@@ -26,17 +26,24 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
   );
   const log = (await response.json()) as DownloadResponse;
+  console.log(log);
   if (!log.success) {
     return NextResponse.json({ error: true });
   }
 
+  const updatedHistory = logData.attributes.history
+    ? logData.attributes.history
+    : [];
   await updateLogs({
     id: toInteger(logData.id),
     videoUrl: log.data.videoUrl,
-    history: {
-      disputed: true,
-      originalUrl: logData.attributes.videoUrl,
-    },
+    history: [
+      ...updatedHistory,
+      {
+        status: "downloaded",
+        message: log.data.videoUrl,
+      },
+    ],
     status: "downloaded",
   });
 

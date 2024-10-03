@@ -694,9 +694,10 @@ export interface WMSLog {
     status: string;
     videoUrl: string;
     history: {
-      disputed: boolean;
-      originalUrl: string;
-    };
+      status: "success" | "error" | "failed" | "downloaded";
+      message: string;
+    }[];
+    action?: "download" | "preview";
   };
 }
 export interface SHOrder {

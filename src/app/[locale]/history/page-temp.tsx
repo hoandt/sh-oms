@@ -57,7 +57,7 @@ const page = () => {
   const handleDownload = async (log: WMSLog) => {
     // check log history
     let videoUrl = "";
-    if (log.attributes.history && log.attributes.history.disputed) {
+    if (log.attributes.history && log.attributes.history) {
       videoUrl = log.attributes.videoUrl;
       const a = document.createElement("a");
       a.href = videoUrl;
@@ -182,32 +182,12 @@ const page = () => {
         enableSorting: true,
         enableHiding: false,
       },
-      {
-        accessorKey: "videoURL",
-        header: () => <div className="">{"Preview"}</div>,
-        cell: ({ row }) => {
-          const videoURL = row.original.attributes.videoUrl;
-          return videoURL ? (
-            //  display Camera icon
 
-            <PlayCircle
-              onClick={() => {
-                setIsOpen(true);
-                handleVideoUrl(row.original);
-              }}
-              className="h-6 w-6 text-slate-600 cursor-pointer"
-            />
-          ) : (
-            "-"
-          );
-        },
-      },
       {
         accessorKey: "actions",
         header: () => <div className="">{"Download"}</div>,
         cell: ({ row }) => {
           const videoURL = row.original.attributes.videoUrl;
-          const isDisputed = row.original.attributes.history?.disputed;
           return videoURL ? (
             //  display Download icon
             <div className="flex">
@@ -222,7 +202,7 @@ const page = () => {
                 <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
                 {isLoadingURL ? "Processing..." : "Download"}
               </Button>
-              {isDisputed && (
+              {videoURL && (
                 <Button
                   variant={"link"}
                   size={"sm"}

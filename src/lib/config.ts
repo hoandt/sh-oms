@@ -6,7 +6,7 @@ export const API_ADMIN_ENDPOINT = {
 };
 
 export const defaultImage = "/assets/images/image-placeholder.png";
-export const DURATION_TOAST = 1500;
+export const DURATION_TOAST = 5000;
 export const BACKEND_URL = process.env.BACKEND_URL;
 export const SH_BACKEND_URL = process.env.SH_BACKEND_URL;
 export const FRONTEND_URL = process.env.FRONTEND_URL;
