@@ -225,9 +225,12 @@ const page = () => {
         accessorKey: "videoURL",
         header: () => <div className="">{"Preview"}</div>,
         cell: ({ row }) => {
-          const videoUrl = row.original.attributes.history?.find(
-            (v) => v.status === "success"
-          )?.message;
+          //check  history is not null then extract video url
+          const videoUrl = Array.isArray(row.original.attributes.history)
+            ? row.original.attributes.history.find(
+                (v) => v.status === "success"
+              )?.message
+            : undefined;
 
           return videoUrl ? (
             //  display Camera icon
@@ -253,10 +256,12 @@ const page = () => {
         accessorKey: "actions",
         header: () => <div className="">{"Download"}</div>,
         cell: ({ row }) => {
-          const videoURL = row.original.attributes.history?.find(
-            (v) => v.status === "success"
-          );
-          return videoURL ? (
+          const videoUrl = Array.isArray(row.original.attributes.history)
+            ? row.original.attributes.history.find(
+                (v) => v.status === "success"
+              )?.message
+            : undefined;
+          return videoUrl ? (
             //  display Download icon
             <div className="flex">
               <Button
@@ -270,7 +275,7 @@ const page = () => {
                 <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
                 {isLoadingURL ? "Processing..." : "Download"}
               </Button>
-              {videoURL && (
+              {videoUrl && (
                 <Button
                   variant={"link"}
                   size={"sm"}
@@ -358,7 +363,11 @@ const page = () => {
         >
           <DialogHeader></DialogHeader>
           <DialogContent className="w-[480px]">
-            <VideoPlayer src={currentVideo} />
+            <VideoPlayer
+              src={currentVideo
+                .replace("uploads", "downloads")
+                .replace(".webm", ".mp4")}
+            />
             {/* open video in a new tab */}
           </DialogContent>
         </Dialog>
