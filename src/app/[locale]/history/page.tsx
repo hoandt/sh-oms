@@ -99,7 +99,7 @@ const page = () => {
           setIsLoading(false);
 
           setCurrentVideo(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
-          console.log(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
+
           setIsOpen(true);
         }
       } catch (error) {
@@ -206,9 +206,7 @@ const page = () => {
     },
   });
   const [currentVideo, setCurrentVideo] = React.useState<string>("");
-  const [currentDropboxVideo, setCurrentDropboxVideo] =
-    React.useState<string>("");
-  const [dropboxLoading, setDropboxLoading] = React.useState(false);
+
   const columns = useMemo(() => {
     return [
       {
@@ -426,21 +424,7 @@ const page = () => {
           </DialogContent>
         </Dialog>
       )}
-      {currentDropboxVideo && (
-        <Dialog
-          defaultOpen={isOpen}
-          onOpenChange={() => {
-            setIsOpen((prev) => !prev);
-            setCurrentVideo("");
-          }}
-        >
-          <DialogHeader></DialogHeader>
-          <DialogContent className="w-[480px]">
-            <VideoPlayer src={currentDropboxVideo} />
-            {/* open video in a new tab */}
-          </DialogContent>
-        </Dialog>
-      )}
+
       {isLoadingURL && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-50 flex items-center justify-center  text-white gap-2">
           <Loader2Icon className="h-8 w-8 animate-spin" />

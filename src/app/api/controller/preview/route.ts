@@ -7,21 +7,33 @@ export async function POST(req: NextRequest, res: NextResponse) {
     Accept: "*/*",
     "Content-Type": "application/json",
   };
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/preview`,
-    {
-      method: "POST",
-      body: JSON.stringify(logData),
-      headers: headersList,
-    }
-  );
-  const log = (await response.json()) as DownloadResponse;
 
-  if (!log.success) {
+  //videoUrl
+  const videoUrl = logData.attributes.videoUrl;
+  // check video URL 404
+  const videoResponse = await fetch(videoUrl);
+  if (videoResponse.status !== 404) {
+    const log = {
+      success: true,
+      videoUrl: videoUrl,
+      message: videoUrl,
+    };
+    return NextResponse.json({
+      log,
+    });
+  } else {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_MEDIA_ENDPOINT}/preview`,
+      {
+        method: "POST",
+        body: JSON.stringify(logData),
+        headers: headersList,
+      }
+    );
+    const log = (await response.json()) as DownloadResponse;
+
     return NextResponse.json({ log });
   }
-
-  return NextResponse.json({ log });
 }
 type DownloadResponse = {
   success: boolean;
