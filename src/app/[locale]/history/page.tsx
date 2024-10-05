@@ -66,16 +66,11 @@ const page = () => {
       window.removeEventListener("keydown", handleEsc);
     };
   }, []);
-  const handleDownload = async (
-    log: WMSLog,
-    type: "download" | "preview" = "download"
-  ) => {
+  const handleDownload = async (log: WMSLog, type: "preview" | "download") => {
     //type preview
     if (type === "preview") {
-      setIsLoading(true);
       try {
-        log.attributes.action = "preview";
-        const cloudinaryUrl = await fetch("/api/controller/download", {
+        const previewUrl = await fetch("/api/controller/preview", {
           method: "POST",
           body: JSON.stringify(log),
           headers: {
@@ -83,62 +78,97 @@ const page = () => {
           },
         });
 
-        //sleep for 2 seconds
-        await new Promise((resolve) => setTimeout(resolve, 35000));
-        const updatedLogs = refetch();
+        const videoUrl = (await previewUrl.json()) as {
+          log: {
+            success: boolean;
+            videoUrl: string;
+            message: string;
+          };
+        };
 
-        setIsLoading(false);
+        if (!videoUrl.log.success) {
+          setIsLoading(false);
+          toast({
+            duration: DURATION_TOAST,
+            title: "Error",
+            description: `Video not found ${log.attributes.transaction} ${videoUrl.log.message}`,
+          });
+
+          return;
+        } else {
+          setIsLoading(false);
+
+          setCurrentVideo(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
+          console.log(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
+          setIsOpen(true);
+        }
       } catch (error) {
         setIsLoading(false);
         console.log("error", error);
       }
-    }
-
-    //type download
-
-    // check log history
-    let videoUrl = "";
-    if (
-      log.attributes.history &&
-      log.attributes.history.find((v) => v.status === "success")
-    ) {
-      videoUrl =
-        log.attributes.history.find((v) => v.status === "success")?.message ||
-        "";
-      const a = document.createElement("a");
-      a.href = videoUrl;
-      a.target = "_blank";
-      a.download = `video-${log.attributes.transaction}.mp4`;
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     } else {
-      setIsLoading(true);
-      try {
-        log.attributes.action = "download";
-        const cloudinaryUrl = await fetch("/api/controller/download", {
-          method: "POST",
-          body: JSON.stringify(log),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        //sleep for 2 seconds
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        const updateLogs = refetch();
-        console.log((await updateLogs).data);
+      let videoUrl = "";
+      if (
+        log.attributes.history &&
+        log.attributes.history.find((v) => v.status === "success")
+      ) {
+        videoUrl =
+          log.attributes.history.find((v) => v.status === "success")?.message ||
+          "";
+        const a = document.createElement("a");
+        a.href = videoUrl;
+        a.target = "_blank";
+        a.download = `video-${log.attributes.transaction}.mp4`;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        //alert confirm
+        const confirm = window.confirm(
+          `Bạn nên xem trước video trước khi tải, vì thời gian xử lý video có thể mất 5 - 10 phút. Vẫn tiếp tục tải?`
+        );
+        if (confirm) {
+          setIsLoading(true);
+          try {
+            log.attributes.action = "download";
+            const downloadUrl = await fetch("/api/controller/download", {
+              method: "POST",
+              body: JSON.stringify(log),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            //sleep for 2 seconds
+            await new Promise((resolve) => setTimeout(resolve, 5000));
 
-        setIsLoading(false);
-        toast({
-          duration: DURATION_TOAST,
-          title: "Video đang được xử lý",
+            //refetch data
+            refetch();
 
-          description: `Video của giao dịch ${log.attributes.transaction} đang được xử lý, vui lòng chờ trong giây lát!`,
-        });
-      } catch (error) {
-        setIsLoading(false);
-        console.log("error", error);
+            setIsLoading(false);
+            //check 429 status
+            if (downloadUrl.status === 429) {
+              setIsLoading(false);
+              toast({
+                duration: DURATION_TOAST,
+                title: "Error",
+                variant: "destructive",
+                description: `Quá nhiều yêu cầu tải, vui lòng thử lại sau 3 phút hoặc Xem trước video!`,
+              });
+              return;
+            }
+
+            setIsLoading(false);
+            toast({
+              duration: DURATION_TOAST,
+              title: "Video đang được xử lý",
+              description: `Video của giao dịch ${log.attributes.transaction} đang được xử lý, vui lòng chờ trong giây lát!`,
+            });
+          } catch (error) {
+            setIsLoading(false);
+            console.log("error", error);
+          }
+        }
       }
     }
   };
@@ -176,6 +206,9 @@ const page = () => {
     },
   });
   const [currentVideo, setCurrentVideo] = React.useState<string>("");
+  const [currentDropboxVideo, setCurrentDropboxVideo] =
+    React.useState<string>("");
+  const [dropboxLoading, setDropboxLoading] = React.useState(false);
   const columns = useMemo(() => {
     return [
       {
@@ -231,24 +264,43 @@ const page = () => {
                 (v) => v.status === "success"
               )?.message
             : undefined;
-
+          const status = row.original.attributes.status;
           return videoUrl ? (
-            //  display Camera icon
-
-            <PlayCircle
+            <Button
+              disabled={isLoadingURL}
+              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
+              variant={"outline"}
               onClick={() => {
-                setIsOpen(true);
-                handleVideoUrl(row.original);
+                handleDownload(row.original, "download");
               }}
-              className="h-6 w-6 text-slate-600 cursor-pointer"
-            />
+            >
+              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
+              {isLoadingURL ? "Processing..." : "Download"}
+            </Button>
           ) : (
-            <PlayCircle
-              onClick={() => {
-                handleDownload(row.original, "preview");
-              }}
-              className="h-6 w-6 text-orange-600 cursor-pointer"
-            />
+            <div>
+              {" "}
+              <a
+                className="text-blue-500 text-sm cursor-pointer px-1"
+                onClick={() => {
+                  handleDownload(row.original, "preview");
+                  setIsLoading(true);
+                }}
+              >
+                Xem trước
+                {/* check current row of react table */}
+              </a>{" "}
+              {status !== "video_processing" && status !== "downloaded" && (
+                <a
+                  onClick={() => {
+                    handleDownload(row.original, "download");
+                  }}
+                  className="text-slate-500 text-xs cursor-pointer px-1"
+                >
+                  Xử lý tải video
+                </a>
+              )}
+            </div>
           );
         },
       },
@@ -261,44 +313,41 @@ const page = () => {
                 (v) => v.status === "success"
               )?.message
             : undefined;
-          return videoUrl ? (
+          const status = row.original.attributes.status;
+          return (
             //  display Download icon
             <div className="flex">
-              <Button
-                disabled={isLoadingURL}
-                className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
-                variant={"outline"}
-                onClick={() => {
-                  handleDownload(row.original);
-                }}
-              >
-                <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
-                {isLoadingURL ? "Processing..." : "Download"}
-              </Button>
-              {videoUrl && (
-                <Button
-                  variant={"link"}
-                  size={"sm"}
-                  className="text-blue-500"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      getVerifyLink(`${row.original.id}`)
-                    );
-                    toast({
-                      duration: DURATION_TOAST,
-                      title: "Copied",
-                      variant: "default",
-                      description: `Video link of transaction ${row.original.attributes.transaction} has been copied!`,
-                    });
-                  }}
-                >
-                  <CopyIcon className="h-4 w-4 cursor-pointer mr-2 text-blue-400" />{" "}
-                  Verification Link
-                </Button>
+              {" "}
+              {(status === "video_processing" || status === "downloaded") &&
+                !videoUrl && (
+                  <div className="text-orange-500 px-1">Processing </div>
+                )}
+              {videoUrl ? (
+                <>
+                  <Button
+                    variant={"link"}
+                    size={"sm"}
+                    className="text-blue-500"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        getVerifyLink(`${row.original.id}`)
+                      );
+                      toast({
+                        duration: DURATION_TOAST,
+                        title: "Copied",
+                        variant: "default",
+                        description: `Video link of transaction ${row.original.attributes.transaction} has been copied!`,
+                      });
+                    }}
+                  >
+                    <CopyIcon className="h-4 w-4 cursor-pointer mr-2 text-blue-400" />{" "}
+                    Verification Link
+                  </Button>
+                </>
+              ) : (
+                "-"
               )}
             </div>
-          ) : (
-            "-"
           );
         },
         enableSorting: false,
@@ -349,7 +398,7 @@ const page = () => {
       //   enableHiding: false,
       // },
     ] as ColumnDef<WMSLog>[];
-  }, []);
+  }, [currentVideo]);
 
   return (
     <div className="px-4">
@@ -365,12 +414,29 @@ const page = () => {
           <DialogContent className="w-[480px]">
             <VideoPlayer
               src={
-                "https://tracking.swifthub.net" +
-                currentVideo
-                  .replace("uploads", "downloads")
-                  .replace(".webm", "")
+                currentVideo.includes("dropbox")
+                  ? currentVideo
+                  : "https://tracking.swifthub.net" +
+                    currentVideo
+                      .replace("uploads", "downloads")
+                      .replace(".webm", "")
               }
             />
+            {/* open video in a new tab */}
+          </DialogContent>
+        </Dialog>
+      )}
+      {currentDropboxVideo && (
+        <Dialog
+          defaultOpen={isOpen}
+          onOpenChange={() => {
+            setIsOpen((prev) => !prev);
+            setCurrentVideo("");
+          }}
+        >
+          <DialogHeader></DialogHeader>
+          <DialogContent className="w-[480px]">
+            <VideoPlayer src={currentDropboxVideo} />
             {/* open video in a new tab */}
           </DialogContent>
         </Dialog>
@@ -378,7 +444,7 @@ const page = () => {
       {isLoadingURL && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-50 flex items-center justify-center  text-white gap-2">
           <Loader2Icon className="h-8 w-8 animate-spin" />
-          <p>Đang xử lý, xin đợi trong 30s - 60s...</p>
+          <p>Đang lấy video...</p>
           {/* output video url */}
         </div>
       )}
