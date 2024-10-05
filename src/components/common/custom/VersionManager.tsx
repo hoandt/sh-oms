@@ -2,7 +2,7 @@
 import { toast } from "@/components/ui/use-toast";
 import { signOut } from "next-auth/react";
 import React, { useEffect } from "react";
-const version = "1.0.2";
+const version = "1.0.3";
 const checkVersion = async (version: string) => {
   // check version in local storage, key is "sh-version"
   const localVersion = localStorage.getItem("sh-version");
