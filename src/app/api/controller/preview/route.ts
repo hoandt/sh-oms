@@ -10,8 +10,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   //videoUrl
   const videoUrl = logData.attributes.videoUrl;
-  // check video URL 404
+
+  if (!videoUrl || videoUrl === "" || videoUrl === "LOCAL") {
+    const log = {
+      success: false,
+      videoUrl: videoUrl,
+      message: "",
+    };
+    return NextResponse.json({
+      log,
+    });
+  }
+
   const videoResponse = await fetch(videoUrl);
+
   if (videoResponse.status !== 404) {
     const log = {
       success: true,

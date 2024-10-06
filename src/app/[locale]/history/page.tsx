@@ -7,15 +7,22 @@ import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 import { SystemInventory, WMSLog } from "@/types/todo";
 import { CommonTable } from "@/components/common/table/CommonTable";
 import { format } from "date-fns";
-import { useMutation } from "@tanstack/react-query";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  useMutation,
+} from "@tanstack/react-query";
 import { deleteLogs } from "@/services";
 
 import {
+  CheckCheck,
   CopyIcon,
   DownloadCloud,
   DownloadCloudIcon,
+  Link,
   Loader2Icon,
   PlayCircle,
+  RefreshCcw,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
@@ -24,6 +31,7 @@ import { signOut, useSession } from "next-auth/react";
 import VideoPlayer from "./component/VideoPlayer";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Filter } from "./component/Filter";
+import { cn } from "@/lib/utils";
 
 const page = () => {
   const { toast } = useToast();
@@ -32,6 +40,11 @@ const page = () => {
   const status = searchParams.get("status") || "";
   const session = useSession() as any;
   const user = session.data as any;
+  const [isProcessing, setIsProcessing] = React.useState({
+    index: 0,
+    processing: false,
+  });
+  const [currentLog, setCurrentLog] = React.useState<WMSLog | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
@@ -68,45 +81,92 @@ const page = () => {
   }, []);
   const handleDownload = async (log: WMSLog, type: "preview" | "download") => {
     //type preview
+
     if (type === "preview") {
+      setCurrentLog(log);
       try {
-        const previewUrl = await fetch("/api/controller/preview", {
-          method: "POST",
-          body: JSON.stringify(log),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const videoUrl = (await previewUrl.json()) as {
-          log: {
-            success: boolean;
-            videoUrl: string;
-            message: string;
-          };
-        };
-
-        if (!videoUrl.log.success) {
-          setIsLoading(false);
-          toast({
-            duration: DURATION_TOAST,
-            title: "Error",
-            description: `Video not found ${log.attributes.transaction} ${videoUrl.log.message}`,
-          });
-
-          return;
+        const currentHistory = log.attributes.history;
+        if (currentHistory) {
+          const dropBox = currentHistory.find(
+            (v) => v.status === ("dropboxUrl" as any)
+          );
+          if (dropBox) {
+            setIsLoading(false);
+            setCurrentVideo(dropBox.message);
+            setIsOpen(true);
+          }
         } else {
+          const previewUrl = await fetch("/api/controller/preview", {
+            method: "POST",
+            body: JSON.stringify(log),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const videoUrl = (await previewUrl.json()) as {
+            log: {
+              success: boolean;
+              videoUrl: string;
+              message: string;
+            };
+          };
+          if (!videoUrl.log.success) {
+            setIsProcessing({
+              index: 0,
+              processing: false,
+            });
+            setIsLoading(false);
+            toast({
+              duration: DURATION_TOAST,
+              title: "Error",
+              variant: "destructive",
+              description: `Video not found ${log.attributes.transaction} ${videoUrl.log.message}`,
+            });
+            return;
+          } else {
+            refetch();
+
+            setCurrentVideo(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
+            setCurrentLog(log);
+            setIsOpen(true);
+          }
           setIsLoading(false);
-
-          setCurrentVideo(videoUrl.log.videoUrl.replace("dl=0", "dl=1"));
-
-          setIsOpen(true);
+          setIsProcessing({
+            index: 0,
+            processing: false,
+          });
         }
       } catch (error) {
         setIsLoading(false);
+        setIsProcessing({
+          index: 0,
+          processing: false,
+        });
         console.log("error", error);
+        toast({
+          duration: DURATION_TOAST,
+          title: "Error",
+          variant: "destructive",
+          description: `Something went wrong, please try again later!`,
+        });
+        setIsProcessing({
+          index: 0,
+          processing: false,
+        });
       }
-    } else {
+    } else if (type === "download") {
+      //alert confirm
+      const confirm = window.confirm(
+        `Video đang được xử lý, xin vui lòng chờ trong 3-5 phút!`
+      );
+      if (confirm) {
+        setCurrentVideo("");
+        setIsProcessing({
+          index: log.id as number,
+          processing: true,
+        });
+        setIsLoading(true);
+      }
       let videoUrl = "";
       if (
         log.attributes.history &&
@@ -115,59 +175,64 @@ const page = () => {
         videoUrl =
           log.attributes.history.find((v) => v.status === "success")?.message ||
           "";
-        const a = document.createElement("a");
-        a.href = videoUrl;
-        a.target = "_blank";
-        a.download = `video-${log.attributes.transaction}.mp4`;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        downloadVideo(videoUrl);
       } else {
-        //alert confirm
-        const confirm = window.confirm(
-          `Bạn nên xem trước video trước khi tải, vì thời gian xử lý video có thể mất 5 - 10 phút. Vẫn tiếp tục tải?`
-        );
-        if (confirm) {
-          setIsLoading(true);
-          try {
-            log.attributes.action = "download";
-            const downloadUrl = await fetch("/api/controller/download", {
-              method: "POST",
-              body: JSON.stringify(log),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            //sleep for 2 seconds
-            await new Promise((resolve) => setTimeout(resolve, 5000));
+        setIsLoading(true);
+        try {
+          console.log(currentVideo);
+          log.attributes.action = "download";
+          const downloadUrl = await fetch("/api/controller/download", {
+            method: "POST",
+            body: JSON.stringify(log),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-            //refetch data
-            refetch();
+          //sleep for 2 seconds
+          await new Promise((resolve) => setTimeout(resolve, 5000));
 
-            setIsLoading(false);
-            //check 429 status
-            if (downloadUrl.status === 429) {
-              setIsLoading(false);
-              toast({
-                duration: DURATION_TOAST,
-                title: "Error",
-                variant: "destructive",
-                description: `Quá nhiều yêu cầu tải, vui lòng thử lại sau 3 phút hoặc Xem trước video!`,
-              });
-              return;
-            }
+          //refetch data
+          refetch();
 
+          setIsLoading(false);
+          //check 429 status
+          if (downloadUrl.status === 429) {
             setIsLoading(false);
             toast({
               duration: DURATION_TOAST,
-              title: "Video đang được xử lý",
-              description: `Video của giao dịch ${log.attributes.transaction} đang được xử lý, vui lòng chờ trong giây lát!`,
+              title: "Error",
+              variant: "destructive",
+              description: `Quá nhiều yêu cầu tải, vui lòng thử lại sau 3 phút hoặc Xem trước video!`,
             });
-          } catch (error) {
-            setIsLoading(false);
-            console.log("error", error);
+            return;
           }
+
+          //check 500 status
+          if (downloadUrl.status === 500) {
+            setIsLoading(false);
+            toast({
+              duration: DURATION_TOAST,
+              title: "Error",
+              variant: "destructive",
+              description: `Something went wrong, please try again later!`,
+            });
+            return;
+          }
+          setIsLoading(false);
+          toast({
+            duration: DURATION_TOAST,
+            title: "Video đang được xử lý",
+            description: `Video của giao dịch ${log.attributes.transaction} đang được xử lý, vui lòng chờ trong giây lát!`,
+          });
+        } catch (error) {
+          toast({
+            duration: DURATION_TOAST,
+            title: "Error",
+            variant: "destructive",
+            description: `Something went wrong, please try again later!`,
+          });
+          setIsLoading(false);
         }
       }
     }
@@ -263,7 +328,8 @@ const page = () => {
               )?.message
             : undefined;
           const status = row.original.attributes.status;
-          return videoUrl ? (
+          const isValid = videoUrl && videoUrl !== "LOCAL";
+          return isValid ? (
             <Button
               disabled={isLoadingURL}
               className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
@@ -277,7 +343,6 @@ const page = () => {
             </Button>
           ) : (
             <div>
-              {" "}
               <a
                 className="text-blue-500 text-sm cursor-pointer px-1"
                 onClick={() => {
@@ -285,19 +350,8 @@ const page = () => {
                   setIsLoading(true);
                 }}
               >
-                Xem trước
-                {/* check current row of react table */}
+                Xem trước và tải
               </a>{" "}
-              {status !== "video_processing" && status !== "downloaded" && (
-                <a
-                  onClick={() => {
-                    handleDownload(row.original, "download");
-                  }}
-                  className="text-slate-500 text-xs cursor-pointer px-1"
-                >
-                  Xử lý tải video
-                </a>
-              )}
             </div>
           );
         },
@@ -314,12 +368,17 @@ const page = () => {
           const status = row.original.attributes.status;
           return (
             //  display Download icon
-            <div className="flex">
-              {" "}
-              {(status === "video_processing" || status === "downloaded") &&
-                !videoUrl && (
-                  <div className="text-orange-500 px-1">Processing </div>
+            <div className="flex items-center gap-1">
+              {isProcessing.index === row.original.id &&
+                status !== "video_processing" && (
+                  <CountDown seconds={10} refetch={refetch} />
                 )}
+              {(status === "video_processing" || status === "downloaded") && (
+                <div className="text-orange-500 px-1">
+                  {" "}
+                  <CountDown seconds={10} refetch={refetch} /> Processing
+                </div>
+              )}
               {videoUrl ? (
                 <>
                   <Button
@@ -396,7 +455,7 @@ const page = () => {
       //   enableHiding: false,
       // },
     ] as ColumnDef<WMSLog>[];
-  }, [currentVideo]);
+  }, [currentVideo, isProcessing.index]);
 
   return (
     <div className="px-4">
@@ -406,12 +465,38 @@ const page = () => {
           onOpenChange={() => {
             setIsOpen((prev) => !prev);
             setCurrentVideo("");
+            setIsLoading(false);
           }}
         >
-          <DialogHeader></DialogHeader>
-          <DialogContent className="w-[480px]">
+          <DialogHeader>
+            {currentLog && <h1>{currentLog.attributes.transaction}</h1>}
+          </DialogHeader>
+          <DialogContent className="w-[512px]">
             <VideoPlayer src={currentVideo} />
-            {/* open video in a new tab */}
+
+            <div className="flex gap-2 items-center">
+              <Button
+                size={"sm"}
+                onClick={() => {
+                  downloadVideo(currentVideo);
+                }}
+              >
+                {currentVideo && <DownloadCloudIcon className="w-4 mr-1" />} Tải
+                preview
+              </Button>
+              {currentLog?.attributes.status !== "video_processing" && (
+                <Button
+                  size={"sm"}
+                  className="bg-blue-50  hover:text-blue-50 hover:bg-blue-400  text-blue-500"
+                  onClick={() => {
+                    refetch();
+                    currentLog && handleDownload(currentLog, "download");
+                  }}
+                >
+                  <Link className="w-4 mr-1" /> Tạo video với link xác thực
+                </Button>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
       )}
@@ -464,3 +549,32 @@ function shiftId(id: string, offset: number) {
 
   return shiftedId;
 }
+
+const CountDown = ({ seconds, refetch }: { seconds: number; refetch: any }) => {
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    //pusle effect dot
+    <span className="relative inline-block">
+      <span className="absolute top-0 right-0 block h-2.5 w-2.5 bg-red-300 rounded-full animate-ping"></span>
+      <span className="relative block h-2.5 w-2.5 bg-red-500 rounded-full"></span>
+    </span>
+  );
+};
+
+const downloadVideo = async (videoUrl: string) => {
+  const a = document.createElement("a");
+  a.href = videoUrl;
+  a.target = "_blank";
+  a.download = `video.mp4`;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
