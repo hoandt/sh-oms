@@ -16,6 +16,7 @@ import { deleteLogs } from "@/services";
 
 import {
   CheckCheck,
+  CheckIcon,
   CopyIcon,
   DownloadCloud,
   DownloadCloudIcon,
@@ -23,6 +24,7 @@ import {
   Loader2Icon,
   PlayCircle,
   RefreshCcw,
+  VerifiedIcon,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
@@ -330,17 +332,7 @@ const page = () => {
           const status = row.original.attributes.status;
           const isValid = videoUrl && videoUrl !== "LOCAL";
           return isValid ? (
-            <Button
-              disabled={isLoadingURL}
-              className="px-4 bg-slate-100 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-md"
-              variant={"outline"}
-              onClick={() => {
-                handleDownload(row.original, "download");
-              }}
-            >
-              <DownloadCloud className="h-6 w-6 cursor-pointer mr-2" />
-              {isLoadingURL ? "Processing..." : "Download"}
-            </Button>
+            <CheckIcon className="text-slate-600 " />
           ) : (
             <div>
               <a
