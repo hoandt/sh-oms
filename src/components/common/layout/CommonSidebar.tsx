@@ -13,6 +13,7 @@ import {
   BoxIcon,
   FileText,
   HandIcon,
+  Link2Icon,
   PanelTopInactiveIcon,
   Printer,
   RotateCcwIcon,
@@ -59,20 +60,25 @@ const router = [
         icon: <Printer />,
         href: "/print",
       },
-      {
-        name: "Picking (Sapo)",
-        icon: <ShoppingBag />,
-        href: "/picking",
-      },
+      // {
+      //   name: "Picking (Sapo)",
+      //   icon: <ShoppingBag />,
+      //   href: "/picking",
+      // },
     ],
   },
   {
     title: "More",
     route: [
       {
-        name: "Cài đặt",
+        name: "Settings",
         icon: <SettingsIcon />,
         href: "/settings",
+      },
+      {
+        name: "Marketplaces",
+        icon: <Link2Icon />,
+        href: "/marketplaces",
       },
     ],
   },
