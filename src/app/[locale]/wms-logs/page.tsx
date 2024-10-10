@@ -459,7 +459,7 @@ const Page = () => {
           <DialogContent
             onPointerDownOutside={(e) => e.preventDefault()}
             hideCloseButton
-            className="min-w-[520px] h-full p-2"
+            className="min-w-[720px] h-full p-2 "
           >
             <DialogHeader className="m-0 p-0">
               {currentUser && (
@@ -468,22 +468,22 @@ const Page = () => {
                   isTrial={currentUser?.isTrial}
                 />
               )}
-              <DialogDescription className="py-4 px-1">
+              <DialogDescription className="py-4 px-1 max-h-[500px] overflow-scroll ">
                 <div>Quá trình đóng hàng đang được thực hiện</div>
                 {/* display line items */}
+                <div className="flex">
+                  {SHOrder && currentUser && (
+                    <ScanLineItems
+                      shOrder={SHOrder}
+                      organization={currentUser.organization.id}
+                      handleComplete={handleRecordComplete}
+                    />
+                  )}
 
-                {SHOrder && currentUser && (
-                  <ScanLineItems
-                    shOrder={SHOrder}
-                    organization={currentUser.organization.id}
-                    handleComplete={handleRecordComplete}
-                  />
-                )}
-
-                {!SHOrder && transactions.length > 0 && (
-                  <TransactionTable transactions={transactions} />
-                )}
-
+                  {!SHOrder && transactions.length > 0 && (
+                    <TransactionTable transactions={transactions} />
+                  )}
+                </div>
                 {barcode && <PackingInstruction barcode={barcode} />}
 
                 {/* timer */}

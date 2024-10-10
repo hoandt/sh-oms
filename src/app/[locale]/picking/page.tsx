@@ -1,14 +1,16 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { createLogs, deleteLogs, getLogs, updateLogs } from "@/services";
-import { WMSLog } from "@/types/todo";
+import { WMSLog, WMSPromotion, WMSPromotions } from "@/types/todo";
 
 import { DURATION_TOAST } from "@/lib/config";
 import { useToast } from "@/components/ui/use-toast";
 
 import PickingBarcodeScanner from "./components/PickingBarcodeScanner";
+import { getPromotions } from "@/services/getPromotions";
+import Promotion from "./components/Promotion";
 
 const Page = () => {
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
@@ -18,25 +20,30 @@ const Page = () => {
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
   const [log, setLog] = useState<VideosLog[]>([]);
   const [transactions, setTransactions] = useState<WMSLog[]>([]);
+  const [promotions, setPromotions] = useState<WMSPromotion[]>([]);
 
-  const mutateUpdateLog = useMutation({
-    mutationFn: ({ id, videoUrl }: { id: number; videoUrl: string }) => {
-      return updateLogs({ id, videoUrl });
-    },
-    onSuccess: (data: any) => {
-      // Handle success if needed
-    },
-  });
+  const [prevOrgId, setPrevOrgId] = useState("");
 
   useEffect(() => {
-    //focus on barcode scanner input
+    // Focus on barcode scanner input
     setIsBarcodeFocused(true);
+
     if (session.data) {
       const user = session.data.userWithRole as UserWithRole;
-
       setCurrentUser(user);
+
+      // Check if the organization ID has changed
+      if (prevOrgId !== user.organization.id.toString()) {
+        setPrevOrgId(user.organization.id.toString()); // Update the previous organization ID
+
+        getPromotions({
+          organization: user.organization.id.toString(),
+        }).then((data) => {
+          setPromotions(data.data[0].attributes.promotion);
+        });
+      }
     }
-  }, [session]);
+  }, [session, prevOrgId]);
 
   const mutateTransaction = useMutation({
     mutationFn: (logs: any) => {
@@ -46,25 +53,6 @@ const Page = () => {
       const newData = (data.data as any).data as VideosLog;
 
       setLog((prev) => [newData, ...prev]);
-    },
-  });
-
-  const mutateDeleteTransaction = useMutation({
-    mutationFn: (id: number) => {
-      return deleteLogs({ id });
-    },
-    onSuccess: (data: any) => {
-      const returnData = (data.data as any).data;
-      const newData = log.filter((e) => e.id !== returnData.id);
-
-      toast({
-        duration: DURATION_TOAST,
-        title: "Đã xóa",
-        description: `Giao dịch ${JSON.stringify(
-          data.data.data.attributes.transaction
-        )} đã được xóa!`,
-      });
-      setLog(newData);
     },
   });
 
@@ -103,8 +91,8 @@ const Page = () => {
             <h1 className="text-2xl text-slate-600 flex font-bold ">
               Nhặt hàng
             </h1>
-            <div className="my-2">
-              <PickingBarcodeScanner />
+            <div className="my-2 flex gap-5">
+              <PickingBarcodeScanner promotions={promotions} />
             </div>
             {/* make a button inline */}
             {/* View all transaction button  */}

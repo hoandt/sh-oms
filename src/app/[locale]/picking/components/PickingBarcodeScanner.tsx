@@ -13,14 +13,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { WMSPromotion } from "@/types/todo";
 const orderIdScan = z.object({
   orderID: z
     .string({ required_error: "Vui lòng nhập mã đơn nhập" })
     .min(1, { message: "Vui lòng nhập mã đơn nhập" }),
 });
 
-const PickingBarcodeScanner = () => {
+const PickingBarcodeScanner = ({
+  promotions,
+}: {
+  promotions: WMSPromotion[];
+}) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [skus, setSkus] = React.useState<string[]>([]);
   const [orderId, setOrderId] = React.useState<string>("");
   const { data } = useGetOutboundDetailBySapo({
     id: orderId,
@@ -88,6 +94,18 @@ const PickingBarcodeScanner = () => {
 
       <div className="mt-2">
         <div>
+          {/* red if not fulfilled */}
+          {data?.order.fulfillments.length ? (
+            <span className=" text-green-500 bg-green-50  text-lg">
+              {/* get service_name in fulfillment */}
+              {data?.order.fulfillments[0].shipment.service_name} -{" "}
+              {data?.order.fulfillments[0].shipment.tracking_code}
+            </span>
+          ) : (
+            <span className=" text-red-500 bg-red-50 px-2">Not Fulfilled</span>
+          )}
+        </div>
+        <div className="flex gap-2">
           <div>Order ID: {data?.order.reference_number}</div>
           <div>Channel: {data?.order.channel}</div>
           <div>
@@ -102,27 +120,14 @@ const PickingBarcodeScanner = () => {
             )}
           </div>
         </div>
-        <div>
-          {/* check order fulfillment */}
-          <div>
-            <div>
-              {/* red if not fulfilled */}
-              {data?.order.fulfillments.length ? (
-                <span className=" text-green-500 bg-green-50  text-lg">
-                  {/* get service_name in fulfillment */}
-                  {data?.order.fulfillments[0].shipment.service_name} -{" "}
-                  {data?.order.fulfillments[0].shipment.tracking_code}
-                </span>
-              ) : (
-                <span className=" text-red-500 bg-red-50 px-2">
-                  Not Fulfilled
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
+
       {data?.order.order_line_items.map((item) => {
+        //check if item.sku is in promotions
+        const isPromotion = promotions.find(
+          (promotion) => promotion.sku === item.sku
+        );
+
         return (
           <div>
             {item.composite_item_domains.length ? (
@@ -130,18 +135,27 @@ const PickingBarcodeScanner = () => {
             ) : (
               <div className="border rounded bg-slate-50">
                 {/* display name, sku, barcode, qty to pick (style table) */}
-                <div className="flex justify-between items-center p-2">
-                  <div>
-                    {item.product_name}
-
-                    <div>{item.sku}</div>
-                    <div>{item.barcode}</div>
-                  </div>
-
+                <div className="flex  gap-2 items-center p-2">
                   <div className="font-bold text-2xl bg-white px-2 ">
                     {item.quantity}
                   </div>
+                  <div>
+                    {item.product_name}
+
+                    <div>
+                      {item.sku} | Barcode: {item.barcode}
+                    </div>
+                  </div>
                 </div>
+              </div>
+            )}
+            {isPromotion && (
+              <div className="bg-blue-200 text-blue-700 p-3 flex gap-2">
+                {/* add pulsing effect */}
+                <span className="animate-pulse px-2 font-bold bg-yellow-300 text-yellow-700 rounded-sm">
+                  PROMOTION
+                </span>
+                {isPromotion.sku} tặng {isPromotion.promotion}
               </div>
             )}
           </div>

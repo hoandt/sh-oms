@@ -700,6 +700,23 @@ export interface WMSLog {
     action?: "download" | "preview";
   };
 }
+export interface WMSPromotions {
+  id: number | string;
+  attributes: {
+    name: string;
+
+    active: boolean;
+    organization: string;
+    expired: string;
+    promotion: WMSPromotion[];
+  };
+}
+export interface WMSPromotion {
+  sku: string;
+  channel: string;
+  promotion: string;
+  validUntil: string;
+}
 export interface SHOrder {
   id: number | string;
   attributes: {
@@ -1349,4 +1366,107 @@ export type HaravanLineItem = {
       src: string;
     };
   };
+};
+const samplePromotion = {
+  id: 1,
+  attributes: {
+    promotion: [
+      {
+        sku: "C0061000609",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "00620",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C61060984004",
+        channel: "all",
+        promotion: "00616",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C84009841000620",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C610609620",
+        channel: "all",
+        promotion: "SC610609620",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C8405584056",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "00608",
+        channel: "all",
+        promotion: "SC0061000609",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C0060800608",
+        channel: "all",
+        promotion: "SC610609620",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C8400984010",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C8400484004",
+        channel: "all",
+        promotion: 84004,
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "00607",
+        channel: "all",
+        promotion: "LUOC02",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C0060700607",
+        channel: "all",
+        promotion: "SC0061000609",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C0062000620",
+        channel: "all",
+        promotion: "SC0061000609",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C0060700608",
+        channel: "all",
+        promotion: "SC610609620",
+        validUntil: "11/10/2024 23:59",
+      },
+      {
+        sku: "C0060700620",
+        channel: "all",
+        promotion: "SC610609620",
+        validUntil: "11/10/2024 23:59",
+      },
+    ],
+    organization: "306",
+    active: true,
+    expired: "2024-10-11T16:59:00.000Z",
+    createdAt: "2024-10-09T18:10:03.327Z",
+    updatedAt: "2024-10-09T18:10:23.687Z",
+    publishedAt: "2024-10-09T18:10:23.685Z",
+  },
 };
