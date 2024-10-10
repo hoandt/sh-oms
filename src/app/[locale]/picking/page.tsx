@@ -10,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 import PickingBarcodeScanner from "./components/PickingBarcodeScanner";
 import { getPromotions } from "@/services/getPromotions";
-import Promotion from "./components/Promotion";
 
 const Page = () => {
   const [isBarcodeFocused, setIsBarcodeFocused] = useState<boolean>(false);
