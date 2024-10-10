@@ -45,6 +45,19 @@ function ScanBarcode({ shOrder, handleComplete, organization }: ScanProps) {
     });
   }, []);
 
+  //listen to "Enter  key press"  to handleComplete if isCompleted
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && isCompleted) {
+        handleComplete();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCompleted]);
+
   // Function to handle barcode scanning
   const handleScan = () => {
     const foundItem = shOrder.attributes.fulfillments.line_items.find(

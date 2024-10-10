@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WMSPromotion } from "@/types/todo";
+import { Badge } from "@/components/ui/badge";
+import { LocationSelect } from "./Location";
 const orderIdScan = z.object({
   orderID: z
     .string({ required_error: "Vui lòng nhập mã đơn nhập" })
@@ -133,14 +135,20 @@ const PickingBarcodeScanner = ({
             {item.composite_item_domains.length ? (
               <Composite compositeDomains={item.composite_item_domains} />
             ) : (
-              <div className="border rounded bg-slate-50">
+              <div className="border rounded bg-slate-50 flex">
                 {/* display name, sku, barcode, qty to pick (style table) */}
+                <div className="flex flex-col align-middle justify-center items-center px-4">
+                  <div className="text-lg">{item.quantity}</div>
+                </div>
+                {/* multiply */}
+                <div className="flex flex-col align-middle justify-center items-center mr-4">
+                  <div className="text-lg text-slate-400"> x</div>
+                </div>
+
                 <div className="flex  gap-2 items-center p-2">
-                  <div className="font-bold text-2xl bg-white px-2 ">
-                    {item.quantity}
-                  </div>
+                  <LocationSelect sku={item.sku} />
                   <div>
-                    {item.product_name}
+                    <span className="text-xs"> {item.product_name}</span>
 
                     <div>
                       {item.sku} | Barcode: {item.barcode}

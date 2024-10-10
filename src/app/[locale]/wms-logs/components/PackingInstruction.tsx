@@ -37,7 +37,9 @@ const useUserWithPromotions = (prevOrgId: any) => {
         setUpdatedOrgId(user.organization.id.toString());
         getPromotions({ organization: user.organization.id.toString() }).then(
           (data) => {
-            setPromotions(data.data[0].attributes.promotion);
+            if (data.data.length && data.data[0].attributes) {
+              setPromotions(data.data[0].attributes.promotion);
+            }
           }
         );
       }
@@ -105,7 +107,7 @@ const PackingInstruction = ({ barcode }: { barcode: string }) => {
                   {item.quantity}
                 </div>
                 <div>
-                  <div>{item.product_name}</div>
+                  <div className="text-xs">{item.product_name}</div>
                   <div>
                     {item.sku} | Barcode: {item.barcode}
                   </div>

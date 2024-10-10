@@ -2,6 +2,7 @@ import { getSystemInventoryDetailSapo } from "@/services";
 import { IIventorySapo } from "@/types/inventories";
 import { CompositeItemDomain } from "@/types/outbound";
 import React, { useEffect } from "react";
+import { LocationSelect } from "./Location";
 
 function Composite({
   compositeDomains,
@@ -91,10 +92,9 @@ function Composite({
                               <div className="text-lg text-slate-400"> x</div>
                             </div>
                             <div className="flex flex-col flex-1">
-                              <div className="text-sm font-bold">
-                                {variant?.name}
-                              </div>
-                              <div className="text-sm">{variant?.barcode}</div>
+                              <div className="text-xs ">{variant?.name}</div>
+                              <div className="text-sm">{variant?.sku}</div>
+                              <LocationSelect sku={variant?.sku!} />
                             </div>
                           </div>
                         );
