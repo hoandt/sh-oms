@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useGetOutboundDetailBySapo } from "@/query-keys/outbound";
-
 import { z } from "zod";
 import {
   Form,
@@ -17,113 +16,105 @@ import Composite from "../../picking/components/Composite";
 import { WMSLog, WMSPromotion } from "@/types/todo";
 import { useSession } from "next-auth/react";
 import { getPromotions } from "@/services/getPromotions";
+
 const orderIdScan = z.object({
   orderID: z
     .string({ required_error: "Vui lòng nhập mã đơn nhập" })
     .min(1, { message: "Vui lòng nhập mã đơn nhập" }),
 });
 
-const PackingInstruction = ({ barcode }: { barcode: string }) => {
-  //   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const { data } = useGetOutboundDetailBySapo({
-    id: barcode,
-  });
-
-  //   no data return null
-  if (!data) {
-    return null;
-  }
-  const [promotions, setPromotions] = useState<WMSPromotion[]>([]);
-  const [prevOrgId, setPrevOrgId] = useState("");
+const useUserWithPromotions = (prevOrgId: any) => {
   const session = useSession() as any;
+  const [promotions, setPromotions] = useState<WMSPromotion[]>([]);
   const [currentUser, setCurrentUser] = useState<UserWithRole>();
+  const [updatedOrgId, setUpdatedOrgId] = useState(prevOrgId);
+
   useEffect(() => {
     if (session.data) {
-      const user = session.data.userWithRole as UserWithRole;
+      const user = session.data.userWithRole as any;
       setCurrentUser(user);
-
-      // Check if the organization ID has changed
-      if (prevOrgId !== user.organization.id.toString()) {
-        setPrevOrgId(user.organization.id.toString()); // Update the previous organization ID
-
-        getPromotions({
-          organization: user.organization.id.toString(),
-        }).then((data) => {
-          setPromotions(data.data[0].attributes.promotion);
-        });
+      if (updatedOrgId !== user.organization.id.toString()) {
+        setUpdatedOrgId(user.organization.id.toString());
+        getPromotions({ organization: user.organization.id.toString() }).then(
+          (data) => {
+            setPromotions(data.data[0].attributes.promotion);
+          }
+        );
       }
     }
-  }, [session, prevOrgId]);
+  }, [session, updatedOrgId]);
+
+  return { currentUser, promotions };
+};
+
+const useOrderDetail = (barcode: string) => {
+  const { data } = useGetOutboundDetailBySapo({ id: barcode });
+  return data;
+};
+
+const PackingInstruction = ({ barcode }: { barcode: string }) => {
+  const data = useOrderDetail(barcode);
+  const { promotions, currentUser } = useUserWithPromotions("");
+
+  if (!data) return null;
 
   return (
     <div
-      className={data?.order.status === "cancelled" ? "bg-red-50" : "bg-white"}
+      className={data.order.status === "cancelled" ? "bg-red-50" : "bg-white"}
     >
       <div className="mt-2">
         <div>
-          <div>Order ID: {data?.order.reference_number}</div>
-          <div>Channel: {data?.order.channel}</div>
+          <div>Order ID: {data.order.reference_number}</div>
+          <div>Channel: {data.order.channel}</div>
           <div>
-            Status:
-            {/* red if cancelled */}
-            {data?.order.status === "cancelled" ? (
+            Status:{" "}
+            {data.order.status === "cancelled" ? (
               <span className="mx-2 text-red-500 bg-red-50 px-2">
-                {data?.order.status}
+                {data.order.status}
               </span>
             ) : (
-              <span>{data?.order.status}</span>
+              <span>{data.order.status}</span>
             )}
           </div>
         </div>
         <div>
-          {/* check order fulfillment */}
           <div>
-            <div>
-              {/* red if not fulfilled */}
-              {data?.order.fulfillments.length ? (
-                <span className=" text-green-500 bg-green-50  text-lg">
-                  {/* get service_name in fulfillment */}
-                  {data?.order.fulfillments[0].shipment.service_name} -{" "}
-                  {data?.order.fulfillments[0].shipment.tracking_code}
-                </span>
-              ) : (
-                <span className=" text-red-500 bg-red-50 px-2"></span>
-              )}
-            </div>
+            {data.order.fulfillments.length ? (
+              <span className="text-green-500 bg-green-50 text-lg">
+                {data.order.fulfillments[0].shipment.service_name} -{" "}
+                {data.order.fulfillments[0].shipment.tracking_code}
+              </span>
+            ) : (
+              <span className="text-red-500 bg-red-50 px-2">Not Fulfilled</span>
+            )}
           </div>
         </div>
       </div>
-      {data?.order.order_line_items.map((item) => {
-        //check if item.sku is in promotions
+      {data.order.order_line_items.map((item) => {
         const isPromotion = promotions.find(
           (promotion) => promotion.sku === item.sku
         );
 
         return (
-          <div>
+          <div key={item.sku} className="border rounded bg-slate-50">
             {item.composite_item_domains.length ? (
               <Composite compositeDomains={item.composite_item_domains} />
             ) : (
-              <div className="border rounded bg-slate-50">
-                {/* display name, sku, barcode, qty to pick (style table) */}
-                <div className="flex  gap-2 items-center p-2">
-                  <div className="font-bold text-2xl bg-white px-2 ">
-                    {item.quantity}
-                  </div>
+              <div className="flex gap-2 items-center p-2">
+                <div className="font-bold text-2xl bg-white px-2">
+                  {item.quantity}
+                </div>
+                <div>
+                  <div>{item.product_name}</div>
                   <div>
-                    {item.product_name}
-
-                    <div>
-                      {item.sku} | Barcode: {item.barcode}
-                    </div>
+                    {item.sku} | Barcode: {item.barcode}
                   </div>
                 </div>
               </div>
             )}
             {isPromotion && (
-              <div className="bg-blue-200 text-blue-700 p-3 flex gap-2">
-                {/* add pulsing effect */}
-                <span className="animate-pulse px-2 font-bold bg-yellow-300 text-yellow-700 rounded-sm">
+              <div className="bg-blue-200 text-blue-700 p-3 flex gap-2 animate-pulse">
+                <span className="px-2 font-bold bg-yellow-300 text-yellow-700 rounded-sm">
                   PROMOTION
                 </span>
                 {isPromotion.sku} tặng {isPromotion.promotion}
