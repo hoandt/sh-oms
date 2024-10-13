@@ -8,21 +8,9 @@ export const inventoryQueryKeys = {
     pageParam?: number;
     code?: string;
   }) => ["get-inventories", pageParam, code],
-  getInventoriesSapo: ({
-    page,
-    keyword,
-    created_on_max,
-    created_on_min,
-    brand_ids,
-    category_ids,
-  }: IGetInventorySapo) => [
+  getInventoriesSapo: (payload: IGetInventorySapo) => [
     "get-inventories-sapo",
-    page,
-    keyword,
-    created_on_max,
-    created_on_min,
-    brand_ids,
-    category_ids,
+    { ...payload },
   ],
   getInventoryDetailSapo: ({ id }: { id?: string }) => [
     "get-inventory-detail-sapo",

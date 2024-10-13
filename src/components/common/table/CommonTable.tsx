@@ -197,6 +197,7 @@ export function CommonTable<TData, TValue>({
     <div className="space-y-4 h-full">
       {extraActionTable && (
         <CommonNewToolbar
+          setPagination={setPagination}
           filterComponent={filterComponent || <></>}
           rows={extraActionTable}
           onCallbackSelection={(type) => {

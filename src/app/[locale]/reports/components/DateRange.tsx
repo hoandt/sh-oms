@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format, getUnixTime, parseISO } from "date-fns";
+import {
+  addDays,
+  format,
+  getUnixTime,
+  parseISO,
+  startOfDay,
+  subDays,
+} from "date-fns";
 import { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -17,7 +24,27 @@ import { z } from "zod";
 import { useQueryParams } from "@/hooks/useQueryParams";
 
 function convertToUnixTimestamp(dateString: string): number {
-  return getUnixTime(parseISO(dateString));
+  if (dateString) {
+    return getUnixTime(parseISO(dateString));
+  }
+}
+
+function getPresetRange(option: string): DateRange | undefined {
+  const today = startOfDay(new Date());
+
+  switch (option) {
+    case "Today":
+      return { from: today, to: today };
+    case "Yesterday":
+      const yesterday = subDays(today, 1);
+      return { from: yesterday, to: yesterday };
+    case "Last 7 Days":
+      return { from: subDays(today, 7), to: today };
+    case "Last 30 Days":
+      return { from: subDays(today, 30), to: today };
+    default:
+      return undefined;
+  }
 }
 
 export function DatePickerWithRange({
@@ -27,22 +54,48 @@ export function DatePickerWithRange({
     from: z.number().nullish(),
     to: z.number().nullish(),
   });
+  const defaultRange = getPresetRange("Last 7 Days");
 
   const { setQueryParams } = useQueryParams({
     schema,
     defaultValues: {
-      from: null,
-      to: null,
+      from: convertToUnixTimestamp(defaultRange.from?.toISOString() || ""),
+      to: convertToUnixTimestamp(defaultRange.to?.toISOString() || ""),
     },
   });
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
-  });
+  // Set the default date range to "Last 7 Days"
+
+  const [date, setDate] = React.useState<DateRange | undefined>(defaultRange);
+  const [activePreset, setActivePreset] = React.useState<string | null>(
+    "Last 7 Days"
+  );
+
+  const handlePresetSelect = (option: string) => {
+    const selectedRange = getPresetRange(option);
+    if (selectedRange) {
+      setQueryParams({
+        from: convertToUnixTimestamp(selectedRange.from?.toISOString() || ""),
+        to: convertToUnixTimestamp(selectedRange.to?.toISOString() || ""),
+      });
+      setDate(selectedRange);
+      setActivePreset(option); // Set the active preset when user selects
+    }
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
+      <div className="flex gap-2 mb-2">
+        {["Today", "Yesterday", "Last 7 Days", "Last 30 Days"].map((option) => (
+          <Button
+            key={option}
+            variant={activePreset === option ? "secondary" : "outline"}
+            onClick={() => handlePresetSelect(option)}
+          >
+            {option}
+          </Button>
+        ))}
+      </div>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -75,12 +128,14 @@ export function DatePickerWithRange({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(value) => {
+              console.log({ first: value?.to });
               setQueryParams({
                 from: convertToUnixTimestamp(value?.from?.toISOString()),
                 to: convertToUnixTimestamp(value?.to?.toISOString()),
               });
 
               setDate(value);
+              setActivePreset(null); // Clear active preset when manually selecting a date
             }}
             numberOfMonths={2}
           />

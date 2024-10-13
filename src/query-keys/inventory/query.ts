@@ -34,34 +34,11 @@ export interface IGetInventorySapo {
   category_ids?: string;
 }
 
-export const useGetInventoriesBySapo = ({
-  keyword,
-  page,
-  pageSize,
-  created_on_max,
-  created_on_min,
-  brand_ids,
-  category_ids,
-}: IGetInventorySapo) => {
+export const useGetInventoriesBySapo = (payload: IGetInventorySapo) => {
   const query = useQuery({
-    queryKey: inventoryQueryKeys.getInventoriesSapo({
-      page,
-      keyword,
-      created_on_max,
-      created_on_min,
-      brand_ids,
-      category_ids,
-    }),
+    queryKey: inventoryQueryKeys.getInventoriesSapo(payload),
     queryFn: () =>
-      getSystemInventoriesSapo({
-        page,
-        pageSize,
-        keyword,
-        created_on_max,
-        created_on_min,
-        brand_ids,
-        category_ids,
-      }),
+      getSystemInventoriesSapo(payload),
   });
   return query;
 };

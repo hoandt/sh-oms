@@ -51,8 +51,6 @@ const Page = () => {
     created_on_min,
   });
 
-  // const { data: locations } = useGetLocationBySapo();
-
   const columns = useMemo(() => {
     return [
       {

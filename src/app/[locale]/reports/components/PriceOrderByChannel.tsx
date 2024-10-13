@@ -33,6 +33,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+enum TAB {
+  VALUE = "Value",
+  ORDER = "Order",
+}
+
 export function PriceOrderByChannel() {
   const { data: session } = useSession() as any;
   const marketplaceIds =
@@ -93,24 +98,24 @@ export function PriceOrderByChannel() {
 
       <CardContent className="flex-1 pb-0 w-full">
         <Tabs
-          defaultValue="account"
+          defaultValue={TAB.VALUE}
           className="w-full rounded flex flex-col gap-6"
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger
-              value="account"
+              value={TAB.VALUE}
               className="py-2 text-center data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-500"
             >
               Tổng giá trị
             </TabsTrigger>
             <TabsTrigger
-              value="password"
+              value={TAB.ORDER}
               className="py-2 text-center data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-500"
             >
               Đơn hàng
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="account">
+          <TabsContent value={TAB.VALUE}>
             <ChartContainer
               config={chartConfig}
               className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
@@ -125,8 +130,22 @@ export function PriceOrderByChannel() {
                 />
               </PieChart>
             </ChartContainer>
+
+            <div className="flex flex-row gap-3 p-3 flex-wrap">
+              {data?.map((e, index) => {
+                return (
+                  <PlatformCard
+                    key={index}
+                    platform={e.channel_name}
+                    value={e.total.toString()}
+                    color="black"
+                    bgColor="bg-blue-100"
+                  />
+                );
+              })}
+            </div>
           </TabsContent>
-          <TabsContent value="password">
+          <TabsContent value={TAB.ORDER}>
             <ChartContainer
               config={chartConfig}
               className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
@@ -141,21 +160,22 @@ export function PriceOrderByChannel() {
                 />
               </PieChart>
             </ChartContainer>
+
+            <div className="flex flex-row gap-3 p-3 flex-wrap">
+              {data?.map((e, index) => {
+                return (
+                  <PlatformCard
+                    key={index}
+                    platform={e.channel_name}
+                    value={e.quantity.toString()}
+                    color="black"
+                    bgColor="bg-blue-100"
+                  />
+                );
+              })}
+            </div>
           </TabsContent>
         </Tabs>
-        <div className="flex flex-row gap-3 p-3 flex-wrap">
-          {data?.map((e, index) => {
-            return (
-              <PlatformCard
-                key={index}
-                platform={e.channel_name}
-                value={e.quantity.toString()}
-                color="black"
-                bgColor="bg-blue-100"
-              />
-            );
-          })}
-        </div>
       </CardContent>
     </Card>
   );

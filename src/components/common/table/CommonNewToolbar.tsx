@@ -17,29 +17,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { RowSelectionState } from "@tanstack/react-table";
+import {
+  OnChangeFn,
+  PaginationState,
+  RowSelectionState,
+} from "@tanstack/react-table";
 import { XIcon } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { SavedFilterSheet } from "./SavedFilterSheet";
 import { Option } from "@/types/common";
 import qs from "qs";
 import { useFilterStore } from "@/lib/store";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Combobox } from "../custom/Combobox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -47,11 +36,11 @@ import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/components/ui/use-toast";
 import { DURATION_TOAST } from "@/lib/config";
 import { useQueryClient } from "@tanstack/react-query";
-// import { mappingFilterDynamic } from "@/lib/utils";
-// import { capitalizeFirstLetter } from "@/lib/helpers";
+
 import { format, parseISO } from "date-fns";
 import { inventoryQueryKeys } from "@/query-keys";
 import { IBrandsSapo, ICategorySapo } from "@/types/inventories";
+import { PAGE_SIZE_TABLE } from "@/lib/helpers";
 
 export interface DataTableSearchableColumn<TData> {
   id: keyof TData;
@@ -75,6 +64,7 @@ interface DataTableToolbarProps<TData> {
   rowSelection: RowSelectionState;
   onCallbackSelection(type: TypeDropdown): void;
   filterComponent: React.ReactNode;
+  setPagination?: OnChangeFn<PaginationState>;
 }
 
 export const schema = z.object({
@@ -96,51 +86,11 @@ const SavedFilterComponent = () => {
   const [type, setType] = useState(TypeFilter["NEW"]);
   const { filter, addFilter, updateFilter } = useFilterStore();
   const specificFilter = filter.filter((e) => e.page.includes(pathname))[0];
-  const dataOptionsFilter = specificFilter?.data.map((e) => {
-    return {
-      label: e.name,
-      value: e.id,
-    };
-  });
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {},
   });
-
-  function onSubmit(values: z.infer<typeof schema>) {
-    const params = new URLSearchParams(searchParams);
-    params.delete("q");
-    params.delete("status");
-
-    if (type === TypeFilter["NEW"]) {
-      addFilter({
-        page: pathname,
-        data: [
-          {
-            id: uuidv4(),
-            name: values.name || "Default",
-            value: params.toString(),
-          },
-        ],
-      });
-    }
-
-    if (type === TypeFilter["EXIST"]) {
-      updateFilter({
-        page: pathname,
-        id: values.selectedFilterId,
-        value: params.toString(),
-      });
-    }
-
-    toast({
-      duration: DURATION_TOAST,
-      title: "Scheduled: Catch up",
-      description: "Friday, February 10, 2023 at 5:57 PM",
-    });
-    return setOpen(false);
-  }
 
   return <></>;
 };
@@ -220,6 +170,7 @@ export function CommonNewToolbar<TData>({
   onCallbackSelection,
   rowSelection,
   rows,
+  setPagination,
 }: DataTableToolbarProps<TData>) {
   const inputRef = useRef<any>(null);
   const router = useRouter();
@@ -241,6 +192,10 @@ export function CommonNewToolbar<TData>({
       params.delete("q");
     }
 
+    setPagination({
+      pageIndex: 0,
+      pageSize: PAGE_SIZE_TABLE,
+    });
     router.replace(`${pathname}?${params.toString()}`);
   }
 
