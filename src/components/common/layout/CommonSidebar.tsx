@@ -7,13 +7,24 @@ import {
 import { cn } from "@/lib/utils";
 import { useSidebarContext } from "@/provider/SidebarProvider";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeftIcon, ArrowRightIcon, Boxes, RepeatIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  Boxes,
+  LayoutDashboard,
+  RepeatIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 const router = [
   {
     title: "",
     route: [
+      {
+        name: "Dashborad",
+        icon: <LayoutDashboard />,
+        href: "/",
+      },
       {
         name: "Inventory",
         icon: <Boxes />,
@@ -28,11 +39,6 @@ const router = [
         name: "Outbound",
         icon: <ArrowLeftIcon />,
         href: "/outbound",
-      },
-      {
-        name: "Reports",
-        icon: <RepeatIcon />,
-        href: "/reports",
       },
     ],
   },

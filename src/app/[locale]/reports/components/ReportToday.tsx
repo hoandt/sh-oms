@@ -7,6 +7,7 @@ import { LucideIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { z } from "zod";
+import { PriceOrderByChannel } from "./PriceOrderByChannel";
 
 interface ReportCardProps {
   icon: LucideIcon;
@@ -72,17 +73,22 @@ const QuickReport: React.FC = () => {
   });
 
   return (
-    <div className="flex gap-4">
-      <ReportCard
-        icon={DollarSign}
-        value={formatNumberWithCommas(data?.total) || 0}
-        label="Tổng giá trị"
-      />
-      <ReportCard
-        icon={Package}
-        value={formatNumberWithCommas(data?.quantity) || 0}
-        label="Đơn hàng"
-      />
+    <div className=" ">
+      {/* title */}
+      <h3 className="text-lg font-bold my-2 text-slate-500">Báo cáo nhanh</h3>
+      <div className="flex gap-4">
+        {/* cards */}
+        <ReportCard
+          icon={DollarSign}
+          value={formatNumberWithCommas(data?.total) || 0}
+          label="Tổng giá trị"
+        />
+        <ReportCard
+          icon={Package}
+          value={formatNumberWithCommas(data?.quantity) || 0}
+          label="Đơn hàng"
+        />
+      </div>
     </div>
   );
 };
@@ -115,7 +121,9 @@ const ToDoList: React.FC = () => {
 
   return (
     <div className="mt-4">
-      <h3 className="text-lg font-bold">Danh sách cần làm</h3>
+      <h3 className="text-lg font-bold my-2 text-slate-500">
+        Danh sách cần làm
+      </h3>
       <div className="grid grid-cols-2 gap-4 mt-2">
         {tasks.map((task, index) => (
           <ToDoItemCard key={index} value={task.value} label={task.title} />
@@ -129,6 +137,7 @@ const ReportToday: React.FC = () => {
   return (
     <Card className="w-full">
       <CardContent className="p-6 space-y-4">
+        <PriceOrderByChannel />
         <QuickReport />
         <ToDoList />
       </CardContent>

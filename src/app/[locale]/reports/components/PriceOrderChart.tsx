@@ -97,13 +97,13 @@ export function PriceOrderChart() {
           change={""}
         />
         <StatCard
-          title="Đơn hàng"
-          value={String(totalOrder)}
+          title="Tổng đơn hàng"
+          value={`${String(totalOrder)} đơn`}
           percentageChange={totalOrderRatio}
           change={""}
         />
         <StatCard
-          title="Tổng giá trị đơn"
+          title="Tổng giá trị / đơn"
           value={String(totalAverage)}
           percentageChange={totalAverageRatio}
           change={""}

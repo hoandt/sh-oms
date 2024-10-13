@@ -7,7 +7,7 @@ import Overview from "./components/Overview";
 import BestSeller from "./components/BestSeller";
 import { DatePickerWithRange } from "./components/DateRange";
 
-const Page = () => {
+const ReportPage = () => {
   return (
     <div className="flex flex-col gap-2 p-4">
       <DatePickerWithRange className="w-[300px]" />
@@ -16,7 +16,6 @@ const Page = () => {
         <ReportToday />
       </div>
       <div className="flex flex-row gap-2">
-        <PriceOrderByChannel />
         <Overview />
       </div>
       <div className="flex flex-row gap-2">
@@ -26,4 +25,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ReportPage;

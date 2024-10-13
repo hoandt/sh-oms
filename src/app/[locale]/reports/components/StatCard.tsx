@@ -24,8 +24,8 @@ export function StatCard({
           <i className="fas fa-info-circle"></i> {/* Info icon */}
         </span>
       </CardHeader>
-      <CardContent className="p-2 flex justify-between items-center">
-        <div className="text-xl font-semibold">{value} đ</div>
+      <CardContent className=" flex justify-between items-center">
+        <div className="text-xl font-semibold">{value}</div>
         <div
           className={`flex items-center text-sm ${
             isPositive ? "text-green-500" : "text-red-500"

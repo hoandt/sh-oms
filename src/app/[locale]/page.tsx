@@ -2,6 +2,7 @@ import auth from "@/auth";
 import { Card } from "@/components/ui/card";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import ReportPage from "./reports/page";
 const checkSubcription = async (userId: number) => {
   return userId;
 };
@@ -44,6 +45,7 @@ export default async function IndexPage() {
           </a>
         </Card>
       </div>
+      <ReportPage />
     </>
   );
 }
