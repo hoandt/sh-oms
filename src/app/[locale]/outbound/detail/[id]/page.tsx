@@ -134,6 +134,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 } `}
               </p>
             </div>
+
             {/* <div>
               <p>
                 <span className="font-bold">City: </span>
@@ -148,6 +149,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                 {data?.data?.customer_ward}
               </p>
             </div> */}
+          </div>
+          <div className="flex flex-row gap-2 items-center text-sm">
+            <h2 className="font-bold">Note</h2>
+            <span>{data?.data?.note}</span>
           </div>
         </CardContent>
         <CardContent className="space-y-2 p-4 py-2">

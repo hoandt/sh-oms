@@ -71,20 +71,27 @@ const Page = () => {
           return <div>{sku}</div>;
         },
       },
-      // {
-      //   accessorKey: "on_hand",
-      //   header: () => <div className="">{"On Hand"}</div>,
-      //   cell: ({ row }) => {
-      //     //reduce total inventory available
-      //     const onHand = row.original.inventories?.reduce(
-      //       (acc, cur) => acc + cur.on_hand,
-      //       0
-      //     );
-      //     return <div>{onHand}</div>;
-      //   },
-      //   enableSorting: false,
-      //   enableHiding: false,
-      // },
+      {
+        accessorKey: "on_hand",
+        header: () => <div className="">{"On Hand"}</div>,
+        cell: ({ row }) => {
+          //reduce total inventory available
+          const onHand = row.original.inventories?.reduce(
+            (acc, cur) => acc + cur.on_hand,
+            0
+          );
+          return (
+            <div>
+              {
+                // comma separated number
+                onHand?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+            </div>
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
 
       {
         accessorKey: "available",
@@ -95,7 +102,11 @@ const Page = () => {
             (acc, cur) => acc + cur.available,
             0
           );
-          return <div>{available}</div>;
+          return (
+            <div>
+              {available?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </div>
+          );
         },
         enableSorting: false,
         enableHiding: false,

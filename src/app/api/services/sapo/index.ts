@@ -181,18 +181,7 @@ export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
 
   const saleChannel = path.split("&")[3].split("=")[1];
 
-  const marketplaces = [
-    "tiktok",
-    "shopee",
-    "lazada",
-    "tiki",
-    "sendo",
-    "shopify",
-    "all",
-    "motherswork",
-    "wholesales",
-    "offline",
-  ];
+  const marketplaces = [""];
 
   const sellers = sellerId.split(",");
 
@@ -226,8 +215,8 @@ export const fetchOutboundsSapo = async (path: string, sellerId: string) => {
     tags = sellerId;
   }
 
-  //url encode tags
-  tags = encodeURIComponent(tags);
+  //replace space with %20
+  tags = tags.replace(/\s/g, "+");
 
   const response = await fetch(
     `https://swifthub2.mysapogo.com/admin/orders.json${path}&tags=${tags}`,
