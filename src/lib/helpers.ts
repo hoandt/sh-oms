@@ -63,3 +63,10 @@ export function formatCurrency(amount: string | number) {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return `${formattedAmount}`;
 }
+
+export function formatNumberWithCommas(amount: number): string {
+  return amount?.toLocaleString('en-US', {
+    minimumFractionDigits: 0, // No decimal places
+    maximumFractionDigits: 0 // No decimal places
+  });
+}

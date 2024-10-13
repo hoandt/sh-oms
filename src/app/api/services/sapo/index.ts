@@ -10,6 +10,21 @@ const fetchCookies = async () => {
   return response.text();
 };
 
+const fetchTokenForMarketPlaces = async () => {
+  const response = await fetch(
+    "https://ext-api.swifthub.net/marketplace-token.json",
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+
+  return response.text();
+};
+
 //crete a functionn to fetch data from the api
 export const fetchInventoriesSapo = async (path: string, sellerId: string) => {
   //default path: ?page=1&pageSize=15&query=&created_on_min=&created_on_max=&brand_ids=
@@ -48,6 +63,7 @@ export const fetchInventorySapo = async (path: string) => {
 
   return response.json();
 };
+
 export const fetchVariantInventorySapo = async (path: string) => {
   const cookie = await fetchCookies();
 
@@ -253,6 +269,136 @@ export const fetchOutboundDetailSapo = async (id: string) => {
       headers: {
         accept: "application/json, text/plain, */*",
         cookie,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+const TOKEN_MARKET =
+  "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzd2lmdGh1YjIiLCJleHAiOjE3Mjg4ODEwNzYsImlhdCI6MTcyODc5NDY3Nn0.v4505aHFcbN1bQ97WYcHie7lj_Ns1jTYLSuUZVHwxpQ";
+const TOKEN_ACCOUNT_ID = "MTA4NTI2OQ==";
+
+export interface ICommon {
+  marketplaceIds: string;
+  from?: number | string;
+  to?: number | string;
+}
+
+export const fetchAnalyticsOrdersToday = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/orders/today?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&zone=Asia/Saigon`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+
+  return response.json();
+};
+
+export const fetchBestSellerProducts = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/products?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&sortField=revenue&sortType=up&limit=4`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+export const fetchDeliveryServicesProviders = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/api/delivery-service-providers`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+export const fetchPriceOrderByChannel = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/orders/type?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=2,3,4,5,7,8,9&zone=Asia/Saigon`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+export const fetchOverviewChannel = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/orders/connection?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=2,3,4,5,7,8,9&zone=Asia/Saigon`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+export const fetchRevenueOrders = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/orders/revenue?ids=${payload.marketplaceIds}&group=day&from=${payload.from}&to=${payload.to}&statuses=0,1,2,3,4,5,6,7,8,9&zone=Asia/Saigon`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
+      },
+      body: null,
+      method: "GET",
+    }
+  );
+  return response.json();
+};
+
+export const fetchRevenueChannel = async (payload: ICommon) => {
+  const response = await fetch(
+    `https://market-place.sapoapps.vn/analytics/orders/type?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=0,1,2,3,4,5,6,7,8,9&zone=Asia/Saigon`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        authorization: TOKEN_MARKET,
+        "x-market-token": TOKEN_MARKET,
+        "x-market-account-id": TOKEN_ACCOUNT_ID,
       },
       body: null,
       method: "GET",
