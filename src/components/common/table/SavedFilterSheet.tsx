@@ -61,7 +61,7 @@ export function SavedFilterSheet() {
                   value={selectedFilter}
                   className="flex flex-col gap-5"
                 >
-                  {specificFilter?.data.map((e, index) => {
+                  {specificFilter?.data?.map((e, index) => {
                     return (
                       <div key={index} className="flex items-center">
                         <div className="w-full flex items-center gap-2">
