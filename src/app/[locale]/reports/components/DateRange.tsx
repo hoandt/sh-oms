@@ -1,14 +1,9 @@
 "use client";
 
 import * as React from "react";
-import {
-  addDays,
-  format,
-  getUnixTime,
-  parseISO,
-  startOfDay,
-  subDays,
-} from "date-fns";
+import { format, getUnixTime, parseISO, startOfDay, subDays } from "date-fns";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -65,11 +60,28 @@ export function DatePickerWithRange({
   });
 
   // Set the default date range to "Last 7 Days"
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [date, setDate] = React.useState<DateRange | undefined>(defaultRange);
   const [activePreset, setActivePreset] = React.useState<string | null>(
     "Last 7 Days"
   );
+  //useEffect to handle the query params defaultRange
+  React.useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+    const from = convertToUnixTimestamp(defaultRange.from?.toISOString() || "");
+    const to = convertToUnixTimestamp(defaultRange.to?.toISOString() || "");
+    console.log(from, to);
+
+    const search = "?" + current.toString();
+    console.log(search);
+
+    const query = search ? `${search}` : "";
+
+    router.push(`${pathname}${query}`);
+  }, []);
 
   const handlePresetSelect = (option: string) => {
     const selectedRange = getPresetRange(option);

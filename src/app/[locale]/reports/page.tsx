@@ -1,12 +1,10 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { PriceOrderChart } from "./components/PriceOrderChart";
 import ReportToday from "./components/ReportToday";
-import { PriceOrderByChannel } from "./components/PriceOrderByChannel";
 import Overview from "./components/Overview";
 import BestSeller from "./components/BestSeller";
 import { DatePickerWithRange } from "./components/DateRange";
-
 const ReportPage = () => {
   return (
     <div className="flex flex-col gap-2 p-4">
