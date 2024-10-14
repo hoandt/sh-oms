@@ -16,6 +16,8 @@ export default async function IndexPage() {
   return (
     <>
       {/* display me 2 cards, show PACKING and VIEW actions */}
+
+      <ReportPage />
       <div className="flex px-4 w-full py-4 gap-4">
         <Card className="w-full  p-6 hover:bg-slate-50">
           <a href="/inventory" className="   rounded-lg p-4">
@@ -45,7 +47,6 @@ export default async function IndexPage() {
           </a>
         </Card>
       </div>
-      <ReportPage />
     </>
   );
 }
