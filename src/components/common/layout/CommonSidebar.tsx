@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeftSquare,
   ArrowRightSquare,
+  BarChart,
   BoxIcon,
   FileText,
   HandIcon,
@@ -27,6 +28,11 @@ const router = [
   {
     title: "CAM",
     route: [
+      {
+        name: "Dashboard",
+        icon: <BarChart />,
+        href: "/",
+      },
       {
         name: "Inbound",
         icon: <ArrowRightSquare />,
