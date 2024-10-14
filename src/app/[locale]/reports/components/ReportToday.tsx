@@ -30,6 +30,13 @@ const ReportCard: React.FC<ReportCardProps> = ({
   value,
   label,
 }) => {
+  //convert value to M if it's over 1M
+  const valueNumber = Number(`${value}`.replace(/[^0-9.-]+/g, ""));
+
+  if (valueNumber > 1000000) {
+    value = (valueNumber / 1000000).toFixed(1) + "M";
+  }
+
   return (
     <Card className="flex-1">
       <CardContent className="pt-6 flex items-center justify-between">
