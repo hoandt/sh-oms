@@ -1,12 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { useQueryParams } from "@/hooks/useQueryParams";
 import { formatNumberWithCommas } from "@/lib/helpers";
 import { useGetReportOrderToday } from "@/query-keys/reports";
 import { DollarSign, Package } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { z } from "zod";
 import { PriceOrderByChannel } from "./PriceOrderByChannel";
 
 interface ReportCardProps {

@@ -22,7 +22,9 @@ const fetchTokenForMarketPlaces = async () => {
     }
   );
 
-  return response.text();
+  const tokenRes = await response.json();
+  const token = tokenRes.token.token;
+  return token;
 };
 
 //crete a functionn to fetch data from the api
@@ -266,8 +268,6 @@ export const fetchOutboundDetailSapo = async (id: string) => {
   return response.json();
 };
 
-const TOKEN_MARKET =
-  "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzd2lmdGh1YjIiLCJleHAiOjE3Mjg4ODEwNzYsImlhdCI6MTcyODc5NDY3Nn0.v4505aHFcbN1bQ97WYcHie7lj_Ns1jTYLSuUZVHwxpQ";
 const TOKEN_ACCOUNT_ID = "MTA4NTI2OQ==";
 
 export interface ICommon {
@@ -277,6 +277,7 @@ export interface ICommon {
 }
 
 export const fetchAnalyticsOrdersToday = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/orders/today?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&zone=Asia/Saigon`,
     {
@@ -295,6 +296,8 @@ export const fetchAnalyticsOrdersToday = async (payload: ICommon) => {
 };
 
 export const fetchBestSellerProducts = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/products?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&sortField=revenue&sortType=up&limit=4`,
     {
@@ -308,10 +311,13 @@ export const fetchBestSellerProducts = async (payload: ICommon) => {
       method: "GET",
     }
   );
+  console.log({ response: await response.text() });
   return response.json();
 };
 
 export const fetchDeliveryServicesProviders = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/api/delivery-service-providers`,
     {
@@ -329,6 +335,8 @@ export const fetchDeliveryServicesProviders = async (payload: ICommon) => {
 };
 
 export const fetchPriceOrderByChannel = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/orders/type?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=2,3,4,5,7,8,9&zone=Asia/Saigon`,
     {
@@ -346,6 +354,8 @@ export const fetchPriceOrderByChannel = async (payload: ICommon) => {
 };
 
 export const fetchOverviewChannel = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/orders/connection?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=2,3,4,5,7,8,9&zone=Asia/Saigon`,
     {
@@ -363,6 +373,8 @@ export const fetchOverviewChannel = async (payload: ICommon) => {
 };
 
 export const fetchRevenueOrders = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/orders/revenue?ids=${payload.marketplaceIds}&group=day&from=${payload.from}&to=${payload.to}&statuses=0,1,2,3,4,5,6,7,8,9&zone=Asia/Saigon`,
     {
@@ -380,6 +392,8 @@ export const fetchRevenueOrders = async (payload: ICommon) => {
 };
 
 export const fetchRevenueChannel = async (payload: ICommon) => {
+  const TOKEN_MARKET = await fetchTokenForMarketPlaces();
+
   const response = await fetch(
     `https://market-place.sapoapps.vn/analytics/orders/type?ids=${payload.marketplaceIds}&from=${payload.from}&to=${payload.to}&statuses=0,1,2,3,4,5,6,7,8,9&zone=Asia/Saigon`,
     {
