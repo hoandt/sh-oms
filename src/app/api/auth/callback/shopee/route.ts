@@ -68,9 +68,13 @@ export async function GET(request: NextRequest, response: NextResponse) {
     };
     const log = await createStore(storePayload);
 
-    return NextResponse.redirect(new URL("/marketplaces", request.url));
+    return NextResponse.redirect(
+      new URL("https://swh.swifthub.net/en/marketplaces", request.url)
+    );
   } catch (error) {
-    return NextResponse.redirect(new URL("/marketplaces", request.url));
+    return NextResponse.redirect(
+      new URL("https://swh.swifthub.net/en/marketplaces", request.url)
+    );
   }
 }
 
